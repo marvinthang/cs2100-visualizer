@@ -18,8 +18,6 @@ export const mipsMnemonics: MipsMnemonic[] = [
     'srl',
     'sw',
     'sub',
-    'xor',
-    'xori'
 ];
 
 export const datapathMnemonics: DatapathMnemonic[] = [

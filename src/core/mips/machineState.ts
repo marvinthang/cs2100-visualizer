@@ -7,6 +7,21 @@ export type MachineState = {
 }
 
 const RegisterNames: RegisterNumber[] = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31];
+export const DEFAULT_DATA_MEMORY_START_ADDRESS = 0;
+export const DEFAULT_DATA_MEMORY_WORD_COUNT = 16;
+
+export function createZeroedDataMemory(
+    startAddress = DEFAULT_DATA_MEMORY_START_ADDRESS,
+    wordCount = DEFAULT_DATA_MEMORY_WORD_COUNT,
+): Record<number, number> {
+    const dataMemory: Record<number, number> = {};
+
+    for (let i = 0; i < wordCount; i++) {
+        dataMemory[startAddress + i * 4] = 0;
+    }
+
+    return dataMemory;
+}
 
 export function createInitialMachineState(): MachineState {
     // assign 0 to all registers, and 0 to all memory addresses
@@ -14,13 +29,10 @@ export function createInitialMachineState(): MachineState {
         RegisterNames.map((reg) => [reg, 0])
     ) as Record<RegisterNumber, number>;
     
-    const dataMemory: Record<number, number> = {
-    };
-    
     return {
         pc: 0,
         registers,
-        dataMemory
+        dataMemory: createZeroedDataMemory(),
     };
 }
 

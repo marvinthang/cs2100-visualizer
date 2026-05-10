@@ -62,8 +62,8 @@ export default function RegisterTable({
     }, [machine.registers]);
 
     const pcRole = machineHighlight.pc ?? 'normal';
-    const pcTextClass = getHighlightTextClass(pcRole);
-    const pcBgClass = getHighlightBackgroundClass(pcRole);
+    const pcTextClass = getHighlightTextClass(pcRole, 'text-slate-700');
+    const pcBgClass = getHighlightBackgroundClass(pcRole, 'bg-slate-100');
 
     return (
         <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
@@ -83,7 +83,7 @@ export default function RegisterTable({
                 </div>
             </div>
 
-            <div className="max-h-80 overflow-auto">
+            <div className="max-h-[450px] overflow-auto">
                 <table className="w-full text-sm">
                     <thead className="sticky top-0 bg-white">
                         <tr className="border-b border-slate-200 text-left text-xs text-slate-500">

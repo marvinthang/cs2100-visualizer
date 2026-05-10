@@ -93,7 +93,7 @@ export default function MemoryTable({
                         Apply
                     </button>
             </div>
-            <div className="max-h-80 overflow-auto">
+            <div className="max-h-[400px] overflow-auto">
                 <table className="w-full text-sm">
                     <thead className="sticky top-0 bg-white">
                         <tr className="border-b border-slate-200 text-left text-xs text-slate-500">

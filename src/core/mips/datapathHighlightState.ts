@@ -59,7 +59,7 @@ export function getHighlightSvgFill(role: HighlightRole, normalColor = 'black'):
     return normalColor;
 }
 
-export function getHighlightTextClass(role: HighlightRole): string {
+export function getHighlightTextClass(role: HighlightRole, normalText = 'text-slate-900'): string {
     if (role === 'input') {
         return 'text-blue-600';
     }
@@ -72,10 +72,10 @@ export function getHighlightTextClass(role: HighlightRole): string {
         return 'text-yellow-600';
     }
 
-    return 'text-slate-900';
+    return normalText;
 }
 
-export function getHighlightBackgroundClass(role: HighlightRole): string {
+export function getHighlightBackgroundClass(role: HighlightRole, normalBg = ''): string {
     if (role === 'input') {
         return 'bg-blue-50';
     }
@@ -92,5 +92,5 @@ export function getHighlightBackgroundClass(role: HighlightRole): string {
         return 'bg-yellow-50';
     }
 
-    return '';
+    return normalBg;
 }

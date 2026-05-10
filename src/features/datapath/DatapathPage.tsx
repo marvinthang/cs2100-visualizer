@@ -12,7 +12,7 @@ import { getActiveDatapathSegments } from '../../core/mips/datapathSegments';
 import StepControls from './components/StepControls';
 import RegisterTable from './components/RegisterTable';
 import MemoryTable from './components/MemoryTable';
-import { createInitialMachineState, type MachineState } from '../../core/mips/machineState';
+import { createInitialMachineState, createZeroedDataMemory, type MachineState } from '../../core/mips/machineState';
 import { type ExecutionContext, createEmptyExecutionContext } from '../../core/mips/executionContext';
 import { datapathInstructionExamples } from '../../core/mips/datapathInstructionExamples';
 import { datapathStages, getCurrentStage, getNextStageIndex, isLastStage } from '../../core/mips/datapathStages';
@@ -136,10 +136,18 @@ export default function DatapathPage() {
     }
 
     function handleResetMemory() {
-        setMachine((machine) => ({
-            ...machine,
-            dataMemory: {},
-        }) as MachineState);
+        setMachine((machine) => {
+            const addresses = Object.keys(machine.dataMemory).map(Number);
+            const dataMemory: Record<number, number> =
+                addresses.length > 0
+                    ? Object.fromEntries(addresses.map((address) => [address, 0]))
+                    : createZeroedDataMemory();
+
+            return {
+                ...machine,
+                dataMemory,
+            };
+        });
 
         resetAllState();
     }
@@ -217,7 +225,6 @@ export default function DatapathPage() {
     }
 
     const defaultSignals = getDatapathControlSignals(mnemonic);
-    const isModified = JSON.stringify(signals) !== JSON.stringify(defaultSignals);
 
     const basePaths = getActiveDatapathBasePaths(mnemonic);
 
