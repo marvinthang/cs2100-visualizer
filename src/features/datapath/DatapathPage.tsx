@@ -18,6 +18,10 @@ import { datapathInstructionExamples } from '../../core/mips/datapathInstruction
 import { datapathStages, getCurrentStage, getNextStageIndex, isLastStage } from '../../core/mips/datapathStages';
 import executeDatapathStep from '../../core/mips/executeDatapathStep';
 import datapathStepPaths from '../../core/mips/datapathStepPaths';
+import DatapathValueTable from './components/DatapathValueTable';
+import instructionEncode from '../../core/mips/instructionEncode';
+import datapathHighlightState from '../../core/mips/datapathHighlightState';
+import machineStateHighlights from '../../core/mips/machineStateHighlights';
 
 type StepSnapshot = {
     machine: MachineState;
@@ -48,13 +52,25 @@ export default function DatapathPage() {
     const [snapshots, setSnapshots] = useState<StepSnapshot[]>([]);
 
     const instruction = datapathInstructionExamples[mnemonic];
+    const bits = instructionEncode(instruction);
     const currentStage = getCurrentStage(stepIndex);
-    
+
+    function resetAllState() {
+        setCurrentContext(createEmptyExecutionContext());
+        setDefaultContext(createEmptyExecutionContext());
+        setStepIndex(null);
+        setWarnings([]);
+        setSnapshots([]);
+    }
+
+    function handleSignalsChange(newSignals: ControlSignals) {
+        setSignals(newSignals);
+        resetAllState();
+    }
+        
     useEffect(() => {
         setSignals(getDatapathControlSignals(mnemonic));
-        setStepIndex(null);
-        setCurrentContext(createEmptyExecutionContext());
-        setWarnings([]);
+        resetAllState();
     }, [mnemonic]);
 
     void currentContext;
@@ -74,8 +90,7 @@ export default function DatapathPage() {
             };
         });
 
-        setSnapshots([]);
-        setStepIndex(null);
+        resetAllState();
     }
 
     function handleMemoryChange(address: number, value: number) {
@@ -87,8 +102,7 @@ export default function DatapathPage() {
             },
         }));
 
-        setSnapshots([]);
-        setStepIndex(null);
+        resetAllState();
     }
 
     function handleMemoryRangeChange(startAddress: number, wordCount: number) {
@@ -109,8 +123,7 @@ export default function DatapathPage() {
             };
         });
 
-        setSnapshots([]);
-        setStepIndex(null);
+        resetAllState();
     }
 
     function handleResetRegisters() {
@@ -119,8 +132,7 @@ export default function DatapathPage() {
             registers: {},
         }) as MachineState);
 
-        setSnapshots([]);
-        setStepIndex(null);
+        resetAllState();
     }
 
     function handleResetMemory() {
@@ -129,8 +141,7 @@ export default function DatapathPage() {
             dataMemory: {},
         }) as MachineState);
 
-        setSnapshots([]);
-        setStepIndex(null);
+        resetAllState();
     }
 
     function handlePreviousStep() {
@@ -246,14 +257,25 @@ export default function DatapathPage() {
     const currentActiveSegments = getActiveDatapathSegments(currentVisiblePaths);
     const modifiedActiveSegments = getActiveDatapathSegments(modifiedPaths);
 
+    const datapathHighlight = datapathHighlightState(
+        currentStage,
+        signals,
+        defaultSignals,
+        currentContext,
+    );
+
+    const machineHighlight = machineStateHighlights(
+        currentStage,
+        signals,
+        currentContext,
+    )
+
     return (
         <main className="p-6">
-
+            <h1 className="text-2xl font-bold">MIPS Datapath Visualizer</h1>
+            
             <div className="mt-6 grid grid-cols-[320px_1fr] gap-6">
                 <section>
-                    <h1 className="text-2xl font-bold">MIPS Datapath Visualizer</h1>
-
-                    <p className="mt-2">Selected Instruction: {mnemonic}</p>
 
                     <InstructionSelector
                         mnemonics={datapathMnemonics}
@@ -261,22 +283,24 @@ export default function DatapathPage() {
                         onChange={setMnemonic}
                     />
 
-                    <p className="mt-3 text-sm font-medium">
-                        Mode:{' '}
-                        <span className={isModified ? 'text-orange-600' : 'text-green-600'}>
-                            {isModified ? 'Manual override' : 'Default control'}
-                        </span>
-                    </p>
-                    <ControlSignalTable
-                        signals={signals}
-                        defaultSignals={defaultSignals}
-                        onChange={setSignals}
-                        editable={isEditingSignals}
-                    />
+                    <div className="mt-4 flex items-center gap-2">
+                        <span className="text-sm font-medium text-slate-700">Mode</span>
+                        <select
+                            value={mode}
+                            onChange={(event) => setMode(event.target.value as 'explore' | 'simulate')}
+                            className="rounded-md border border-slate-200 px-2 py-1 text-sm"
+                        >
+                            <option value="explore">Explore</option>
+                            <option value="simulate">Simulate</option>
+                        </select>
+                    </div>
 
                     <button
                         type="button"
-                        onClick={() => setSignals(getDatapathControlSignals(mnemonic))}
+                        onClick={() => {
+                            setSignals(getDatapathControlSignals(mnemonic));
+                            resetAllState();
+                        }}
                         className="mt-4 rounded border px-3 py-2 text-sm font-medium"
                     >
                         Reset Control Signals
@@ -290,48 +314,55 @@ export default function DatapathPage() {
                         {isEditingSignals ? 'Lock signals' : 'Edit signals'}
                     </button>
 
+                    <ControlSignalTable
+                        signals={signals}
+                        defaultSignals={defaultSignals}
+                        onChange={handleSignalsChange}
+                        editable={isEditingSignals}
+                        datapathHighlight={datapathHighlight}
+                    />
+
                     <StepControls
                         stage={currentStage}
-                        isFirstStage={history.length === 0}
+                        isFirstStage={snapshots.length === 0}
                         isLastStage={isLastStage(stepIndex)}
                         onPreviousStep={handlePreviousStep}
                         onNextStep={handleNextStep}
                         onResetStep={handleResetStep}
                     />
-                    <div className="mt-4 flex items-center gap-2">
-                        <span className="text-sm font-medium text-slate-700">Mode</span>
-                        <select
-                            value={mode}
-                            onChange={(event) => setMode(event.target.value as 'explore' | 'simulate')}
-                            className="rounded-md border border-slate-200 px-2 py-1 text-sm"
-                        >
-                            <option value="explore">Explore</option>
-                            <option value="simulate">Simulate</option>
-                        </select>
-                    </div>
-
-                    <RegisterTable 
-                        machine={machine} 
-                        onRegisterChange={handleRegisterChange}
-                        onResetRegisters={handleResetRegisters}
-                    />
-                    <MemoryTable 
-                        machine={machine}
-                        onMemoryChange={handleMemoryChange}
-                        onMemoryRangeChange={handleMemoryRangeChange}
-                        onResetMemory={handleResetMemory}
-                    />
                 </section>
 
                 <section className="overflow-auto">
                     <DatapathDiagram 
+                        bits={bits}
                         defaultActiveSegments={defaultActiveSegments}
                         currentActiveSegments={currentActiveSegments}
                         modifiedActiveSegments={modifiedActiveSegments}
                         defaultSignals={defaultSignals}
                         signals={signals}
+                        datapathHighlight={datapathHighlight}
                     />
                 </section>
+            </div>
+
+            <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+                <DatapathValueTable
+                    context={currentContext}
+                    datapathHighlight={datapathHighlight}
+                />
+                <RegisterTable 
+                    machine={machine} 
+                    onRegisterChange={handleRegisterChange}
+                    onResetRegisters={handleResetRegisters}
+                    machineHighlight={machineHighlight}
+                />
+                <MemoryTable 
+                    machine={machine}
+                    onMemoryChange={handleMemoryChange}
+                    onMemoryRangeChange={handleMemoryRangeChange}
+                    onResetMemory={handleResetMemory}
+                    machineHighlight={machineHighlight}
+                />
             </div>
         </main>
     );

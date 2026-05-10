@@ -37,11 +37,17 @@ export function writeRegister(state: MachineState, regNum: RegisterNumber, value
     return { ...state, registers };
 }
 
-export function readWord(state: MachineState, address: number): number {
-    return state.dataMemory[address] ?? 0;
+export function readWord(state: MachineState, address: number): number | undefined {
+    if (address % 4 !== 0) {
+        return undefined;
+    }
+    return state.dataMemory[address] ?? undefined;
 }
 
 export function writeWord(state: MachineState, address: number, value: number): MachineState {
+    if (address % 4 !== 0) {
+        return state;
+    }
     const dataMemory = { ...state.dataMemory, [address]: value };
     return { ...state, dataMemory };
 }

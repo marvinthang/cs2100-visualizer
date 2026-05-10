@@ -1,19 +1,25 @@
-import type { ControlSignals, DatapathSegment } from '../../../types/mips';
+import type { ControlHighlightId, ControlSignals, DatapathSegment, DatapathValueId, EncodedInstruction } from '../../../types/mips';
 
 export default function StaticDatapathSvg({
+    bits,
     signals,
     wireStroke,
     wireStrokeWidth,
     wireFill,
     wireArrow,
     signalFill,
+    muxFill,
+    valueFill,
 }: {
+    bits: EncodedInstruction;
     signals: ControlSignals;
     wireStroke: (id: DatapathSegment) => string;
     wireStrokeWidth: (id: DatapathSegment) => number;
     wireFill: (id: DatapathSegment) => string;
     wireArrow: (id: DatapathSegment) => string;
     signalFill: (signal: keyof ControlSignals) => string;
+    muxFill: (signal: ControlHighlightId) => string;
+    valueFill: (id: DatapathValueId) => string;
 }) {
     return (
         <svg
@@ -80,7 +86,7 @@ export default function StaticDatapathSvg({
                 strokeWidth={wireStrokeWidth('ADD4_TO_ADD4_JUNCTION')}
             />
             <text
-                fill="black"
+                fill={valueFill('ADD4')}
                 style={{
                     whiteSpace: 'pre',
                 }}
@@ -102,7 +108,7 @@ export default function StaticDatapathSvg({
                 strokeWidth={1.5}
             />
             <text
-                fill="black"
+                fill={valueFill('BRANCH_ADDER')}
                 style={{
                     whiteSpace: 'pre',
                 }}
@@ -127,7 +133,7 @@ export default function StaticDatapathSvg({
                 strokeWidth={1.3}
             />
             <text
-                fill="black"
+                fill={valueFill('PC')}
                 style={{
                     whiteSpace: 'pre',
                 }}
@@ -151,7 +157,7 @@ export default function StaticDatapathSvg({
                 strokeWidth={1.3}
             />
             <text
-                fill="black"
+                fill={valueFill('IM_ADDRESS')}
                 style={{
                     whiteSpace: 'pre',
                 }}
@@ -166,7 +172,7 @@ export default function StaticDatapathSvg({
                 </tspan>
             </text>
             <text
-                fill="black"
+                fill={valueFill('IM_INSTRUCTION')}
                 style={{
                     whiteSpace: 'pre',
                 }}
@@ -209,7 +215,7 @@ export default function StaticDatapathSvg({
                 strokeWidth={1.3}
             />
             <text
-                fill="black"
+                fill={valueFill('RF_WD')}
                 style={{
                     whiteSpace: 'pre',
                 }}
@@ -224,7 +230,7 @@ export default function StaticDatapathSvg({
                 </tspan>
             </text>
             <text
-                fill="black"
+                fill={valueFill('RF_RD2')}
                 style={{
                     whiteSpace: 'pre',
                 }}
@@ -239,7 +245,7 @@ export default function StaticDatapathSvg({
                 </tspan>
             </text>
             <text
-                fill="black"
+                fill={valueFill('RF_WR')}
                 style={{
                     whiteSpace: 'pre',
                 }}
@@ -254,7 +260,7 @@ export default function StaticDatapathSvg({
                 </tspan>
             </text>
             <text
-                fill="black"
+                fill={valueFill('RF_RR1')}
                 style={{
                     whiteSpace: 'pre',
                 }}
@@ -278,7 +284,7 @@ export default function StaticDatapathSvg({
                 strokeWidth={1.3}
             />
             <text
-                fill="black"
+                fill={valueFill('DM_WRITE_DATA')}
                 style={{
                     whiteSpace: 'pre',
                 }}
@@ -296,7 +302,7 @@ export default function StaticDatapathSvg({
                 </tspan>
             </text>
             <text
-                fill="black"
+                fill={valueFill('DM_ADDRESS')}
                 style={{
                     whiteSpace: 'pre',
                 }}
@@ -317,7 +323,7 @@ export default function StaticDatapathSvg({
                 strokeWidth={1.3}
             />
             <text
-                fill="black"
+                fill={valueFill('ALU_RESULT')}
                 style={{
                     whiteSpace: 'pre',
                 }}
@@ -335,7 +341,7 @@ export default function StaticDatapathSvg({
                 </tspan>
             </text>
             <text
-                fill="black"
+                fill={valueFill('ALU_ZERO')}
                 style={{
                     whiteSpace: 'pre',
                 }}
@@ -479,14 +485,15 @@ export default function StaticDatapathSvg({
                 style={{
                     whiteSpace: 'pre',
                 }}
+                textAnchor="middle"
                 xmlSpace="preserve"
                 fontFamily="Inter"
                 fontSize={15}
                 fontWeight="bold"
                 letterSpacing="0em"
             >
-                <tspan x={0.182129} y={14.4545}>
-                    {'00000'}
+                <tspan x={0.182129+26} y={14.4545}>
+                    {bits.rt}
                 </tspan>
             </text>
             <text
@@ -520,7 +527,7 @@ export default function StaticDatapathSvg({
                 strokeWidth={1.5}
             />
             <text
-                fill="black"
+                fill={valueFill('LEFT_SHIFT_2')}
                 style={{
                     whiteSpace: 'pre',
                 }}
@@ -544,7 +551,7 @@ export default function StaticDatapathSvg({
                 strokeWidth={1.5}
             />
             <text
-                fill="black"
+                fill={valueFill('SIGN_EXTEND')}
                 style={{
                     whiteSpace: 'pre',
                 }}
@@ -572,7 +579,7 @@ export default function StaticDatapathSvg({
                 strokeWidth={2}
             />
             <text
-                fill="black"
+                fill={muxFill('PCSrc')}
                 style={{
                     whiteSpace: 'pre',
                 }}
@@ -604,7 +611,7 @@ export default function StaticDatapathSvg({
                 strokeWidth={2}
             />
             <text
-                fill="black"
+                fill={muxFill('MemToReg')}
                 style={{
                     whiteSpace: 'pre',
                 }}
@@ -636,7 +643,7 @@ export default function StaticDatapathSvg({
                 strokeWidth={2}
             />
             <text
-                fill="black"
+                fill={muxFill('ALUSrc')}
                 style={{
                     whiteSpace: 'pre',
                 }}
@@ -668,7 +675,7 @@ export default function StaticDatapathSvg({
                 strokeWidth={2}
             />
             <text
-                fill="black"
+                fill={muxFill('RegDst')}
                 style={{
                     whiteSpace: 'pre',
                 }}
@@ -856,12 +863,13 @@ export default function StaticDatapathSvg({
                 }}
                 xmlSpace="preserve"
                 fontFamily="Inter"
+                textAnchor="middle"
                 fontSize={15}
                 fontWeight="bold"
                 letterSpacing="0em"
             >
-                <tspan x={0.0185547} y={14.4545}>
-                    {'000000'}
+                <tspan x={0.0185547+32} y={14.4545}>
+                    {bits.opcode}
                 </tspan>
             </text>
             <text
@@ -872,12 +880,13 @@ export default function StaticDatapathSvg({
                 }}
                 xmlSpace="preserve"
                 fontFamily="Inter"
+                textAnchor="middle"
                 fontSize={15}
                 fontWeight="bold"
                 letterSpacing="0em"
             >
-                <tspan x={0.182129} y={14.4545}>
-                    {'00000'}
+                <tspan x={0.182129+25} y={14.4545}>
+                    {bits.shamt}
                 </tspan>
             </text>
             <text
@@ -907,12 +916,13 @@ export default function StaticDatapathSvg({
                 }}
                 xmlSpace="preserve"
                 fontFamily="Inter"
+                textAnchor="middle"
                 fontSize={15}
                 fontWeight="bold"
                 letterSpacing="0em"
             >
-                <tspan x={0.0185547} y={14.4545}>
-                    {'000000'}
+                <tspan x={0.0185547+31} y={14.4545}>
+                    {bits.funct}
                 </tspan>
             </text>
             <text
@@ -921,14 +931,15 @@ export default function StaticDatapathSvg({
                 style={{
                     whiteSpace: 'pre',
                 }}
+                textAnchor="middle"
                 xmlSpace="preserve"
                 fontFamily="Inter"
                 fontSize={15}
                 fontWeight="bold"
                 letterSpacing="0em"
             >
-                <tspan x={5.18213} y={14.4545}>
-                    {'00000'}
+                <tspan x={5.18213+26} y={14.4545}>
+                    {bits.rd}
                 </tspan>
             </text>
             <text
@@ -975,14 +986,15 @@ export default function StaticDatapathSvg({
                 style={{
                     whiteSpace: 'pre',
                 }}
+                textAnchor="middle"
                 xmlSpace="preserve"
                 fontFamily="Inter"
                 fontSize={15}
                 fontWeight="bold"
                 letterSpacing="0em"
             >
-                <tspan x={0.182129} y={14.4545}>
-                    {'00000'}
+                <tspan x={0.182129+25} y={14.4545}>
+                    {bits.rs}
                 </tspan>
             </text>
             <text
@@ -1184,7 +1196,7 @@ export default function StaticDatapathSvg({
                 </tspan>
             </text>
             <text
-                fill="black"
+                fill={valueFill('RF_RR2')}
                 style={{
                     whiteSpace: 'pre',
                 }}
@@ -1199,7 +1211,7 @@ export default function StaticDatapathSvg({
                 </tspan>
             </text>
             <text
-                fill="black"
+                fill={valueFill('RF_RD1')}
                 style={{
                     whiteSpace: 'pre',
                 }}
@@ -1214,7 +1226,7 @@ export default function StaticDatapathSvg({
                 </tspan>
             </text>
             <text
-                fill="black"
+                fill={valueFill('DM_READ_DATA')}
                 style={{
                     whiteSpace: 'pre',
                 }}
@@ -1232,7 +1244,7 @@ export default function StaticDatapathSvg({
                 </tspan>
             </text>
             <text
-                fill="black"
+                fill={valueFill('IR_RS')}
                 style={{
                     whiteSpace: 'pre',
                 }}
@@ -1247,7 +1259,7 @@ export default function StaticDatapathSvg({
                 </tspan>
             </text>
             <text
-                fill="black"
+                fill={valueFill('IR_RD')}
                 style={{
                     whiteSpace: 'pre',
                 }}
@@ -1263,7 +1275,7 @@ export default function StaticDatapathSvg({
             </text>
             <text
                 transform="translate(128.058 325.204) rotate(-7)"
-                fill="black"
+                fill={valueFill('IR_RT')}
                 style={{
                     whiteSpace: 'pre',
                 }}
@@ -1278,7 +1290,7 @@ export default function StaticDatapathSvg({
                 </tspan>
             </text>
             <text
-                fill="black"
+                fill={valueFill('IR_IMMEDIATE')}
                 style={{
                     whiteSpace: 'pre',
                 }}

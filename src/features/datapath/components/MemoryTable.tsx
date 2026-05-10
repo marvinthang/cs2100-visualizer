@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 import type { MachineState } from '../../../core/mips/machineState';
+import type { MachineStateHighlightState } from '../../../types/mips';
+import { getHighlightBackgroundClass, getHighlightTextClass } from '../../../core/mips/datapathHighlightState';
 
 function makeDataMemoryDrafts(machine: MachineState): Record<number, string> {
     return Object.fromEntries(
@@ -12,11 +14,13 @@ export default function MemoryTable({
     onMemoryChange,
     onMemoryRangeChange,
     onResetMemory,
+    machineHighlight,
 }: { 
     machine: MachineState 
     onMemoryChange: (address: number, value: number) => void;
     onMemoryRangeChange: (startAddress: number, wordCount: number) => void;
     onResetMemory: () => void;
+    machineHighlight: MachineStateHighlightState;
 }) {
 
     const [startAddressInput, setStartAddressInput] = useState('0');
@@ -99,37 +103,42 @@ export default function MemoryTable({
                         </tr>
                     </thead>
                     <tbody>
-                        {memoryRows.map(({ address }) => (
-                            <tr key={address} className="border-b border-slate-100 font-mono">
-                                <td className="py-1.5 pr-2 text-slate-500">{address}</td>
-                                <td className="py-1.5 pr-2 text-slate-500">0x{Number(address).toString(16).toUpperCase().padStart(8, '0')}</td>
-                                <td className="py-1.5 text-right">
-                                    <input
-                                        type="number"
-                                        value={dataMemoryDrafts[address]}
-                                        onChange={(event) => 
-                                            setDataMemoryDrafts((drafts) => ({
-                                                ...drafts,
-                                                [address]: event.target.value,
-                                            }))
-                                        }
-                                        onBlur={() => {
-                                            const raw = dataMemoryDrafts[address];
-                                            const value = Number(raw);
-                                            if (raw.trim() === '' || Number.isNaN(value)) {
+                        {memoryRows.map(({ address }) => {
+                            const role = machineHighlight.memory[address] ?? 'normal';
+                            const textClass = getHighlightTextClass(role);
+                            const bgClass = getHighlightBackgroundClass(role);
+                            return (
+                                <tr key={address} className={`border-b border-slate-100 font-mono ${bgClass}`}>
+                                    <td className={`py-1.5 pr-2 ${textClass}`}>{address}</td>
+                                    <td className={`py-1.5 pr-2 ${textClass}`}>0x{Number(address).toString(16).toUpperCase().padStart(8, '0')}</td>
+                                    <td className={`py-1.5 text-right ${textClass}`}>
+                                        <input
+                                            type="number"
+                                            value={dataMemoryDrafts[address]}
+                                            onChange={(event) => 
                                                 setDataMemoryDrafts((drafts) => ({
                                                     ...drafts,
-                                                    [address]: String(machine.dataMemory[address] ?? 0),
-                                                }));
-                                                return;
+                                                    [address]: event.target.value,
+                                                }))
                                             }
-                                            onMemoryChange(address, value);
-                                        }}
-                                        className="w-24 rounded-md border border-slate-200 px-2 py-1 text-left text-slate-900"
-                                    />
-                                </td>
-                            </tr>
-                        ))}
+                                            onBlur={() => {
+                                                const raw = dataMemoryDrafts[address];
+                                                const value = Number(raw);
+                                                if (raw.trim() === '' || Number.isNaN(value)) {
+                                                    setDataMemoryDrafts((drafts) => ({
+                                                        ...drafts,
+                                                        [address]: String(machine.dataMemory[address] ?? 0),
+                                                    }));
+                                                    return;
+                                                }
+                                                onMemoryChange(address, value);
+                                            }}
+                                            className="w-24 rounded-md border border-slate-200 px-2 py-1 text-left text-slate-900"
+                                        />
+                                    </td>
+                                </tr>
+                            );
+                        })}
                     </tbody>
                 </table>
             </div>

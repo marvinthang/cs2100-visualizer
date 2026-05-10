@@ -1,4 +1,4 @@
-import type { ControlSignals } from "../../../types/mips";
+import type { ControlSignals, DatapathHighlightState } from "../../../types/mips";
 
 const controlSignalOptions: {
     [Signal in keyof ControlSignals]: readonly ControlSignals[Signal][];
@@ -19,11 +19,13 @@ export default function ControlSignalTable({
     defaultSignals,
     onChange,
     editable,
+    datapathHighlight,
 }: {
-    signals: ControlSignals
-    defaultSignals: ControlSignals
-    onChange: (signals: ControlSignals) => void
-    editable: boolean
+    signals: ControlSignals;
+    defaultSignals: ControlSignals;
+    onChange: (signals: ControlSignals) => void;
+    editable: boolean;
+    datapathHighlight: DatapathHighlightState;
 }) {
     function updateSignal<K extends keyof ControlSignals>(
         name: K,
@@ -36,13 +38,13 @@ export default function ControlSignalTable({
     }
 
     return (
-        <table className="mt-6 text-sm">
+        <table className="rounded w-full mt-6 text-sm">
             <thead className="bg-slate-100">
                 <tr>
                     <th className="border border-slate-300 px-4 py-2 text-left">
                         Signal
                     </th>
-                    <th className="border border-slate-300 px-4 py-2 text-left">
+                    <th className="border border-slate-300 px-4 py-2 text-center">
                         Value
                     </th>
                 </tr>
@@ -51,22 +53,22 @@ export default function ControlSignalTable({
             <tbody>
                 {(Object.entries(signals) as [keyof ControlSignals, ControlSignals[keyof ControlSignals]][]).map(([signal, value]) => {
                     const isModified = value !== defaultSignals[signal];
+                    const role = datapathHighlight.controls[signal];
+                    const bgClass = role === undefined ? (isModified ? 'bg-orange-100' : undefined) : 'bg-blue-100';
                     return (
                         <tr 
                             key={signal}
-                            className={isModified ? 'bg-orange-100' : undefined}
+                            className={`border border-slate-300 ${bgClass}`}
                         >
                             <td className="border border-slate-300 px-4 py-2 font-medium">
                                 {signal}
                             </td>
                             <td 
                                 className={
-                                    isModified
-                                        ? 'border border-slate-300 px-4 py-2 font-semibold text-red-600'
-                                        : 'border border-slate-300 px-4 py-2 text-green-600'
+                                    `border border-slate-300 px-4 py-2 font-semibold text-center ${isModified ? 'text-red-600' : 'text-green-600'}`
                                 }
                             >
-                                {editable ? (
+                                {editable && signal != 'ALUOp' ? (
                                     <select
                                         value={String(value)}
                                         onChange={(event) => {

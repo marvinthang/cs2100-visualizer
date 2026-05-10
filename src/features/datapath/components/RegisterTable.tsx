@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import type { MachineState } from '../../../core/mips/machineState';
-import type { RegisterNumber } from '../../../types/mips';
+import type { MachineStateHighlightState, RegisterNumber } from '../../../types/mips';
+import { getHighlightBackgroundClass, getHighlightTextClass } from '../../../core/mips/datapathHighlightState';
 
 const registerRows = [
     [0, '$zero'],
@@ -47,10 +48,12 @@ export default function RegisterTable({
     machine,
     onRegisterChange,
     onResetRegisters,
+    machineHighlight,
 }: { 
     machine: MachineState 
     onRegisterChange: (register: RegisterNumber, value: number) => void;
     onResetRegisters: () => void;
+    machineHighlight: MachineStateHighlightState;
 }) {
     const [registerDrafts, setRegisterDrafts] = useState<Record<RegisterNumber, string>>(() => makeRegisterDrafts(machine));
 
@@ -58,12 +61,16 @@ export default function RegisterTable({
         setRegisterDrafts(makeRegisterDrafts(machine));
     }, [machine.registers]);
 
+    const pcRole = machineHighlight.pc ?? 'normal';
+    const pcTextClass = getHighlightTextClass(pcRole);
+    const pcBgClass = getHighlightBackgroundClass(pcRole);
+
     return (
         <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
             <div className="mb-3 flex items-center justify-between">
                 <h2 className="text-sm font-semibold text-slate-900">Registers</h2>
                 <div className="flex items-center gap-2">
-                    <span className="rounded-md bg-slate-100 px-2 py-1 font-mono text-xs text-slate-700">
+                    <span className={`rounded-md ${pcBgClass} px-2 py-1 font-mono text-xs ${pcTextClass}`}>
                         PC = {machine.pc}
                     </span>
                     <button
@@ -86,43 +93,48 @@ export default function RegisterTable({
                         </tr>
                     </thead>
                     <tbody>
-                        {registerRows.map(([id, name]) => (
-                            <tr key={id} className="border-b border-slate-100 font-mono">
-                                <td className="py-1.5 pr-2 text-slate-500">${id}</td>
-                                <td className="py-1.5 pr-2 text-slate-700">{name}</td>
-                                <td className="py-1.5 text-right text-slate-900">
-                                    <input
-                                        type="number"
-                                        value={registerDrafts[id]}
-                                        disabled={id === 0}
-                                        onChange={(event) => 
-                                            setRegisterDrafts((drafts) => ({
-                                                ...drafts,
-                                                [id]: event.target.value,
-                                            }))
-                                        }
-                                        onBlur={() => {
-                                            const raw = registerDrafts[id];
-                                            const value = Number(raw);
-                                            if (raw.trim() === '' || Number.isNaN(value)) {
+                        {registerRows.map(([id, name]) => {
+                            const role = machineHighlight.registers[id] ?? 'normal';
+                            const textClass = getHighlightTextClass(role);
+                            const bgClass = getHighlightBackgroundClass(role);
+                            return (
+                                <tr key={id} className={`border-b border-slate-100 font-mono ${bgClass}`}>
+                                    <td className={`py-1.5 pr-2 text-slate-500 ${textClass}`}>{id}</td>
+                                    <td className={`py-1.5 pr-2 ${textClass}`}>{name}</td>
+                                    <td className={`py-1.5 text-right ${textClass}`}>
+                                        <input
+                                            type="number"
+                                            value={registerDrafts[id]}
+                                            disabled={id === 0}
+                                            onChange={(event) => 
                                                 setRegisterDrafts((drafts) => ({
                                                     ...drafts,
-                                                    [id]: String(machine.registers[id] ?? 0),
-                                                }));
-                                                return;
+                                                    [id]: event.target.value,
+                                                }))
                                             }
-                                            onRegisterChange(id, value)
-                                        }}
-                                        onKeyDown={(event) => {
-                                            if (event.key === 'Enter') {
-                                                event.currentTarget.blur();
-                                            }
-                                        }}
-                                        className="w-24 rounded-md border border-slate-200 px-2 py-1 text-right text-slate-900 disabled:bg-slate-100 disabled:text-slate-400"
-                                    />
-                                </td>
-                            </tr>
-                        ))}
+                                            onBlur={() => {
+                                                const raw = registerDrafts[id];
+                                                const value = Number(raw);
+                                                if (raw.trim() === '' || Number.isNaN(value)) {
+                                                    setRegisterDrafts((drafts) => ({
+                                                        ...drafts,
+                                                        [id]: String(machine.registers[id] ?? 0),
+                                                    }));
+                                                    return;
+                                                }
+                                                onRegisterChange(id, value)
+                                            }}
+                                            onKeyDown={(event) => {
+                                                if (event.key === 'Enter') {
+                                                    event.currentTarget.blur();
+                                                }
+                                            }}
+                                            className="w-24 rounded-md border border-slate-200 px-2 py-1 text-right text-slate-900 disabled:bg-slate-100 disabled:text-slate-400"
+                                        />
+                                    </td>
+                                </tr>
+                        );
+                        })}
                     </tbody>
                 </table>
             </div>

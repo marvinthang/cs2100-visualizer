@@ -8,16 +8,14 @@ export type MipsMnemonic =
     | 'j'
     | 'lui'
     | 'lw'
-    | 'nor'
     | 'or'
     | 'ori'
+    | 'nor'
     | 'slt'
     | 'sll'
     | 'srl'
     | 'sw'
-    | 'sub'
-    | 'xor'
-    | 'xori';
+    | 'sub';
 
 export type DatapathMnemonic =
     | 'add'
@@ -29,7 +27,7 @@ export type DatapathMnemonic =
     | 'slt'
     | 'or'
     | 'sw'
-    | 'sub'
+    | 'sub';
 
 export type ControlSignals = {
     RegDst: 0 | 1 | 'X';
@@ -41,7 +39,7 @@ export type ControlSignals = {
     Branch: 0 | 1;
     BranchNE: 0 | 1;
     ALUOp: '00' | '01' | '10';
-}
+};
 
 export type DatapathPath =
     // --- Instruction Fetch ---
@@ -216,8 +214,72 @@ export type InstructionFields<TMnemonic extends MipsMnemonic> = {
     shamt?: number;
     funct?: number;
     label?: string;
-}
+    address?: number;
+};
 
 export type MipsInstructionFields = InstructionFields<MipsMnemonic>;
 
 export type DatapathInstructionFields = InstructionFields<DatapathMnemonic>;
+
+export type EncodedInstruction = {
+    opcode: string;
+    rs: string;
+    rt: string;
+    rd: string;
+    shamt: string;
+    funct: string;
+    immediate: string;
+    address: string;
+    full: string;
+    hex: string;
+};
+
+export type DatapathValueId =
+    | 'PC'
+    | 'ADD4'
+    | 'BRANCH_ADDER'
+    | 'SIGN_EXTEND'
+    | 'LEFT_SHIFT_2'
+    | 'IM_ADDRESS'
+    | 'IM_INSTRUCTION'
+    | 'IR_OPCODE'
+    | 'IR_RS'
+    | 'IR_RT'
+    | 'IR_RD'
+    | 'IR_SHAMT'
+    | 'IR_FUNCT'
+    | 'IR_IMMEDIATE'
+    | 'RF_RR1'
+    | 'RF_RR2'
+    | 'RF_WR'
+    | 'RF_RD1'
+    | 'RF_RD2'
+    | 'RF_WD'
+    | 'ALU_OP1'
+    | 'ALU_OP2'
+    | 'ALU_RESULT'
+    | 'ALU_ZERO'
+    | 'DM_ADDRESS'
+    | 'DM_WRITE_DATA'
+    | 'DM_READ_DATA';
+
+export type ControlHighlightId = keyof ControlSignals | 'PCSrc';
+
+export type DatapathStepValueHighlights = {
+    inputs: DatapathValueId[];
+    outputs: DatapathValueId[];
+    controls: ControlHighlightId[];
+};
+
+export type HighlightRole = 'normal' | 'input' | 'output' | 'control' | 'modified';
+
+export type DatapathHighlightState = {
+    values: Partial<Record<DatapathValueId, HighlightRole>>;
+    controls: Partial<Record<ControlHighlightId, HighlightRole>>;
+};
+
+export type MachineStateHighlightState = {
+    registers: Partial<Record<RegisterNumber, HighlightRole>>;
+    memory: Partial<Record<number, HighlightRole>>;
+    pc?: HighlightRole;
+}

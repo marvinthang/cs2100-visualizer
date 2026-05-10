@@ -1,18 +1,23 @@
-import type { ControlSignals, DatapathSegment } from '../../../types/mips';
+import type { ControlHighlightId, ControlSignals, DatapathHighlightState, DatapathSegment, DatapathValueId, EncodedInstruction } from '../../../types/mips';
 import StaticDatapathSvg from './StaticDatapathSvg';
+import { getHighlightSvgFill } from '../../../core/mips/datapathHighlightState';
 
 export default function DatapathDiagram({
+    bits,
     defaultActiveSegments,
     currentActiveSegments,
     modifiedActiveSegments,
     defaultSignals,
     signals,
+    datapathHighlight,
 }: {
+    bits: EncodedInstruction;
     defaultActiveSegments: readonly DatapathSegment[];
     currentActiveSegments: readonly DatapathSegment[];
     modifiedActiveSegments: readonly DatapathSegment[];
     defaultSignals: ControlSignals;
     signals: ControlSignals;
+    datapathHighlight: DatapathHighlightState;
 }) {
     const isModified = (id: DatapathSegment) => modifiedActiveSegments.includes(id);
     const isDefault = (id: DatapathSegment) => defaultActiveSegments.includes(id) && !isModified(id);
@@ -23,13 +28,18 @@ export default function DatapathDiagram({
     const wireFill = (id: DatapathSegment) => isCurrent(id) ? isDefault(id) ? '#FF0000' : '#facc15' : 'black';
     const wireArrow = (id: DatapathSegment) => isCurrent(id) ? isDefault(id) ? 'url(#arrow-red)' : 'url(#arrow-yellow)' : 'url(#arrow-black)';
     const signalFill = (signal: keyof ControlSignals) => signals[signal] === defaultSignals[signal] ? '#2C1AF4' : '#ea580c';
+    const muxFill = (signal: ControlHighlightId) => getHighlightSvgFill(datapathHighlight.controls[signal] ?? 'normal');
+    const valueFill = (id: DatapathValueId) => getHighlightSvgFill(datapathHighlight.values[id] ?? 'normal');
 
     return <StaticDatapathSvg 
+        bits={bits}
         signals={signals}
         wireStroke={wireStroke}
         wireStrokeWidth={wireStrokeWidth}
         wireFill={wireFill}
         wireArrow={wireArrow}
         signalFill={signalFill}
+        muxFill={muxFill}
+        valueFill={valueFill}
     />;
 }

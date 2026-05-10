@@ -87,21 +87,25 @@ export default function executeDatapathStep(
         };
     } else if (stage == 'ID') {
         const RegDst = getBitSignal(signals, 'RegDst', warnings);
-        const regData1 = readRegister(machineState, instruction.rs);
-        const regData2 = readRegister(machineState, instruction.rt);
+        const readReg1 = instruction.rs;
+        const readReg2 = instruction.rt;
+        const readData1 = readRegister(machineState, readReg1);
+        const readData2 = readRegister(machineState, readReg2);
         const writeReg = RegDst === undefined ? undefined : (RegDst === 0 ? instruction.rt : instruction.rd);
         newContext = {
             ...context,
             instruction,
-            regData1,
-            regData2,
-            writeRegister: writeReg,
+            readReg1,
+            readReg2,
+            readData1,
+            readData2,
+            writeReg: writeReg,
             immediate: instruction.immediate,
         };
     } else if (stage == 'EX') {
         const aluSrc = getBitSignal(signals, 'ALUSrc', warnings);
-        const aluOp1 = context.regData1;
-        const aluOp2 = aluSrc === undefined ? undefined : (aluSrc === 0 ? context.regData2 : context.immediate);
+        const aluOp1 = context.readData1;
+        const aluOp2 = aluSrc === undefined ? undefined : (aluSrc === 0 ? context.readData2 : context.immediate);
         const op = getALUOperation(instruction, signals, warnings);
 
         const aluResult = op !== undefined && aluOp2 !== undefined && aluOp1 !== undefined? computeALUResult(op, aluOp1, aluOp2) : undefined;
@@ -121,23 +125,40 @@ export default function executeDatapathStep(
         const memRead = getBitSignal(signals, 'MemRead', warnings);
         const memWrite = getBitSignal(signals, 'MemWrite', warnings);
 
-        const address = context.aluResult;
+        const memAddress = context.aluResult;
+        const memWriteData = context.readData2;
+        newContext = {
+            ...context,
+            memAddress,
+            memWriteData,
+        };
+
         if (memRead === 1 && memWrite === 1) {
             warnings.push('Cannot read and write memory at the same time');
             return {
                 machineState,
-                executionContext: context,
+                executionContext: newContext,
                 warnings
             };
         }
-        if (memRead === 1 && address !== undefined) {
+        if (memRead === 1 && memAddress !== undefined) {
+            if (memAddress % 4 !== 0) {
+                warnings.push(`Memory address ${memAddress} is not word-aligned`);
+            }
             newContext = {
-                ...context,
-                memReadData: readWord(machineState, address),
+                ...newContext,
+                memReadData: readWord(machineState, memAddress),
+                memWriteData: context.readData2,
             };
         }
-        if (memWrite === 1 && address !== undefined && context.regData2 !== undefined && shouldCommit) {
-            newMachineState = writeWord(machineState, address, context.regData2);
+        if (memWrite === 1 && memAddress !== undefined) {
+            if (memAddress % 4 !== 0) {
+                warnings.push(`Memory address ${memAddress} is not word-aligned`);
+            }
+
+        }
+        if (memWrite === 1 && memAddress !== undefined && context.readData2 !== undefined && shouldCommit) {
+            newMachineState = writeWord(machineState, memAddress, context.readData2);
         }
 
         const branch = getBitSignal(signals, 'Branch', warnings);
@@ -147,7 +168,7 @@ export default function executeDatapathStep(
             warnings.push('Branch control signals are not fully defined');
             return {
                 machineState,
-                executionContext: context,
+                executionContext: newContext,
                 warnings
             };
         }
@@ -158,26 +179,27 @@ export default function executeDatapathStep(
             warnings.push('ALU result is not available to determine branch outcome');
             return {
                 machineState,
-                executionContext: context,
+                executionContext: newContext,
                 warnings
             };
         }
 
         const branchTaken = (branch === 1 && isZero) || (branchNE === 1 && !isZero);
         const nextPc = branchTaken ? context.branchTarget : context.pcPlus4;
+        newContext = {
+            ...newContext,
+            branchTaken,
+            nextPc,
+        };
 
         if (nextPc === undefined) {
             warnings.push('Next PC is not defined due to missing branch target or PC+4');
             return {
                 machineState,
-                executionContext: context,
+                executionContext: newContext,
                 warnings
             };
         }
-        newContext = {
-            ...newContext,
-            nextPc,
-        };
 
         if (shouldCommit) {
             newMachineState = {
@@ -186,13 +208,32 @@ export default function executeDatapathStep(
             };
         }
     } else if (stage == 'WB') {
+        
+        const memToReg = getBitSignal(signals, 'MemToReg', warnings);
         const regWrite = getBitSignal(signals, 'RegWrite', warnings);
+        const writeReg = context.writeReg;
+
+        if (memToReg === undefined) {
+            warnings.push('MemToReg control signal is not defined');
+            return {
+                machineState,
+                executionContext: newContext,
+                warnings
+            };
+        }
+        
+        const regWriteData = memToReg === 1 ? context.memReadData : context.aluResult;
+
+        newContext = {
+            ...newContext,
+            writeData: regWriteData,
+        };
         
         if (regWrite === undefined) {
             warnings.push('RegWrite control signal is not defined');
             return {
                 machineState,
-                executionContext: context,
+                executionContext: newContext,
                 warnings
             };
         }
@@ -200,46 +241,34 @@ export default function executeDatapathStep(
         if (regWrite === 0) {
             return {
                 machineState,
-                executionContext: context,
+                executionContext: newContext,
                 warnings
             };
         }
-        
-        const memToReg = getBitSignal(signals, 'MemToReg', warnings);
-        const writeReg = context.writeRegister;
         
         if (writeReg === undefined) {
             warnings.push('Write register is not defined');
             return {
                 machineState,
-                executionContext: context,
+                executionContext: newContext,
                 warnings
             };
         }
 
-        if (memToReg === undefined) {
-            warnings.push('MemToReg control signal is not defined');
-            return {
-                machineState,
-                executionContext: context,
-                warnings
-            };
-        }
 
-        const writeData = memToReg === 1 ? context.memReadData : context.aluResult;
-
-        if (writeData === undefined) {
+        if (regWriteData === undefined) {
             warnings.push('Write data is not available from ALU result or memory read');
             return {
                 machineState,
-                executionContext: context,
+                executionContext: newContext,
                 warnings
             };
         }
 
         if (shouldCommit) {
-            newMachineState = writeRegister(machineState, writeReg, writeData);
+            newMachineState = writeRegister(machineState, writeReg, regWriteData);
         }
+
     } else {
         warnings.push(`Unknown stage ${stage}`);
     }

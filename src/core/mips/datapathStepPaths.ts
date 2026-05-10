@@ -22,8 +22,9 @@ export default function datapathStepPaths(
         return [
             'IR_RS_TO_RF_RR1',
             'IR_RT_TO_RF_RR2',
+            'IR_IMM_TO_SIGN_EXTEND',
             ...(signals.RegDst === 'X' ? [] : signals.RegDst === 0 ? ['IR_RT_TO_REGDST_MUX0'] : ['IR_RD_TO_REGDST_MUX1']),
-            ...(signals.RegDst !== 'X' && signals.RegWrite === 1 ? ['REGDST_MUX_TO_RF_WR'] : []),
+            ...(signals.RegDst !== 'X' ? ['REGDST_MUX_TO_RF_WR'] : []),
         ] as DatapathPath[];
     }
 
@@ -31,7 +32,6 @@ export default function datapathStepPaths(
         return [
             'RF_RD1_TO_ALU1',
             'ALUSRC_MUX_TO_ALU2',
-            ...(signals.ALUSrc === 1 || signals.Branch === 1 || signals.BranchNE === 1 ? ['IR_IMM_TO_SIGN_EXTEND'] : []),
             ...(signals.Branch === 1 || signals.BranchNE === 1 ? ['SIGN_EXTEND_TO_LEFT_SHIFT_2', 'LEFT_SHIFT_2_TO_BRANCH_ADDER1', 'ADD4_TO_BRANCH_ADDER0'] : []),
             ...(signals.ALUSrc === 0 ? ['RF_RD2_TO_ALUSRC_MUX0'] : ['SIGN_EXTEND_TO_ALUSRC_MUX1']),
         ] as DatapathPath[];
@@ -39,8 +39,9 @@ export default function datapathStepPaths(
 
     if (stage === 'MEM') {
         return [
-            ...(signals.MemRead === 1 || signals.MemWrite === 1 ? ['ALU_TO_DM_ADDR'] : []),
-            ...((signals.Branch === 1 && context.isZero === true) || (signals.BranchNE === 1 && context.isZero === false) ? ['BRANCH_ADDER_TO_PCSRC_MUX1'] : ['ADD4_TO_PCSRC_MUX0']),
+            'ALU_TO_DM_ADDR',
+            'RF_RD2_TO_DM_WD',
+            ...(context.branchTaken === undefined ? [] : context.branchTaken ? ['BRANCH_ADDER_TO_PCSRC_MUX1'] : ['ADD4_TO_PCSRC_MUX0']),
             'PCSRC_MUX_TO_PC',
         ] as DatapathPath[];
     }
