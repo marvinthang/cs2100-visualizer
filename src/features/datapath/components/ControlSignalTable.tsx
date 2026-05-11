@@ -1,9 +1,9 @@
 import type {
     BaseControlSignals,
     ControlSignalId,
-    DatapathHighlightState,
     RuntimeControlSignals,
-} from '../../../types/mips';
+} from '../../../core/mips/single-cycle/control/types';
+import type { DatapathHighlightState } from '../../../core/mips/single-cycle/highlight/types';
 
 const controlSignalOptions: {
     [Signal in keyof BaseControlSignals]: readonly BaseControlSignals[Signal][];

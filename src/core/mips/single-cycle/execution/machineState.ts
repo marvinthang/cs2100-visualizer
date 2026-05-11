@@ -1,4 +1,4 @@
-import type { RegisterNumber } from '../../../types/mips';
+import type { RegisterNumber } from '../../../../types/mips';
 
 export type MachineState = {
     pc: number;

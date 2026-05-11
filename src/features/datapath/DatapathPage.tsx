@@ -1,17 +1,24 @@
 import { useState } from 'react';
-import { datapathMnemonics } from '../../core/mips-datapath/instruction/instructionSet';
+import { datapathMnemonics } from '../../core/mips/instruction/instructionSet';
 import ControlSignalTable from './components/ControlSignalTable';
 import DatapathDiagram from './components/DatapathDiagram';
 import StepControls from './components/StepControls';
 import RegisterTable from './components/RegisterTable';
 import MemoryTable from './components/MemoryTable';
 import DatapathValueTable from './components/DatapathValueTable';
-import { type DatapathSimulatorMode, useDatapathSimulator } from './hooks/useDatapathSimulator';
+import {
+    type DatapathSimulatorMode,
+    useDatapathSimulator,
+} from './hooks/useDatapathSimulator';
+import type { DatapathInspectID } from '../../core/mips/single-cycle/inspector/types';
 import type { DatapathMnemonic } from '../../types/mips';
+import InspectorPanel from './components/InspectorPanel';
 
 export default function DatapathPage() {
     const simulator = useDatapathSimulator();
     const [isEditingSignals, setIsEditingSignals] = useState(false);
+    const [selectedInspectId, setSelectedInspectId] =
+        useState<DatapathInspectID | null>(null);
 
     const {
         mnemonic,
@@ -50,9 +57,12 @@ export default function DatapathPage() {
         <main className="min-h-screen bg-slate-50 p-6 text-slate-900">
             <div className="mx-auto max-w-[1900px]">
                 <header className="mb-6">
-                    <h1 className="text-2xl font-bold">MIPS Datapath Visualizer</h1>
+                    <h1 className="text-2xl font-bold">
+                        MIPS Datapath Visualizer
+                    </h1>
                     <p className="mt-1 text-sm text-slate-600">
-                        Explore control signals, datapath flow, and step-by-step execution.
+                        Explore control signals, datapath flow, and step-by-step
+                        execution.
                     </p>
                 </header>
 
@@ -72,7 +82,10 @@ export default function DatapathPage() {
                                     <select
                                         value={mnemonic}
                                         onChange={(event) =>
-                                            setMnemonic(event.target.value as DatapathMnemonic)
+                                            setMnemonic(
+                                                event.target
+                                                    .value as DatapathMnemonic,
+                                            )
                                         }
                                         className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900"
                                     >
@@ -93,13 +106,16 @@ export default function DatapathPage() {
                                         value={mode}
                                         onChange={(event) => {
                                             handleModeChange(
-                                                event.target.value as DatapathSimulatorMode,
+                                                event.target
+                                                    .value as DatapathSimulatorMode,
                                             );
                                         }}
                                         className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900"
                                     >
                                         <option value="explore">Explore</option>
-                                        <option value="simulate">Simulate</option>
+                                        <option value="simulate">
+                                            Simulate
+                                        </option>
                                     </select>
                                 </label>
                             </div>
@@ -122,7 +138,9 @@ export default function DatapathPage() {
 
                                 <button
                                     type="button"
-                                    onClick={() => setIsEditingSignals((value) => !value)}
+                                    onClick={() =>
+                                        setIsEditingSignals((value) => !value)
+                                    }
                                     className="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-100"
                                 >
                                     {isEditingSignals ? 'Lock' : 'Edit'}
@@ -167,11 +185,21 @@ export default function DatapathPage() {
                                 defaultSignals={defaultSignals}
                                 signals={signals}
                                 datapathHighlight={datapathHighlight}
+                                selectedInspectId={selectedInspectId}
+                                onInspect={setSelectedInspectId}
                             />
                         </div>
                     </section>
 
                     <aside className="space-y-4 xl:sticky xl:top-6 xl:h-[calc(100vh-3rem)] xl:overflow-y-auto">
+                        <InspectorPanel
+                            id={selectedInspectId}
+                            step={currentStep}
+                            machine={machine}
+                            context={currentContext}
+                            signals={signals}
+                            onClear={() => setSelectedInspectId(null)}
+                        />
                         <DatapathValueTable
                             context={currentContext}
                             datapathHighlight={datapathHighlight}

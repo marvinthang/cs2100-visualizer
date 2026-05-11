@@ -1,8 +1,22 @@
-import type {
-    EncodedInstruction,
-    MipsInstructionFields,
-    MipsMnemonic,
-} from '../../../types/mips';
+import type { MipsInstructionFields, MipsMnemonic } from '../../../types/mips';
+
+export type EncodedField = {
+    bin: string;
+    hex: string;
+    dec: string;
+};
+
+export type EncodedInstruction = {
+    opcode: EncodedField;
+    rs: EncodedField;
+    rt: EncodedField;
+    rd: EncodedField;
+    shamt: EncodedField;
+    funct: EncodedField;
+    immediate: EncodedField;
+    address: EncodedField;
+    full: EncodedField;
+};
 
 const opcodeMap: Record<MipsMnemonic, number> = {
     add: 0x00,
@@ -84,9 +98,19 @@ export function encodeMipsInstructionWord(
     return ((opcode << 26) | (rs << 21) | (rt << 16) | immediate) >>> 0;
 }
 
-function trimBinary(value: number, bits: number): string {
-    const mask = (1 << bits) - 1;
-    return (value & mask).toString(2).padStart(bits, '0');
+export function encodeField(value: number, bits: number): EncodedField {
+    const normalized = bits === 32 ? value >>> 0 : value & ((1 << bits) - 1);
+
+    return {
+        bin: normalized.toString(2).padStart(bits, '0'),
+        hex:
+            '0x' +
+            normalized
+                .toString(16)
+                .padStart(Math.ceil(bits / 4), '0')
+                .toUpperCase(),
+        dec: normalized.toString(),
+    };
 }
 
 export function encodeMipsInstruction(
@@ -94,15 +118,14 @@ export function encodeMipsInstruction(
 ): EncodedInstruction {
     const word = encodeMipsInstructionWord(instruction);
     return {
-        opcode: trimBinary(word >>> 26, 6),
-        rs: trimBinary(word >>> 21, 5),
-        rt: trimBinary(word >>> 16, 5),
-        rd: trimBinary(word >>> 11, 5),
-        shamt: trimBinary(word >>> 6, 5),
-        funct: trimBinary(word, 6),
-        immediate: trimBinary(word, 16),
-        address: trimBinary(word, 26),
-        full: trimBinary(word, 32),
-        hex: '0x' + word.toString(16).padStart(8, '0'),
+        opcode: encodeField(word >>> 26, 6),
+        rs: encodeField(word >>> 21, 5),
+        rt: encodeField(word >>> 16, 5),
+        rd: encodeField(word >>> 11, 5),
+        shamt: encodeField(word >>> 6, 5),
+        funct: encodeField(word, 6),
+        immediate: encodeField(word, 16),
+        address: encodeField(word, 26),
+        full: encodeField(word, 32),
     };
 }

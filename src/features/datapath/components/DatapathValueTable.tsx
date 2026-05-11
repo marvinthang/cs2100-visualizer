@@ -1,6 +1,9 @@
-import { getHighlightBackgroundClass, getHighlightTextClass } from "../../../core/mips-datapath/highlight/datapathHighlightState";
-import type { ExecutionContext } from "../../../core/mips-datapath/execution/executionContext";
-import type { DatapathHighlightState } from "../../../types/mips";
+import {
+    getHighlightBackgroundClass,
+    getHighlightTextClass,
+} from '../../../core/mips/single-cycle/highlight/datapathHighlightState';
+import type { ExecutionContext } from '../../../core/mips/single-cycle/execution/executionContext';
+import type { DatapathHighlightState } from '../../../core/mips/single-cycle/highlight/types';
 
 function formatValue(value: number | undefined): string {
     if (value === undefined) {
@@ -12,7 +15,7 @@ function formatValue(value: number | undefined): string {
 export default function DatapathValueTable({
     context,
     datapathHighlight,
-} : {
+}: {
     context: ExecutionContext;
     datapathHighlight: DatapathHighlightState;
 }) {
@@ -33,7 +36,9 @@ export default function DatapathValueTable({
 
     return (
         <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-            <h2 className="mb-3 text-sm font-semibold text-slate-900">Datapath Values</h2>
+            <h2 className="mb-3 text-sm font-semibold text-slate-900">
+                Datapath Values
+            </h2>
             <div className="max-h-[200px] overflow-auto">
                 <table className="w-full text-sm">
                     <thead>
@@ -45,13 +50,21 @@ export default function DatapathValueTable({
 
                     <tbody>
                         {rows.map(([name, label, value]) => {
-                            const role = datapathHighlight.values[name] ?? 'normal';
+                            const role =
+                                datapathHighlight.values[name] ?? 'normal';
                             const textClass = getHighlightTextClass(role);
                             const bgClass = getHighlightBackgroundClass(role);
                             return (
-                                <tr key={name} className={`border-b border-slate-100 font-mono text-xs ${bgClass}`}>
-                                    <td className={`py-1.5 pr-3 ${textClass}`}>{label}</td>
-                                    <td className={`py-1.5 text-right ${textClass}`}>
+                                <tr
+                                    key={name}
+                                    className={`border-b border-slate-100 font-mono text-xs ${bgClass}`}
+                                >
+                                    <td className={`py-1.5 pr-3 ${textClass}`}>
+                                        {label}
+                                    </td>
+                                    <td
+                                        className={`py-1.5 text-right ${textClass}`}
+                                    >
                                         {formatValue(value)}
                                     </td>
                                 </tr>

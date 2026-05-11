@@ -1,7 +1,11 @@
 import { useEffect, useState } from 'react';
-import type { MachineState } from '../../../core/mips-datapath/execution/machineState';
-import type { MachineStateHighlightState, RegisterNumber } from '../../../types/mips';
-import { getHighlightBackgroundClass, getHighlightTextClass } from '../../../core/mips-datapath/highlight/datapathHighlightState';
+import type { MachineState } from '../../../core/mips/single-cycle/execution/machineState';
+import type { MachineStateHighlightState } from '../../../core/mips/single-cycle/highlight/types';
+import type { RegisterNumber } from '../../../types/mips';
+import {
+    getHighlightBackgroundClass,
+    getHighlightTextClass,
+} from '../../../core/mips/single-cycle/highlight/datapathHighlightState';
 
 const registerRows = [
     [0, '$zero'],
@@ -38,9 +42,11 @@ const registerRows = [
     [31, '$ra'],
 ] as const;
 
-function makeRegisterDrafts(machine: MachineState): Record<RegisterNumber, string> {
+function makeRegisterDrafts(
+    machine: MachineState,
+): Record<RegisterNumber, string> {
     return Object.fromEntries(
-        registerRows.map(([id]) => [id, String(machine.registers[id] ?? 0)])
+        registerRows.map(([id]) => [id, String(machine.registers[id] ?? 0)]),
     ) as Record<RegisterNumber, string>;
 }
 
@@ -49,13 +55,15 @@ export default function RegisterTable({
     onRegisterChange,
     onResetRegisters,
     machineHighlight,
-}: { 
-    machine: MachineState 
+}: {
+    machine: MachineState;
     onRegisterChange: (register: RegisterNumber, value: number) => void;
     onResetRegisters: () => void;
     machineHighlight: MachineStateHighlightState;
 }) {
-    const [registerDrafts, setRegisterDrafts] = useState<Record<RegisterNumber, string>>(() => makeRegisterDrafts(machine));
+    const [registerDrafts, setRegisterDrafts] = useState<
+        Record<RegisterNumber, string>
+    >(() => makeRegisterDrafts(machine));
 
     useEffect(() => {
         setRegisterDrafts(makeRegisterDrafts(machine));
@@ -68,9 +76,13 @@ export default function RegisterTable({
     return (
         <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
             <div className="mb-3 flex items-center justify-between">
-                <h2 className="text-sm font-semibold text-slate-900">Registers</h2>
+                <h2 className="text-sm font-semibold text-slate-900">
+                    Registers
+                </h2>
                 <div className="flex items-center gap-2">
-                    <span className={`rounded-md ${pcBgClass} px-2 py-1 font-mono text-xs ${pcTextClass}`}>
+                    <span
+                        className={`rounded-md ${pcBgClass} px-2 py-1 font-mono text-xs ${pcTextClass}`}
+                    >
                         PC = {machine.pc}
                     </span>
                     <button
@@ -94,19 +106,31 @@ export default function RegisterTable({
                     </thead>
                     <tbody>
                         {registerRows.map(([id, name]) => {
-                            const role = machineHighlight.registers[id] ?? 'normal';
+                            const role =
+                                machineHighlight.registers[id] ?? 'normal';
                             const textClass = getHighlightTextClass(role);
                             const bgClass = getHighlightBackgroundClass(role);
                             return (
-                                <tr key={id} className={`border-b border-slate-100 font-mono text-xs ${bgClass}`}>
-                                    <td className={`py-1.5 pr-2 text-slate-500 ${textClass}`}>{id}</td>
-                                    <td className={`py-1.5 pr-2 ${textClass}`}>{name}</td>
-                                    <td className={`py-1.5 text-right ${textClass}`}>
+                                <tr
+                                    key={id}
+                                    className={`border-b border-slate-100 font-mono text-xs ${bgClass}`}
+                                >
+                                    <td
+                                        className={`py-1.5 pr-2 text-slate-500 ${textClass}`}
+                                    >
+                                        {id}
+                                    </td>
+                                    <td className={`py-1.5 pr-2 ${textClass}`}>
+                                        {name}
+                                    </td>
+                                    <td
+                                        className={`py-1.5 text-right ${textClass}`}
+                                    >
                                         <input
                                             type="number"
                                             value={registerDrafts[id]}
                                             disabled={id === 0}
-                                            onChange={(event) => 
+                                            onChange={(event) =>
                                                 setRegisterDrafts((drafts) => ({
                                                     ...drafts,
                                                     [id]: event.target.value,
@@ -115,14 +139,24 @@ export default function RegisterTable({
                                             onBlur={() => {
                                                 const raw = registerDrafts[id];
                                                 const value = Number(raw);
-                                                if (raw.trim() === '' || Number.isNaN(value)) {
-                                                    setRegisterDrafts((drafts) => ({
-                                                        ...drafts,
-                                                        [id]: String(machine.registers[id] ?? 0),
-                                                    }));
+                                                if (
+                                                    raw.trim() === '' ||
+                                                    Number.isNaN(value)
+                                                ) {
+                                                    setRegisterDrafts(
+                                                        (drafts) => ({
+                                                            ...drafts,
+                                                            [id]: String(
+                                                                machine
+                                                                    .registers[
+                                                                    id
+                                                                ] ?? 0,
+                                                            ),
+                                                        }),
+                                                    );
                                                     return;
                                                 }
-                                                onRegisterChange(id, value)
+                                                onRegisterChange(id, value);
                                             }}
                                             onKeyDown={(event) => {
                                                 if (event.key === 'Enter') {
@@ -133,7 +167,7 @@ export default function RegisterTable({
                                         />
                                     </td>
                                 </tr>
-                        );
+                            );
                         })}
                     </tbody>
                 </table>

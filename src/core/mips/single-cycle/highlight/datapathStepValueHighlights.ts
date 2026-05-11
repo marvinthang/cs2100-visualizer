@@ -1,10 +1,8 @@
-import type {
-    RuntimeControlSignals,
-    DatapathStep,
-    DatapathStepValueHighlights,
-    DatapathValueId,
-} from '../../../types/mips';
+import type { DatapathStep } from '../../../../types/mips';
+import type { RuntimeControlSignals } from '../control/types';
 import type { ExecutionContext } from '../execution/executionContext';
+import type { DatapathStepValueHighlights } from './types';
+import type { DatapathValueId } from '../diagram/types';
 
 export function getDatapathStepValueHighlights(
     step: DatapathStep | null,

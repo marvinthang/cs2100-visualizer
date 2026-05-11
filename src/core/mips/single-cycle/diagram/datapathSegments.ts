@@ -1,4 +1,4 @@
-import type { DatapathPath, DatapathSegment } from '../../../types/mips';
+import type { DatapathPath, DatapathSegment } from './types';
 
 export const datapathPathSegments: Partial<
     Record<DatapathPath, DatapathSegment[]>

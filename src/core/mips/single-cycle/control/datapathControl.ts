@@ -1,4 +1,5 @@
-import type { BaseControlSignals, DatapathMnemonic } from '../../../types/mips';
+import type { DatapathMnemonic } from '../../../../types/mips';
+import type { BaseControlSignals } from './types';
 
 const rTypeControl: BaseControlSignals = {
     RegDst: 1,

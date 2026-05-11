@@ -1,13 +1,16 @@
 import type {
     ControlSignalId,
-    DatapathHighlightState,
+    RuntimeControlSignals,
+} from '../../../core/mips/single-cycle/control/types';
+import type {
     DatapathSegment,
     DatapathValueId,
-    EncodedInstruction,
-    RuntimeControlSignals,
-} from '../../../types/mips';
+} from '../../../core/mips/single-cycle/diagram/types';
+import type { DatapathHighlightState } from '../../../core/mips/single-cycle/highlight/types';
+import type { DatapathInspectID } from '../../../core/mips/single-cycle/inspector/types';
+import type { EncodedInstruction } from '../../../core/mips/instruction/encodeMipsInstruction';
 import StaticDatapathSvg from './StaticDatapathSvg';
-import { getHighlightSvgFill } from '../../../core/mips-datapath/highlight/datapathHighlightState';
+import { getHighlightSvgFill } from '../../../core/mips/single-cycle/highlight/datapathHighlightState';
 
 export default function DatapathDiagram({
     bits,
@@ -17,6 +20,8 @@ export default function DatapathDiagram({
     defaultSignals,
     signals,
     datapathHighlight,
+    selectedInspectId,
+    onInspect,
 }: {
     bits: EncodedInstruction;
     defaultActiveSegments: readonly DatapathSegment[];
@@ -25,6 +30,8 @@ export default function DatapathDiagram({
     defaultSignals: RuntimeControlSignals;
     signals: RuntimeControlSignals;
     datapathHighlight: DatapathHighlightState;
+    selectedInspectId: DatapathInspectID | null;
+    onInspect: (id: DatapathInspectID | null) => void;
 }) {
     const isModified = (id: DatapathSegment) =>
         modifiedActiveSegments.includes(id);
@@ -63,6 +70,8 @@ export default function DatapathDiagram({
             signalFill={signalFill}
             muxFill={muxFill}
             valueFill={valueFill}
+            selectedInspectId={selectedInspectId}
+            onInspect={onInspect}
         />
     );
 }

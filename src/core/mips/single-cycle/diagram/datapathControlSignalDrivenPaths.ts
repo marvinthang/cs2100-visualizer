@@ -1,8 +1,5 @@
-import type {
-    ControlSignalId,
-    DatapathPath,
-    RuntimeControlSignals,
-} from '../../../types/mips';
+import type { ControlSignalId, RuntimeControlSignals } from '../control/types';
+import type { DatapathPath } from './types';
 
 type SignalValue = '0' | '1' | 'X';
 

@@ -1,38 +1,37 @@
 import { useState } from 'react';
-import { getDatapathControlSignals } from '../../../core/mips-datapath/control/datapathControl';
-import { getActiveDatapathBasePaths } from '../../../core/mips-datapath/diagram/datapathBasePaths';
+import { getDatapathControlSignals } from '../../../core/mips/single-cycle/control/datapathControl';
+import type {
+    ControlSignalId,
+    RuntimeControlSignals,
+} from '../../../core/mips/single-cycle/control/types';
+import { getActiveDatapathBasePaths } from '../../../core/mips/single-cycle/diagram/datapathBasePaths';
 import {
     getControlSignalDrivenPathMap,
     getControlSignalDrivenPaths,
-} from '../../../core/mips-datapath/diagram/datapathControlSignalDrivenPaths';
-import { getActiveDatapathSegments } from '../../../core/mips-datapath/diagram/datapathSegments';
-import { getDatapathStepPaths } from '../../../core/mips-datapath/diagram/datapathStepPaths';
+} from '../../../core/mips/single-cycle/diagram/datapathControlSignalDrivenPaths';
+import { getActiveDatapathSegments } from '../../../core/mips/single-cycle/diagram/datapathSegments';
+import { getDatapathStepPaths } from '../../../core/mips/single-cycle/diagram/datapathStepPaths';
 import {
     datapathSteps,
     getCurrentStep,
     getNextStepIndex,
     isLastStep as isLastDatapathStep,
-} from '../../../core/mips-datapath/diagram/datapathSteps';
-import { executeDatapathStep } from '../../../core/mips-datapath/execution/executeDatapathStep';
+} from '../../../core/mips/single-cycle/diagram/datapathSteps';
+import { executeDatapathStep } from '../../../core/mips/single-cycle/execution/executeDatapathStep';
 import {
     type ExecutionContext,
     createEmptyExecutionContext,
-} from '../../../core/mips-datapath/execution/executionContext';
+} from '../../../core/mips/single-cycle/execution/executionContext';
 import {
     createInitialMachineState,
     createZeroedDataMemory,
     type MachineState,
-} from '../../../core/mips-datapath/execution/machineState';
-import { getDatapathHighlightState } from '../../../core/mips-datapath/highlight/datapathHighlightState';
-import { getMachineStateHighlights } from '../../../core/mips-datapath/highlight/machineStateHighlights';
-import { datapathInstructionExamples } from '../../../core/mips-datapath/instruction/datapathInstructionExamples';
-import { encodeMipsInstruction } from '../../../core/mips-datapath/instruction/encodeMipsInstruction';
-import type {
-    RuntimeControlSignals,
-    DatapathMnemonic,
-    RegisterNumber,
-    ControlSignalId,
-} from '../../../types/mips';
+} from '../../../core/mips/single-cycle/execution/machineState';
+import { getDatapathHighlightState } from '../../../core/mips/single-cycle/highlight/datapathHighlightState';
+import { getMachineStateHighlights } from '../../../core/mips/single-cycle/highlight/machineStateHighlights';
+import { datapathInstructionExamples } from '../../../core/mips/instruction/datapathInstructionExamples';
+import { encodeMipsInstruction } from '../../../core/mips/instruction/encodeMipsInstruction';
+import type { DatapathMnemonic, RegisterNumber } from '../../../types/mips';
 
 type StepSnapshot = {
     machine: MachineState;

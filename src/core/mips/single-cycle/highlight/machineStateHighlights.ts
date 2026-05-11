@@ -1,9 +1,7 @@
-import type {
-    RuntimeControlSignals,
-    DatapathStep,
-    MachineStateHighlightState,
-} from '../../../types/mips';
+import type { DatapathStep } from '../../../../types/mips';
+import type { RuntimeControlSignals } from '../control/types';
 import type { ExecutionContext } from '../execution/executionContext';
+import type { MachineStateHighlightState } from './types';
 
 export function getMachineStateHighlights(
     step: DatapathStep | null,

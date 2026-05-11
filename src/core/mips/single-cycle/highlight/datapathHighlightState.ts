@@ -1,13 +1,7 @@
-import type {
-    ControlSignalId,
-    RuntimeControlSignals,
-    DatapathStep,
-} from '../../../types/mips';
+import type { ControlSignalId, RuntimeControlSignals } from '../control/types';
+import type { DatapathStep } from '../../../../types/mips';
 import { getDatapathStepValueHighlights } from './datapathStepValueHighlights';
-import type {
-    HighlightRole,
-    DatapathHighlightState,
-} from '../../../types/mips';
+import type { HighlightRole, DatapathHighlightState } from './types';
 import type { ExecutionContext } from '../execution/executionContext';
 
 export function getDatapathHighlightState(

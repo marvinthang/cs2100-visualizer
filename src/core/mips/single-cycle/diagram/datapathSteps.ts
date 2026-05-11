@@ -1,4 +1,4 @@
-import type { DatapathStep } from '../../../types/mips';
+import type { DatapathStep } from '../../../../types/mips';
 
 export const datapathSteps: DatapathStep[] = ['IF', 'ID', 'EX', 'MEM', 'WB'];
 

@@ -1,9 +1,8 @@
 import type {
-    ControlSignalId,
-    RuntimeControlSignals,
     DatapathInstructionFields,
     DatapathStep,
-} from '../../../types/mips';
+} from '../../../../types/mips';
+import type { ControlSignalId, RuntimeControlSignals } from '../control/types';
 import type { ExecutionContext } from './executionContext';
 import {
     readRegister,
@@ -194,6 +193,7 @@ function executeEX(frame: ExecutionFrame): void {
         ...frame.context,
         aluOp1,
         aluOp2,
+        aluOp: op,
         aluResult,
         isZero,
         branchTarget,
@@ -208,6 +208,8 @@ function executeEX(frame: ExecutionFrame): void {
             `└─ Branch target = ${toHex(branchTarget)}`,
         ],
     };
+    console.log('op = ', op);
+    console.log('ALU execution frame:', frame.context);
 }
 
 function executeMEM(frame: ExecutionFrame): void {

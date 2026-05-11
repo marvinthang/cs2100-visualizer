@@ -1,4 +1,5 @@
-import type { DatapathMnemonic, DatapathPath } from '../../../types/mips';
+import type { DatapathMnemonic } from '../../../../types/mips';
+import type { DatapathPath } from './types';
 
 const commonFetchPaths: DatapathPath[] = [
     'PC_TO_IM',

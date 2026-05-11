@@ -46,16 +46,3 @@ export type InstructionFields<TMnemonic extends MipsMnemonic> = {
 export type MipsInstructionFields = InstructionFields<MipsMnemonic>;
 
 export type DatapathInstructionFields = InstructionFields<DatapathMnemonic>;
-
-export type EncodedInstruction = {
-    opcode: string;
-    rs: string;
-    rt: string;
-    rd: string;
-    shamt: string;
-    funct: string;
-    immediate: string;
-    address: string;
-    full: string;
-    hex: string;
-};

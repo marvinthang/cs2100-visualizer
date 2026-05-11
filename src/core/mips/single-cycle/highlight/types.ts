@@ -1,6 +1,6 @@
-import type { ControlSignalId } from './control';
-import type { DatapathValueId } from './datapath';
-import type { RegisterNumber } from './register';
+import type { RegisterNumber } from '../../../../types/mips';
+import type { ControlSignalId } from '../control/types';
+import type { DatapathValueId } from '../diagram/types';
 
 export type DatapathStepValueHighlights = {
     inputs: DatapathValueId[];

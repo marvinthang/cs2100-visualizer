@@ -1,10 +1,79 @@
+import type { EncodedInstruction } from '../../../core/mips/instruction/encodeMipsInstruction';
 import type {
     ControlSignalId,
+    RuntimeControlSignals,
+} from '../../../core/mips/single-cycle/control/types';
+import type {
     DatapathSegment,
     DatapathValueId,
-    EncodedInstruction,
-    RuntimeControlSignals,
-} from '../../../types/mips';
+} from '../../../core/mips/single-cycle/diagram/types';
+import type { DatapathInspectID } from '../../../core/mips/single-cycle/inspector/types';
+
+function InspectPathHitBox({
+    id,
+    d,
+    x,
+    y,
+    width,
+    height,
+    onInspect,
+}: {
+    id: DatapathInspectID;
+    d?: string;
+    x?: number;
+    y?: number;
+    width?: number;
+    height?: number;
+    onInspect: (id: DatapathInspectID) => void;
+}) {
+    if (d !== undefined) {
+        return (
+            <path
+                d={d}
+                fill="transparent"
+                className="cursor-pointer"
+                role="button"
+                tabIndex={0}
+                onClick={() => onInspect(id)}
+                onKeyDown={(event) => {
+                    if (event.key === 'Enter' || event.key === ' ') {
+                        onInspect(id);
+                    }
+                }}
+            />
+        );
+    }
+
+    return (
+        <rect
+            x={x}
+            y={y}
+            width={width}
+            height={height}
+            fill="transparent"
+            className="cursor-pointer"
+            role="button"
+            tabIndex={0}
+            onClick={() => onInspect(id)}
+            onKeyDown={(event) => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                    onInspect(id);
+                }
+            }}
+        />
+    );
+}
+
+const aluShapePath =
+    'M545 333V280L620 313.5V403.5L545 439V375L560.5 355L545 333Z';
+const add4ShapePath =
+    'M294.5 72V50L350.5 67.5V97L294.5 116V89.5L301.5 81.5L294.5 72Z';
+const branchAdderShapePath =
+    'M597 125V103L653 120.5V150L597 169V142.5L604 134.5L597 125Z';
+const leftShift2ShapePath =
+    'M444.5 127.75C463.902 127.75 481.433 130.707 494.087 135.464C500.417 137.843 505.487 140.658 508.962 143.746C512.437 146.834 514.25 150.132 514.25 153.5C514.25 156.868 512.437 160.166 508.962 163.254C505.487 166.342 500.417 169.157 494.087 171.536C481.433 176.293 463.902 179.25 444.5 179.25C425.098 179.25 407.567 176.293 394.913 171.536C388.583 169.157 383.513 166.342 380.038 163.254C376.563 160.166 374.75 156.868 374.75 153.5C374.75 150.132 376.563 146.834 380.038 143.746C383.513 140.658 388.583 137.843 394.913 135.464C407.567 130.707 425.098 127.75 444.5 127.75Z';
+const signExtendShapePath =
+    'M352 500.75C367.654 500.75 381.79 503.757 391.984 508.586C402.235 513.442 408.25 520.003 408.25 527C408.25 533.997 402.235 540.558 391.984 545.414C381.79 550.243 367.654 553.25 352 553.25C336.346 553.25 322.21 550.243 312.016 545.414C301.765 540.558 295.75 533.997 295.75 527C295.75 520.003 301.765 513.442 312.016 508.586C322.21 503.757 336.346 500.75 352 500.75Z';
 
 export default function StaticDatapathSvg({
     bits,
@@ -16,6 +85,8 @@ export default function StaticDatapathSvg({
     signalFill,
     muxFill,
     valueFill,
+    selectedInspectId,
+    onInspect,
 }: {
     bits: EncodedInstruction;
     signals: RuntimeControlSignals;
@@ -26,6 +97,8 @@ export default function StaticDatapathSvg({
     signalFill: (signal: ControlSignalId) => string;
     muxFill: (signal: ControlSignalId) => string;
     valueFill: (id: DatapathValueId) => string;
+    selectedInspectId: DatapathInspectID | null;
+    onInspect: (id: DatapathInspectID | null) => void;
 }) {
     return (
         <svg
@@ -81,9 +154,9 @@ export default function StaticDatapathSvg({
                 markerEnd={wireArrow('IM_TO_IR')}
             />
             <path
-                d="M294.5 72V50L350.5 67.5V97L294.5 116V89.5L301.5 81.5L294.5 72Z"
-                fill="white"
-                stroke="black"
+                d={add4ShapePath}
+                fill={selectedInspectId === 'ADD4' ? '#eff6ff' : 'white'}
+                stroke={selectedInspectId === 'ADD4' ? '#2563eb' : 'black'}
                 strokeWidth={1.5}
             />
             <path
@@ -107,10 +180,19 @@ export default function StaticDatapathSvg({
                     {'Add'}
                 </tspan>
             </text>
+            <InspectPathHitBox
+                id="ADD4"
+                d={add4ShapePath}
+                onInspect={onInspect}
+            />
             <path
-                d="M597 125V103L653 120.5V150L597 169V142.5L604 134.5L597 125Z"
-                fill="white"
-                stroke="black"
+                d={branchAdderShapePath}
+                fill={
+                    selectedInspectId === 'BRANCH_ADDER' ? '#eff6ff' : 'white'
+                }
+                stroke={
+                    selectedInspectId === 'BRANCH_ADDER' ? '#2563eb' : 'black'
+                }
                 strokeWidth={1.5}
             />
             <text
@@ -129,13 +211,19 @@ export default function StaticDatapathSvg({
                     {'Add'}
                 </tspan>
             </text>
+            <InspectPathHitBox
+                id="BRANCH_ADDER"
+                d={branchAdderShapePath}
+                onInspect={onInspect}
+            />
+
             <rect
                 x={192.65}
                 y={43.65}
                 width={44.7}
                 height={74.7}
-                fill="#D9D9D9"
-                stroke="black"
+                fill={selectedInspectId === 'PC' ? '#eff6ff' : '#D9D9D9'}
+                stroke={selectedInspectId === 'PC' ? '#2563eb' : 'black'}
                 strokeWidth={1.3}
             />
             <text
@@ -153,13 +241,30 @@ export default function StaticDatapathSvg({
                     {'PC'}
                 </tspan>
             </text>
+            <InspectPathHitBox
+                id="PC"
+                x={192.65}
+                y={43.65}
+                width={44.7}
+                height={74.7}
+                onInspect={onInspect}
+            />
+
             <rect
                 x={50.65}
                 y={38.65}
                 width={114.7}
                 height={125.7}
-                fill="#E7E4B9"
-                stroke="black"
+                fill={
+                    selectedInspectId === 'INSTRUCTION_MEMORY'
+                        ? '#eff6ff'
+                        : '#E7E4B9'
+                }
+                stroke={
+                    selectedInspectId === 'INSTRUCTION_MEMORY'
+                        ? '#2563eb'
+                        : 'black'
+                }
                 strokeWidth={1.3}
             />
             <text
@@ -211,13 +316,28 @@ export default function StaticDatapathSvg({
                     {'Memory'}
                 </tspan>
             </text>
+            <InspectPathHitBox
+                id="INSTRUCTION_MEMORY"
+                x={50.65}
+                y={38.65}
+                width={114.7}
+                height={125.7}
+                onInspect={onInspect}
+            />
+
             <rect
                 x={302.65}
                 y={268.65}
                 width={110.7}
                 height={164.7}
-                fill="#FFFFCB"
-                stroke="black"
+                fill={
+                    selectedInspectId === 'REGISTER_FILE'
+                        ? '#eff6ff'
+                        : '#FFFFCB'
+                }
+                stroke={
+                    selectedInspectId === 'REGISTER_FILE' ? '#2563eb' : 'black'
+                }
                 strokeWidth={1.3}
             />
             <text
@@ -285,8 +405,12 @@ export default function StaticDatapathSvg({
                 y={357.65}
                 width={115.7}
                 height={149.7}
-                fill="#E1FEC4"
-                stroke="black"
+                fill={
+                    selectedInspectId === 'DATA_MEMORY' ? '#eff6ff' : '#E1FEC4'
+                }
+                stroke={
+                    selectedInspectId === 'DATA_MEMORY' ? '#2563eb' : 'black'
+                }
                 strokeWidth={1.3}
             />
             <text
@@ -324,8 +448,8 @@ export default function StaticDatapathSvg({
             </text>
             <path
                 d="M545 333V280L620 313.5V403.5L545 439V375L560.5 355L545 333Z"
-                fill="white"
-                stroke="black"
+                fill={selectedInspectId === 'ALU' ? '#eff6ff' : 'white'}
+                stroke={selectedInspectId === 'ALU' ? '#2563eb' : 'black'}
                 strokeWidth={1.3}
             />
             <text
@@ -380,6 +504,16 @@ export default function StaticDatapathSvg({
                     {'File'}
                 </tspan>
             </text>
+
+            <InspectPathHitBox
+                id="REGISTER_FILE"
+                x={302.65}
+                y={268.65}
+                width={110.7}
+                height={164.7}
+                onInspect={onInspect}
+            />
+
             <text
                 fill="#FF0000"
                 style={{
@@ -399,6 +533,14 @@ export default function StaticDatapathSvg({
                     {'Memory'}
                 </tspan>
             </text>
+            <InspectPathHitBox
+                id="DATA_MEMORY"
+                x={662.65}
+                y={357.65}
+                width={115.7}
+                height={149.7}
+                onInspect={onInspect}
+            />
             <text
                 fill="#FF0000"
                 style={{
@@ -415,6 +557,12 @@ export default function StaticDatapathSvg({
                     {'ALU'}
                 </tspan>
             </text>
+            <InspectPathHitBox
+                id="ALU"
+                d={aluShapePath}
+                onInspect={onInspect}
+            />
+
             <path
                 d="M237 59H247"
                 stroke={wireStroke('PC_TO_PC_JUNCTION')}
@@ -440,11 +588,19 @@ export default function StaticDatapathSvg({
             />
             <path
                 d="M95.5 178H125.5V252.5V317V380.5V444.5V508V582.5H95L95.0921 508L95.1706 444.5L95.2497 380.5L95.3282 317L95.4079 252.5L95.5 178Z"
-                fill="white"
+                fill={
+                    selectedInspectId === 'INSTRUCTION_REGISTER'
+                        ? '#eff6ff'
+                        : 'white'
+                }
             />
             <path
                 d="M95.4079 252.5L95.5 178H125.5V252.5M95.4079 252.5H125.5M125.5 508V582.5H95L95.0921 508L95.1706 444.5L95.2497 380.5L95.3282 317L95.4079 252.5M125.5 252.5V317M95.3282 317H125.5M125.5 317V380.5M95.2497 380.5H125.5M125.5 380.5V444.5M95.1706 444.5H125.5M125.5 444.5V508M95.0921 508H125.5"
-                stroke="black"
+                stroke={
+                    selectedInspectId === 'INSTRUCTION_REGISTER'
+                        ? '#2563eb'
+                        : 'black'
+                }
                 strokeWidth={2.3}
             />
             <text
@@ -499,7 +655,7 @@ export default function StaticDatapathSvg({
                 letterSpacing="0em"
             >
                 <tspan x={0.182129 + 26} y={14.4545}>
-                    {bits.rt}
+                    {bits.rt.bin}
                 </tspan>
             </text>
             <text
@@ -527,9 +683,13 @@ export default function StaticDatapathSvg({
                 strokeWidth={wireStrokeWidth('IR_RT_TO_RT_JUNCTION')}
             />
             <path
-                d="M444.5 127.75C463.902 127.75 481.433 130.707 494.087 135.464C500.417 137.843 505.487 140.658 508.962 143.746C512.437 146.834 514.25 150.132 514.25 153.5C514.25 156.868 512.437 160.166 508.962 163.254C505.487 166.342 500.417 169.157 494.087 171.536C481.433 176.293 463.902 179.25 444.5 179.25C425.098 179.25 407.567 176.293 394.913 171.536C388.583 169.157 383.513 166.342 380.038 163.254C376.563 160.166 374.75 156.868 374.75 153.5C374.75 150.132 376.563 146.834 380.038 143.746C383.513 140.658 388.583 137.843 394.913 135.464C407.567 130.707 425.098 127.75 444.5 127.75Z"
-                fill="#F1F1F1"
-                stroke="black"
+                d={leftShift2ShapePath}
+                fill={
+                    selectedInspectId === 'LEFT_SHIFT_2' ? '#eff6ff' : '#F1F1F1'
+                }
+                stroke={
+                    selectedInspectId === 'LEFT_SHIFT_2' ? '#2563eb' : 'black'
+                }
                 strokeWidth={1.5}
             />
             <text
@@ -550,10 +710,19 @@ export default function StaticDatapathSvg({
                     {'2-bit'}
                 </tspan>
             </text>
+            <InspectPathHitBox
+                id="LEFT_SHIFT_2"
+                d={leftShift2ShapePath}
+                onInspect={onInspect}
+            />
             <path
-                d="M352 500.75C367.654 500.75 381.79 503.757 391.984 508.586C402.235 513.442 408.25 520.003 408.25 527C408.25 533.997 402.235 540.558 391.984 545.414C381.79 550.243 367.654 553.25 352 553.25C336.346 553.25 322.21 550.243 312.016 545.414C301.765 540.558 295.75 533.997 295.75 527C295.75 520.003 301.765 513.442 312.016 508.586C322.21 503.757 336.346 500.75 352 500.75Z"
-                fill="#F1F1F1"
-                stroke="black"
+                d={signExtendShapePath}
+                fill={
+                    selectedInspectId === 'SIGN_EXTEND' ? '#eff6ff' : '#F1F1F1'
+                }
+                stroke={
+                    selectedInspectId === 'SIGN_EXTEND' ? '#2563eb' : 'black'
+                }
                 strokeWidth={1.5}
             />
             <text
@@ -574,14 +743,19 @@ export default function StaticDatapathSvg({
                     {'Extend'}
                 </tspan>
             </text>
+            <InspectPathHitBox
+                id="SIGN_EXTEND"
+                d={signExtendShapePath}
+                onInspect={onInspect}
+            />
             <rect
                 x={695}
                 y={66}
                 width={27}
                 height={90}
                 rx={4}
-                fill="#F1F1F1"
-                stroke="black"
+                fill={selectedInspectId === 'PCSRC_MUX' ? '#eff6ff' : '#F1F1F1'}
+                stroke={selectedInspectId === 'PCSRC_MUX' ? '#2563eb' : 'black'}
                 strokeWidth={2}
             />
             <text
@@ -605,6 +779,14 @@ export default function StaticDatapathSvg({
                     {'X'}
                 </tspan>
             </text>
+            <InspectPathHitBox
+                id="PCSRC_MUX"
+                x={695}
+                y={66}
+                width={27}
+                height={90}
+                onInspect={onInspect}
+            />
             <path d="M709 157L709 183" stroke="#2C1AF4" strokeWidth={1.5} />
             <rect
                 x={822}
@@ -612,8 +794,12 @@ export default function StaticDatapathSvg({
                 width={27}
                 height={90}
                 rx={4}
-                fill="#F1F1F1"
-                stroke="black"
+                fill={
+                    selectedInspectId === 'MEMTOREG_MUX' ? '#eff6ff' : '#F1F1F1'
+                }
+                stroke={
+                    selectedInspectId === 'MEMTOREG_MUX' ? '#2563eb' : 'black'
+                }
                 strokeWidth={2}
             />
             <text
@@ -637,6 +823,14 @@ export default function StaticDatapathSvg({
                     {'X'}
                 </tspan>
             </text>
+            <InspectPathHitBox
+                id="MEMTOREG_MUX"
+                x={822}
+                y={450}
+                width={27}
+                height={90}
+                onInspect={onInspect}
+            />
             <path d="M836 432.5L836 450" stroke="#2C1AF4" strokeWidth={1.5} />
             <rect
                 x={485}
@@ -644,8 +838,12 @@ export default function StaticDatapathSvg({
                 width={27}
                 height={90}
                 rx={4}
-                fill="#F1F1F1"
-                stroke="black"
+                fill={
+                    selectedInspectId === 'ALUSRC_MUX' ? '#eff6ff' : '#F1F1F1'
+                }
+                stroke={
+                    selectedInspectId === 'ALUSRC_MUX' ? '#2563eb' : 'black'
+                }
                 strokeWidth={2}
             />
             <text
@@ -669,6 +867,14 @@ export default function StaticDatapathSvg({
                     {'X'}
                 </tspan>
             </text>
+            <InspectPathHitBox
+                id="ALUSRC_MUX"
+                x={485}
+                y={381}
+                width={27}
+                height={90}
+                onInspect={onInspect}
+            />
             <path d="M499 366L499 380" stroke="#2C1AF4" strokeWidth={1.5} />
             <rect
                 x={218}
@@ -676,8 +882,12 @@ export default function StaticDatapathSvg({
                 width={27}
                 height={90}
                 rx={4}
-                fill="#F1F1F1"
-                stroke="black"
+                fill={
+                    selectedInspectId === 'REGDST_MUX' ? '#eff6ff' : '#F1F1F1'
+                }
+                stroke={
+                    selectedInspectId === 'REGDST_MUX' ? '#2563eb' : 'black'
+                }
                 strokeWidth={2}
             />
             <text
@@ -701,6 +911,14 @@ export default function StaticDatapathSvg({
                     {'X'}
                 </tspan>
             </text>
+            <InspectPathHitBox
+                id="REGDST_MUX"
+                x={218}
+                y={365}
+                width={27}
+                height={90}
+                onInspect={onInspect}
+            />
             <path d="M232 456L232 471" stroke="#2C1AF4" strokeWidth={1.5} />
             <path
                 d="M269 104H294.5"
@@ -875,7 +1093,7 @@ export default function StaticDatapathSvg({
                 letterSpacing="0em"
             >
                 <tspan x={0.0185547 + 32} y={14.4545}>
-                    {bits.opcode}
+                    {bits.opcode.bin}
                 </tspan>
             </text>
             <text
@@ -892,7 +1110,7 @@ export default function StaticDatapathSvg({
                 letterSpacing="0em"
             >
                 <tspan x={0.182129 + 25} y={14.4545}>
-                    {bits.shamt}
+                    {bits.shamt.bin}
                 </tspan>
             </text>
             <text
@@ -928,7 +1146,7 @@ export default function StaticDatapathSvg({
                 letterSpacing="0em"
             >
                 <tspan x={0.0185547 + 31} y={14.4545}>
-                    {bits.funct}
+                    {bits.funct.bin}
                 </tspan>
             </text>
             <text
@@ -945,7 +1163,7 @@ export default function StaticDatapathSvg({
                 letterSpacing="0em"
             >
                 <tspan x={5.18213 + 26} y={14.4545}>
-                    {bits.rd}
+                    {bits.rd.bin}
                 </tspan>
             </text>
             <text
@@ -1000,9 +1218,19 @@ export default function StaticDatapathSvg({
                 letterSpacing="0em"
             >
                 <tspan x={0.182129 + 25} y={14.4545}>
-                    {bits.rs}
+                    {bits.rs.bin}
                 </tspan>
             </text>
+
+            <InspectPathHitBox
+                id="INSTRUCTION_REGISTER"
+                x={95}
+                y={178}
+                width={31}
+                height={405}
+                onInspect={onInspect}
+            />
+
             <text
                 fill={signalFill('RegDst')}
                 style={{

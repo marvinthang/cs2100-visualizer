@@ -1,10 +1,10 @@
 import type {
-    RuntimeControlSignals,
     DatapathInstructionFields,
-    DatapathPath,
     DatapathStep,
-} from '../../../types/mips';
+} from '../../../../types/mips';
+import type { RuntimeControlSignals } from '../control/types';
 import type { ExecutionContext } from '../execution/executionContext';
+import type { DatapathPath } from './types';
 
 export function getDatapathStepPaths(
     step: DatapathStep,

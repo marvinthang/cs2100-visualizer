@@ -1,7 +1,7 @@
 import type {
     DatapathInstructionFields,
     RegisterNumber,
-} from '../../../types/mips';
+} from '../../../../types/mips';
 
 export type ExecutionContext = {
     instruction?: DatapathInstructionFields;
@@ -14,6 +14,7 @@ export type ExecutionContext = {
     immediate?: number;
     aluOp1?: number;
     aluOp2?: number;
+    aluOp?: 'add' | 'sub' | 'and' | 'or' | 'slt' | undefined;
     aluResult?: number;
     isZero?: boolean;
     branchTarget?: number;
