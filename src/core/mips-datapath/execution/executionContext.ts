@@ -1,4 +1,7 @@
-import type { DatapathInstructionFields, RegisterNumber } from '../../types/mips';
+import type {
+    DatapathInstructionFields,
+    RegisterNumber,
+} from '../../../types/mips';
 
 export type ExecutionContext = {
     instruction?: DatapathInstructionFields;
@@ -20,8 +23,11 @@ export type ExecutionContext = {
     writeData?: number;
     nextPc?: number;
     branchTaken?: boolean;
+    logs: string[];
 };
 
 export function createEmptyExecutionContext(): ExecutionContext {
-    return {};
+    return {
+        logs: [],
+    };
 }

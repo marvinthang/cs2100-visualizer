@@ -1,4 +1,10 @@
-import type { ControlHighlightId, ControlSignals, DatapathSegment, DatapathValueId, EncodedInstruction } from '../../../types/mips';
+import type {
+    ControlSignalId,
+    DatapathSegment,
+    DatapathValueId,
+    EncodedInstruction,
+    RuntimeControlSignals,
+} from '../../../types/mips';
 
 export default function StaticDatapathSvg({
     bits,
@@ -12,23 +18,23 @@ export default function StaticDatapathSvg({
     valueFill,
 }: {
     bits: EncodedInstruction;
-    signals: ControlSignals;
+    signals: RuntimeControlSignals;
     wireStroke: (id: DatapathSegment) => string;
     wireStrokeWidth: (id: DatapathSegment) => number;
     wireFill: (id: DatapathSegment) => string;
     wireArrow: (id: DatapathSegment) => string;
-    signalFill: (signal: keyof ControlSignals) => string;
-    muxFill: (signal: ControlHighlightId) => string;
+    signalFill: (signal: ControlSignalId) => string;
+    muxFill: (signal: ControlSignalId) => string;
     valueFill: (id: DatapathValueId) => string;
 }) {
     return (
         <svg
-            width={900}
-            height={600}
+            width={789}
+            height={526}
             viewBox="0 0 900 600"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
-            className="mt-6 rounded border bg-white"
+            className="rounded border bg-white"
         >
             <defs>
                 <marker
@@ -492,7 +498,7 @@ export default function StaticDatapathSvg({
                 fontWeight="bold"
                 letterSpacing="0em"
             >
-                <tspan x={0.182129+26} y={14.4545}>
+                <tspan x={0.182129 + 26} y={14.4545}>
                     {bits.rt}
                 </tspan>
             </text>
@@ -868,7 +874,7 @@ export default function StaticDatapathSvg({
                 fontWeight="bold"
                 letterSpacing="0em"
             >
-                <tspan x={0.0185547+32} y={14.4545}>
+                <tspan x={0.0185547 + 32} y={14.4545}>
                     {bits.opcode}
                 </tspan>
             </text>
@@ -885,7 +891,7 @@ export default function StaticDatapathSvg({
                 fontWeight="bold"
                 letterSpacing="0em"
             >
-                <tspan x={0.182129+25} y={14.4545}>
+                <tspan x={0.182129 + 25} y={14.4545}>
                     {bits.shamt}
                 </tspan>
             </text>
@@ -921,7 +927,7 @@ export default function StaticDatapathSvg({
                 fontWeight="bold"
                 letterSpacing="0em"
             >
-                <tspan x={0.0185547+31} y={14.4545}>
+                <tspan x={0.0185547 + 31} y={14.4545}>
                     {bits.funct}
                 </tspan>
             </text>
@@ -938,7 +944,7 @@ export default function StaticDatapathSvg({
                 fontWeight="bold"
                 letterSpacing="0em"
             >
-                <tspan x={5.18213+26} y={14.4545}>
+                <tspan x={5.18213 + 26} y={14.4545}>
                     {bits.rd}
                 </tspan>
             </text>
@@ -993,7 +999,7 @@ export default function StaticDatapathSvg({
                 fontWeight="bold"
                 letterSpacing="0em"
             >
-                <tspan x={0.182129+25} y={14.4545}>
+                <tspan x={0.182129 + 25} y={14.4545}>
                     {bits.rs}
                 </tspan>
             </text>
@@ -1058,7 +1064,7 @@ export default function StaticDatapathSvg({
                 </tspan>
             </text>
             <text
-                fill='#2C1AF4'
+                fill="#2C1AF4"
                 style={{
                     whiteSpace: 'pre',
                 }}
@@ -1107,14 +1113,15 @@ export default function StaticDatapathSvg({
                 style={{
                     whiteSpace: 'pre',
                 }}
+                textAnchor="middle"
                 xmlSpace="preserve"
                 fontFamily="Inter"
                 fontSize={17}
                 fontWeight="bold"
                 letterSpacing="0em"
             >
-                <tspan x={683.284} y={199.682}>
-                    {'PCSrc'}
+                <tspan x={708.284} y={199.682}>
+                    {`PCSrc${signals.PCSrc === undefined ? '' : `=${signals.PCSrc}`}`}
                 </tspan>
             </text>
             <text

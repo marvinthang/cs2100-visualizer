@@ -1,16 +1,16 @@
-import type { DatapathStage } from '../../../types/mips';
+import type { DatapathStep } from '../../../types/mips';
 
 export default function StepControls({
-    stage,
-    isFirstStage,
-    isLastStage,
+    step,
+    isFirstStep,
+    isLastStep,
     onPreviousStep,
     onNextStep,
     onResetStep,
 }: {
-    stage: DatapathStage | null;
-    isFirstStage: boolean;
-    isLastStage: boolean;
+    step: DatapathStep | null;
+    isFirstStep: boolean;
+    isLastStep: boolean;
     onPreviousStep: () => void;
     onNextStep: () => void;
     onResetStep: () => void;
@@ -20,7 +20,7 @@ export default function StepControls({
             <div className="mb-3 flex items-center justify-between">
                 <h2 className="text-sm font-semibold text-slate-900">Step-by-step execution</h2>
                 <span className="rounded-md bg-slate-100 px-2 py-1 font-mono text-xs text-slate-700">
-                    {stage ?? 'Not started'}
+                    {step ?? 'Not started'}
                 </span>
             </div>
 
@@ -28,7 +28,7 @@ export default function StepControls({
                 <button
                     type="button"
                     onClick={onPreviousStep}
-                    disabled={isFirstStage}
+                    disabled={isFirstStep}
                     className="rounded-md bg-slate-900 px-3 py-1.5 text-sm font-medium text-white disabled:bg-slate-300"
                 >
                     Previous
@@ -37,7 +37,7 @@ export default function StepControls({
                 <button
                     type="button"
                     onClick={onNextStep}
-                    disabled={isLastStage}
+                    disabled={isLastStep}
                     className="rounded-md bg-slate-900 px-3 py-1.5 text-sm font-medium text-white disabled:bg-slate-300"
                 >
                     Next
@@ -48,7 +48,7 @@ export default function StepControls({
                     onClick={onResetStep}
                     className="rounded-md border border-slate-200 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-100"
                 >
-                    Reset step
+                    Reset
                 </button>
             </div>
         </div>

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import type { MachineState } from '../../../core/mips/machineState';
+import type { MachineState } from '../../../core/mips-datapath/execution/machineState';
 import type { MachineStateHighlightState, RegisterNumber } from '../../../types/mips';
-import { getHighlightBackgroundClass, getHighlightTextClass } from '../../../core/mips/datapathHighlightState';
+import { getHighlightBackgroundClass, getHighlightTextClass } from '../../../core/mips-datapath/highlight/datapathHighlightState';
 
 const registerRows = [
     [0, '$zero'],
@@ -83,7 +83,7 @@ export default function RegisterTable({
                 </div>
             </div>
 
-            <div className="max-h-[450px] overflow-auto">
+            <div className="max-h-[200px] overflow-auto">
                 <table className="w-full text-sm">
                     <thead className="sticky top-0 bg-white">
                         <tr className="border-b border-slate-200 text-left text-xs text-slate-500">
@@ -98,7 +98,7 @@ export default function RegisterTable({
                             const textClass = getHighlightTextClass(role);
                             const bgClass = getHighlightBackgroundClass(role);
                             return (
-                                <tr key={id} className={`border-b border-slate-100 font-mono ${bgClass}`}>
+                                <tr key={id} className={`border-b border-slate-100 font-mono text-xs ${bgClass}`}>
                                     <td className={`py-1.5 pr-2 text-slate-500 ${textClass}`}>{id}</td>
                                     <td className={`py-1.5 pr-2 ${textClass}`}>{name}</td>
                                     <td className={`py-1.5 text-right ${textClass}`}>
@@ -129,7 +129,7 @@ export default function RegisterTable({
                                                     event.currentTarget.blur();
                                                 }
                                             }}
-                                            className="w-24 rounded-md border border-slate-200 px-2 py-1 text-right text-slate-900 disabled:bg-slate-100 disabled:text-slate-400"
+                                            className="w-24 rounded-md border border-slate-200 px-2 py-1 text-left text-slate-900 disabled:bg-slate-100 disabled:text-slate-400"
                                         />
                                     </td>
                                 </tr>

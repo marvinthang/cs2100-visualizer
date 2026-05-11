@@ -1,13 +1,17 @@
-import type { ControlSignals, DatapathStage, DatapathStepValueHighlights, DatapathValueId } from "../../types/mips";
-import type { ExecutionContext } from "./executionContext";
+import type {
+    RuntimeControlSignals,
+    DatapathStep,
+    DatapathStepValueHighlights,
+    DatapathValueId,
+} from '../../../types/mips';
+import type { ExecutionContext } from '../execution/executionContext';
 
-export default function datapathStepValueHighlights(
-    stage: DatapathStage | null,
-    signals: ControlSignals,
-    context: ExecutionContext
+export function getDatapathStepValueHighlights(
+    step: DatapathStep | null,
+    signals: RuntimeControlSignals,
+    context: ExecutionContext,
 ): DatapathStepValueHighlights {
-
-    if (stage === 'IF') {
+    if (step === 'IF') {
         return {
             inputs: ['PC'],
             outputs: ['IM_ADDRESS', 'IM_INSTRUCTION', 'ADD4'],
@@ -15,7 +19,7 @@ export default function datapathStepValueHighlights(
         };
     }
 
-    if (stage === 'ID') {
+    if (step === 'ID') {
         return {
             inputs: [
                 'IR_OPCODE',
@@ -36,32 +40,46 @@ export default function datapathStepValueHighlights(
         };
     }
 
-    if (stage === 'EX') {
+    if (step === 'EX') {
         return {
             inputs: [
                 'RF_RD1',
-                ...(signals.ALUSrc === 1 || signals.Branch === 1 || signals.BranchNE === 1 ? ['SIGN_EXTEND'] : []),
+                ...(signals.ALUSrc === 1 ||
+                signals.Branch === 1 ||
+                signals.BranchNE === 1
+                    ? ['SIGN_EXTEND']
+                    : []),
                 ...(signals.ALUSrc === 0 ? ['RF_RD2'] : []),
-                ...(signals.Branch === 1 || signals.BranchNE === 1 ? ['ADD4'] : []),
+                ...(signals.Branch === 1 || signals.BranchNE === 1
+                    ? ['ADD4']
+                    : []),
             ] as DatapathValueId[],
             outputs: [
                 'ALU_OP1',
                 'ALU_OP2',
                 'ALU_RESULT',
                 'ALU_ZERO',
-                ...(signals.Branch === 1 || signals.BranchNE === 1 ? ['LEFT_SHIFT_2', 'BRANCH_ADDER'] : []),
+                ...(signals.Branch === 1 || signals.BranchNE === 1
+                    ? ['LEFT_SHIFT_2', 'BRANCH_ADDER']
+                    : []),
             ] as DatapathValueId[],
             controls: ['ALUSrc', 'ALUOp'],
         };
     }
 
-    if (stage === 'MEM') {
+    if (step === 'MEM') {
         return {
             inputs: [
                 'ALU_RESULT',
                 'RF_RD2',
-                ...(context.branchTaken === undefined ? [] : context.branchTaken ? ['BRANCH_ADDER'] : ['ADD4']),
-                ...(signals.Branch === 1 || signals.BranchNE === 1 ? ['ALU_ZERO'] : []),
+                ...(context.branchTaken === undefined
+                    ? []
+                    : context.branchTaken
+                      ? ['BRANCH_ADDER']
+                      : ['ADD4']),
+                ...(signals.Branch === 1 || signals.BranchNE === 1
+                    ? ['ALU_ZERO']
+                    : []),
             ] as DatapathValueId[],
             outputs: [
                 'DM_ADDRESS',
@@ -73,10 +91,14 @@ export default function datapathStepValueHighlights(
         };
     }
 
-    if (stage === 'WB') {
+    if (step === 'WB') {
         return {
             inputs: [
-                ...(signals.MemToReg === 'X' ? [] : signals.MemToReg === 1 ? ['DM_READ_DATA'] : ['ALU_RESULT']),
+                ...(signals.MemToReg === 'X'
+                    ? []
+                    : signals.MemToReg === 1
+                      ? ['DM_READ_DATA']
+                      : ['ALU_RESULT']),
             ] as DatapathValueId[],
             outputs: [
                 ...(signals.MemToReg !== 'X' ? ['RF_WD'] : []),

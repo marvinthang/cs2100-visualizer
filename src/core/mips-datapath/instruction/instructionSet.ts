@@ -1,4 +1,4 @@
-import type { DatapathMnemonic, MipsMnemonic } from '../../types/mips';
+import type { DatapathMnemonic, MipsMnemonic } from '../../../types/mips';
 
 export const mipsMnemonics: MipsMnemonic[] = [
     'add',
@@ -30,13 +30,15 @@ export const datapathMnemonics: DatapathMnemonic[] = [
     'slt',
     'or',
     'sw',
-    'sub'
+    'sub',
 ];
 
 export function isMipsMnemonic(mnemonic: string): mnemonic is MipsMnemonic {
     return mipsMnemonics.includes(mnemonic as MipsMnemonic);
 }
 
-export function isDatapathMnemonic(mnemonic: string): mnemonic is DatapathMnemonic {
+export function isDatapathMnemonic(
+    mnemonic: string,
+): mnemonic is DatapathMnemonic {
     return datapathMnemonics.includes(mnemonic as DatapathMnemonic);
 }

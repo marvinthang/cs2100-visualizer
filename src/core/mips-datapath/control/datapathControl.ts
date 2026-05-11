@@ -1,6 +1,6 @@
-import type { ControlSignals, DatapathMnemonic } from "../../types/mips";
+import type { BaseControlSignals, DatapathMnemonic } from '../../../types/mips';
 
-const rTypeControl: ControlSignals = {
+const rTypeControl: BaseControlSignals = {
     RegDst: 1,
     ALUSrc: 0,
     MemToReg: 0,
@@ -12,7 +12,7 @@ const rTypeControl: ControlSignals = {
     ALUOp: '10',
 };
 
-const addiControl: ControlSignals = {
+const addiControl: BaseControlSignals = {
     RegDst: 0,
     ALUSrc: 1,
     MemToReg: 0,
@@ -24,7 +24,7 @@ const addiControl: ControlSignals = {
     ALUOp: '00',
 };
 
-const beqControl: ControlSignals = {
+const beqControl: BaseControlSignals = {
     RegDst: 'X',
     ALUSrc: 0,
     MemToReg: 'X',
@@ -36,7 +36,7 @@ const beqControl: ControlSignals = {
     ALUOp: '01',
 };
 
-const bneControl: ControlSignals = {
+const bneControl: BaseControlSignals = {
     RegDst: 'X',
     ALUSrc: 0,
     MemToReg: 'X',
@@ -48,7 +48,7 @@ const bneControl: ControlSignals = {
     ALUOp: '01',
 };
 
-const lwControl: ControlSignals = {
+const lwControl: BaseControlSignals = {
     RegDst: 0,
     ALUSrc: 1,
     MemToReg: 1,
@@ -60,7 +60,7 @@ const lwControl: ControlSignals = {
     ALUOp: '00',
 };
 
-const swControl: ControlSignals = {
+const swControl: BaseControlSignals = {
     RegDst: 'X',
     ALUSrc: 1,
     MemToReg: 'X',
@@ -72,7 +72,10 @@ const swControl: ControlSignals = {
     ALUOp: '00',
 };
 
-export const datapathControlTable: Record<DatapathMnemonic, ControlSignals> = {
+export const datapathControlTable: Record<
+    DatapathMnemonic,
+    BaseControlSignals
+> = {
     add: rTypeControl,
     addi: addiControl,
     and: rTypeControl,
@@ -85,6 +88,8 @@ export const datapathControlTable: Record<DatapathMnemonic, ControlSignals> = {
     sub: rTypeControl,
 };
 
-export function getDatapathControlSignals(mnemonic: DatapathMnemonic): ControlSignals {
+export function getDatapathControlSignals(
+    mnemonic: DatapathMnemonic,
+): BaseControlSignals {
     return datapathControlTable[mnemonic];
 }

@@ -1,5 +1,5 @@
-import { getHighlightBackgroundClass, getHighlightTextClass } from "../../../core/mips/datapathHighlightState";
-import type { ExecutionContext } from "../../../core/mips/executionContext";
+import { getHighlightBackgroundClass, getHighlightTextClass } from "../../../core/mips-datapath/highlight/datapathHighlightState";
+import type { ExecutionContext } from "../../../core/mips-datapath/execution/executionContext";
 import type { DatapathHighlightState } from "../../../types/mips";
 
 function formatValue(value: number | undefined): string {
@@ -34,31 +34,32 @@ export default function DatapathValueTable({
     return (
         <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
             <h2 className="mb-3 text-sm font-semibold text-slate-900">Datapath Values</h2>
+            <div className="max-h-[200px] overflow-auto">
+                <table className="w-full text-sm">
+                    <thead>
+                        <tr className="border-b border-slate-200 text-left text-xs text-slate-500">
+                            <th className="py-2 pr-3">Reg</th>
+                            <th className="py-2 text-right">Value</th>
+                        </tr>
+                    </thead>
 
-            <table className="w-full text-sm">
-                <thead>
-                    <tr className="border-b border-slate-200 text-left text-xs text-slate-500">
-                        <th className="py-2 pr-3">Reg</th>
-                        <th className="py-2 text-right">Value</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-                    {rows.map(([name, label, value]) => {
-                        const role = datapathHighlight.values[name] ?? 'normal';
-                        const textClass = getHighlightTextClass(role);
-                        const bgClass = getHighlightBackgroundClass(role);
-                        return (
-                            <tr key={name} className={`border-b border-slate-100 font-mono ${bgClass}`}>
-                                <td className={`py-1.5 pr-3 ${textClass}`}>{label}</td>
-                                <td className={`py-1.5 text-right ${textClass}`}>
-                                    {formatValue(value)}
-                                </td>
-                            </tr>
-                        );
-                    })}
-                </tbody>
-            </table>
+                    <tbody>
+                        {rows.map(([name, label, value]) => {
+                            const role = datapathHighlight.values[name] ?? 'normal';
+                            const textClass = getHighlightTextClass(role);
+                            const bgClass = getHighlightBackgroundClass(role);
+                            return (
+                                <tr key={name} className={`border-b border-slate-100 font-mono text-xs ${bgClass}`}>
+                                    <td className={`py-1.5 pr-3 ${textClass}`}>{label}</td>
+                                    <td className={`py-1.5 text-right ${textClass}`}>
+                                        {formatValue(value)}
+                                    </td>
+                                </tr>
+                            );
+                        })}
+                    </tbody>
+                </table>
+            </div>
         </div>
     );
 }

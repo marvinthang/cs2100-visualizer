@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import type { MachineState } from '../../../core/mips/machineState';
+import type { MachineState } from '../../../core/mips-datapath/execution/machineState';
 import type { MachineStateHighlightState } from '../../../types/mips';
-import { getHighlightBackgroundClass, getHighlightTextClass } from '../../../core/mips/datapathHighlightState';
+import { getHighlightBackgroundClass, getHighlightTextClass } from '../../../core/mips-datapath/highlight/datapathHighlightState';
 
 function makeDataMemoryDrafts(machine: MachineState): Record<number, string> {
     return Object.fromEntries(
@@ -46,11 +46,13 @@ export default function MemoryTable({
         <div
             className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm"
         >
-            <div className="mb-3 flex items-center justify-between">
-                <h2 className="text-sm font-semibold text-slate-900">Data Memory</h2>
+            <div className="flex items-start justify-between gap-3">
+                <h2 className="text-sm font-semibold text-slate-900">
+                    Data Memory
+                </h2>
                 <div className="flex items-center gap-2">
                     <span className="rounded-md bg-slate-100 px-2 py-1 font-mono text-xs text-slate-700">
-                        {memoryRows.length > 0 ? `Address range: ${memoryRows[0].address} - ${memoryRows[memoryRows.length - 1].address}` : 'Empty'}
+                        {memoryRows.length > 0 ? `Addr range: ${memoryRows[0].address} - ${memoryRows[memoryRows.length - 1].address}` : 'Empty'}
                     </span>
                     <button
                         type="button"
@@ -63,7 +65,7 @@ export default function MemoryTable({
             </div>
             <div className="mb-4 grid grid-cols-[1fr_1fr_auto] gap-2">
                 <label className="text-xs font-medium text-slate-600">
-                    Start address
+                    Start addr
                     <input
                         type="number"
                         min={0}
@@ -93,11 +95,11 @@ export default function MemoryTable({
                         Apply
                     </button>
             </div>
-            <div className="max-h-[400px] overflow-auto">
+            <div className="max-h-[200px] overflow-auto">
                 <table className="w-full text-sm">
                     <thead className="sticky top-0 bg-white">
                         <tr className="border-b border-slate-200 text-left text-xs text-slate-500">
-                            <th className="py-2 pr-2">Address</th>
+                            <th className="py-2 pr-2">Addr</th>
                             <th className="py-2 pr-2">Hex</th>
                             <th className="py-2 text-right">Value</th>
                         </tr>
@@ -108,7 +110,7 @@ export default function MemoryTable({
                             const textClass = getHighlightTextClass(role);
                             const bgClass = getHighlightBackgroundClass(role);
                             return (
-                                <tr key={address} className={`border-b border-slate-100 font-mono ${bgClass}`}>
+                                <tr key={address} className={`border-b border-slate-100 font-mono text-xs ${bgClass}`}>
                                     <td className={`py-1.5 pr-2 ${textClass}`}>{address}</td>
                                     <td className={`py-1.5 pr-2 ${textClass}`}>0x{Number(address).toString(16).toUpperCase().padStart(8, '0')}</td>
                                     <td className={`py-1.5 text-right ${textClass}`}>

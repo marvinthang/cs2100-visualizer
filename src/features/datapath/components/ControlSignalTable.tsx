@@ -1,7 +1,12 @@
-import type { ControlSignals, DatapathHighlightState } from "../../../types/mips";
+import type {
+    BaseControlSignals,
+    ControlSignalId,
+    DatapathHighlightState,
+    RuntimeControlSignals,
+} from '../../../types/mips';
 
 const controlSignalOptions: {
-    [Signal in keyof ControlSignals]: readonly ControlSignals[Signal][];
+    [Signal in keyof BaseControlSignals]: readonly BaseControlSignals[Signal][];
 } = {
     RegDst: [0, 1, 'X'],
     ALUSrc: [0, 1],
@@ -21,24 +26,24 @@ export default function ControlSignalTable({
     editable,
     datapathHighlight,
 }: {
-    signals: ControlSignals;
-    defaultSignals: ControlSignals;
-    onChange: (signals: ControlSignals) => void;
+    signals: RuntimeControlSignals;
+    defaultSignals: RuntimeControlSignals;
+    onChange: (signals: RuntimeControlSignals) => void;
     editable: boolean;
     datapathHighlight: DatapathHighlightState;
 }) {
-    function updateSignal<K extends keyof ControlSignals>(
+    function updateSignal<K extends keyof BaseControlSignals>(
         name: K,
-        value: ControlSignals[K]
+        value: BaseControlSignals[K],
     ) {
         onChange({
             ...signals,
             [name]: value,
-        })
+        });
     }
 
     return (
-        <table className="rounded w-full mt-6 text-sm">
+        <table className="rounded w-full text-sm">
             <thead className="bg-slate-100">
                 <tr>
                     <th className="border border-slate-300 px-4 py-2 text-left">
@@ -51,46 +56,63 @@ export default function ControlSignalTable({
             </thead>
 
             <tbody>
-                {(Object.entries(signals) as [keyof ControlSignals, ControlSignals[keyof ControlSignals]][]).map(([signal, value]) => {
+                {(
+                    Object.entries(signals) as [
+                        ControlSignalId,
+                        RuntimeControlSignals[ControlSignalId],
+                    ][]
+                ).map(([signal, value]) => {
                     const isModified = value !== defaultSignals[signal];
                     const role = datapathHighlight.controls[signal];
-                    const bgClass = role === undefined ? (isModified ? 'bg-orange-100' : undefined) : 'bg-blue-100';
+                    const bgClass =
+                        role === undefined
+                            ? isModified
+                                ? 'bg-orange-100'
+                                : undefined
+                            : 'bg-blue-100';
                     return (
-                        <tr 
+                        <tr
                             key={signal}
                             className={`border border-slate-300 ${bgClass}`}
                         >
                             <td className="border border-slate-300 px-4 py-2 font-medium">
                                 {signal}
                             </td>
-                            <td 
-                                className={
-                                    `border border-slate-300 px-4 py-2 font-semibold text-center ${isModified ? 'text-red-600' : 'text-green-600'}`
-                                }
+                            <td
+                                className={`border border-slate-300 px-4 py-2 font-semibold text-center ${isModified ? 'text-red-600' : 'text-green-600'}`}
                             >
-                                {editable && signal != 'ALUOp' ? (
+                                {editable &&
+                                signal != 'ALUOp' &&
+                                signal != 'PCSrc' ? (
                                     <select
                                         value={String(value)}
                                         onChange={(event) => {
                                             updateSignal(
                                                 signal,
-                                                parseControlValue(signal, event.target.value)
+                                                parseControlValue(
+                                                    signal,
+                                                    event.target.value,
+                                                ),
                                             );
                                         }}
                                         className="rounded border px-2 py-1"
                                     >
-                                        {controlSignalOptions[signal].map((option) => (
-                                            <option 
-                                                key={String(option)} value={String(option)}
-                                                className={
-                                                    option !== defaultSignals[signal]
-                                                        ? 'text-red-600'
-                                                        : 'text-green-600'
-                                                }
-                                            >
-                                                {option}
-                                            </option>
-                                        ))}
+                                        {controlSignalOptions[signal].map(
+                                            (option) => (
+                                                <option
+                                                    key={String(option)}
+                                                    value={String(option)}
+                                                    className={
+                                                        option !==
+                                                        defaultSignals[signal]
+                                                            ? 'text-red-600'
+                                                            : 'text-green-600'
+                                                    }
+                                                >
+                                                    {option}
+                                                </option>
+                                            ),
+                                        )}
                                     </select>
                                 ) : (
                                     <span>{value}</span>
@@ -101,19 +123,25 @@ export default function ControlSignalTable({
                 })}
             </tbody>
         </table>
-    )
+    );
 }
 
-function parseControlValue<K extends keyof ControlSignals>(
+function parseControlValue<K extends keyof BaseControlSignals>(
     signal: K,
-    value: string
-): ControlSignals[K] {
+    value: string,
+): BaseControlSignals[K] {
+    if (controlSignalOptions[signal] === undefined) {
+        throw new Error(`Unknown control signal "${signal}"`);
+    }
+
     const option = controlSignalOptions[signal].find(
-        (candidate) => String(candidate) === value
+        (candidate) => String(candidate) === value,
     );
 
     if (option === undefined) {
-        throw new Error(`Invalid value "${value}" for control signal "${signal}"`);
+        throw new Error(
+            `Invalid value "${value}" for control signal "${signal}"`,
+        );
     }
 
     return option;

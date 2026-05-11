@@ -1,22 +1,12 @@
-import type { DatapathPath, DatapathSegment } from "../../types/mips";
+import type { DatapathPath, DatapathSegment } from '../../../types/mips';
 
-export const datapathPathSegments: Partial<Record<DatapathPath, DatapathSegment[]>> = {
-    PC_TO_ADD4: [
-        'PC_TO_PC_JUNCTION',
-        'PC_JUNCTION',
-        'PC_JUNCTION_TO_ADD4',
-    ],
-    CONST4_TO_ADD4: [
-        'CONST4_TO_ADD4',
-    ],
-    PC_TO_IM: [
-        'PC_TO_PC_JUNCTION',
-        'PC_JUNCTION',
-        'PC_JUNCTION_TO_IM',
-    ],
-    IM_TO_IR: [
-        'IM_TO_IR',
-    ],
+export const datapathPathSegments: Partial<
+    Record<DatapathPath, DatapathSegment[]>
+> = {
+    PC_TO_ADD4: ['PC_TO_PC_JUNCTION', 'PC_JUNCTION', 'PC_JUNCTION_TO_ADD4'],
+    CONST4_TO_ADD4: ['CONST4_TO_ADD4'],
+    PC_TO_IM: ['PC_TO_PC_JUNCTION', 'PC_JUNCTION', 'PC_JUNCTION_TO_IM'],
+    IM_TO_IR: ['IM_TO_IR'],
     ADD4_TO_BRANCH_ADDER0: [
         'ADD4_TO_ADD4_JUNCTION',
         'ADD4_JUNCTION',
@@ -27,12 +17,8 @@ export const datapathPathSegments: Partial<Record<DatapathPath, DatapathSegment[
         'ADD4_JUNCTION',
         'ADD4_JUNCTION_TO_PCSRC_MUX0',
     ],
-    PCSRC_MUX_TO_PC: [
-        'PCSRC_MUX_TO_PC',
-    ],
-    IR_RS_TO_RF_RR1: [
-        'IR_RS_TO_RF_RR1',
-    ],
+    PCSRC_MUX_TO_PC: ['PCSRC_MUX_TO_PC'],
+    IR_RS_TO_RF_RR1: ['IR_RS_TO_RF_RR1'],
     IR_RT_TO_RF_RR2: [
         'IR_RT_TO_RT_JUNCTION',
         'RT_JUNCTION',
@@ -43,15 +29,9 @@ export const datapathPathSegments: Partial<Record<DatapathPath, DatapathSegment[
         'RT_JUNCTION',
         'RT_JUNCTION_TO_REGDST_MUX0',
     ],
-    IR_RD_TO_REGDST_MUX1: [
-        'IR_RD_TO_REGDST_MUX1',
-    ],
-    REGDST_MUX_TO_RF_WR: [
-        'REGDST_MUX_TO_RF_WR',
-    ],
-    IR_IMM_TO_SIGN_EXTEND: [
-        'IR_IMM_TO_SIGN_EXTEND',
-    ],
+    IR_RD_TO_REGDST_MUX1: ['IR_RD_TO_REGDST_MUX1'],
+    REGDST_MUX_TO_RF_WR: ['REGDST_MUX_TO_RF_WR'],
+    IR_IMM_TO_SIGN_EXTEND: ['IR_IMM_TO_SIGN_EXTEND'],
     RF_RD1_TO_ALU1: ['RF_RD1_TO_ALU1'],
     RF_RD2_TO_ALUSRC_MUX0: [
         'RF_RD2_TO_RD2_JUNCTION',
@@ -102,6 +82,8 @@ export const datapathPathSegments: Partial<Record<DatapathPath, DatapathSegment[
     ],
 };
 
-export function getActiveDatapathSegments(activePaths: readonly DatapathPath[]): DatapathSegment[] {
+export function getActiveDatapathSegments(
+    activePaths: readonly DatapathPath[],
+): DatapathSegment[] {
     return activePaths.flatMap((path) => datapathPathSegments[path] ?? []);
 }

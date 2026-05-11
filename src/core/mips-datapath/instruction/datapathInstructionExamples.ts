@@ -1,6 +1,12 @@
-import type { DatapathInstructionFields, DatapathMnemonic } from '../../types/mips';
+import type {
+    DatapathInstructionFields,
+    DatapathMnemonic,
+} from '../../../types/mips';
 
-export const datapathInstructionExamples: Record<DatapathMnemonic, DatapathInstructionFields> = {
+export const datapathInstructionExamples: Record<
+    DatapathMnemonic,
+    DatapathInstructionFields
+> = {
     add: {
         mnemonic: 'add',
         rs: 9,
