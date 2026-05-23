@@ -1,0 +1,23 @@
+{
+  "$schema": "https://raw.githubusercontent.com/stryker-mutator/stryker-js/master/packages/api/schema/stryker-core.json",
+  "_comment": "sim bits substrate mutation coverage",
+  "packageManager": "npm",
+  "reporters": ["clear-text"],
+  "testRunner": "command",
+  "commandRunner": {
+    "command": "bun test src/index.test.ts"
+  },
+  "mutate": ["src/index.ts"],
+  "thresholds": {
+    "high": 90,
+    "low": 80,
+    "break": 80
+  },
+  "checkers": [],
+  "coverageAnalysis": "off",
+  "tempDirName": ".stryker-tmp",
+  "concurrency": 4,
+  "timeoutMS": 30000,
+  "incremental": true,
+  "incrementalFile": "/tmp/stryker-incremental-bits.json"
+}

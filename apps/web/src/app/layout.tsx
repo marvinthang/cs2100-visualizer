@@ -1,0 +1,25 @@
+import type { Metadata } from 'next'
+import type { ReactNode } from 'react'
+import { cn } from '@a/ui'
+import AppShell from '@/components/app-shell'
+import CommandPalette from '@/features/command-palette/command-palette'
+import { mono, sans } from './fonts'
+import { Providers } from './providers'
+import './global.css'
+
+const metadata: Metadata = {
+  description: 'Interactive single-cycle MIPS datapath visualizer.',
+  title: 'MIPS datapath visualizer'
+}
+const Layout = ({ children }: { children: ReactNode }) => (
+  <html className={cn('font-sans tracking-[-0.02em]', sans.variable, mono.variable)} lang='en' suppressHydrationWarning>
+    <body className='min-h-screen antialiased'>
+      <Providers>
+        <AppShell>{children}</AppShell>
+        <CommandPalette />
+      </Providers>
+    </body>
+  </html>
+)
+export default Layout
+export { metadata }

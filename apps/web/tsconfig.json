@@ -1,6 +1,10 @@
 {
   "extends": "lintmax/tsconfig",
   "compilerOptions": {
+    "paths": {
+      "@/*": ["./src/*"],
+      "@content/*": ["./content/*"]
+    },
     "types": ["bun-types"]
   }
 }

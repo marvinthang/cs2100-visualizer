@@ -1,0 +1,28 @@
+{
+  "name": "@sim/bits",
+  "version": "0.0.1",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/1qh/sim",
+    "directory": "packages/bits"
+  },
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.mts",
+      "import": "./dist/index.mjs"
+    }
+  },
+  "main": "dist/index.mjs",
+  "types": "dist/index.d.mts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsdown",
+    "prepublishOnly": "bun run build",
+    "postpublish": "bun ../../tools/prune-versions.ts",
+    "test": "bun test"
+  }
+}
