@@ -1,0 +1,171 @@
+import { useState } from 'react';
+import {
+    assembleMipsProgram,
+    type AssembleMipsResult,
+    type AssembledMipsInstruction,
+} from '../../core/mips/assembly/assembleMipsProgram';
+import { executeInstruction } from '../../core/mips/execution/executeInstruction';
+import {
+    createInitialMachineState,
+    createZeroedDataMemory,
+    type MachineState,
+} from '../../core/mips/single-cycle/execution/machineState';
+import type { MachineStateHighlightState } from '../../core/mips/single-cycle/highlight/types';
+import type { RegisterNumber } from '../../types/mips';
+
+const emptyHighlight: MachineStateHighlightState = {
+    registers: {},
+    memory: {},
+};
+
+// Mark every register/memory cell that changed between two machine states, so
+// the tables can highlight what the last instruction wrote.
+function diffHighlight(
+    before: MachineState,
+    after: MachineState,
+): MachineStateHighlightState {
+    const registers: MachineStateHighlightState['registers'] = {};
+    for (const key of Object.keys(after.registers)) {
+        const id = Number(key) as RegisterNumber;
+        if (after.registers[id] !== before.registers[id]) {
+            registers[id] = 'output';
+        }
+    }
+
+    const memory: MachineStateHighlightState['memory'] = {};
+    for (const key of Object.keys(after.dataMemory)) {
+        const address = Number(key);
+        if (after.dataMemory[address] !== before.dataMemory[address]) {
+            memory[address] = 'output';
+        }
+    }
+
+    return { registers, memory, pc: 'output' };
+}
+
+export function useAssemblySimulator() {
+    const [machine, setMachine] = useState<MachineState>(() =>
+        createInitialMachineState(),
+    );
+    const [program, setProgram] = useState<AssembledMipsInstruction[]>([]);
+    const [programIndex, setProgramIndex] = useState(0);
+    const [loadedMachine, setLoadedMachine] = useState<MachineState | null>(
+        null,
+    );
+    const [machineHighlight, setMachineHighlight] =
+        useState<MachineStateHighlightState>(emptyHighlight);
+
+    const programLoaded = program.length > 0;
+    const programFinished = programLoaded && programIndex >= program.length;
+
+    // Assemble the editor source and load it. Returns the assemble result so the
+    // editor can show errors; only loads when there are none.
+    function handleLoadProgram(source: string): AssembleMipsResult {
+        const result = assembleMipsProgram(source);
+        if (result.errors.length > 0 || result.instructions.length === 0) {
+            return result;
+        }
+
+        const initialMachine: MachineState = { ...machine, pc: 0 };
+        setProgram(result.instructions);
+        setProgramIndex(0);
+        setLoadedMachine(initialMachine);
+        setMachine(initialMachine);
+        setMachineHighlight(emptyHighlight);
+
+        return result;
+    }
+
+    // Execute the current instruction in full, then advance to whatever PC it
+    // produced (next instruction, branch target, or jump target).
+    function handleStepInstruction() {
+        if (!programLoaded || programIndex >= program.length) {
+            return;
+        }
+
+        const after = executeInstruction(
+            machine,
+            program[programIndex].fields,
+        );
+        setMachineHighlight(diffHighlight(machine, after));
+        setMachine(after);
+        setProgramIndex(after.pc / 4);
+    }
+
+    function handleResetProgram() {
+        if (loadedMachine === null) {
+            return;
+        }
+        setMachine(loadedMachine);
+        setProgramIndex(0);
+        setMachineHighlight(emptyHighlight);
+    }
+
+    function handleRegisterChange(register: RegisterNumber, value: number) {
+        if (register === 0) {
+            return;
+        }
+        setMachine((machine) => ({
+            ...machine,
+            registers: { ...machine.registers, [register]: value },
+        }));
+        setMachineHighlight(emptyHighlight);
+    }
+
+    function handleResetRegisters() {
+        setMachine((machine) => ({ ...machine, registers: {} }) as MachineState);
+        setMachineHighlight(emptyHighlight);
+    }
+
+    function handleMemoryChange(address: number, value: number) {
+        setMachine((machine) => ({
+            ...machine,
+            dataMemory: { ...machine.dataMemory, [address]: value },
+        }));
+        setMachineHighlight(emptyHighlight);
+    }
+
+    function handleMemoryRangeChange(startAddress: number, wordCount: number) {
+        setMachine((machine) => {
+            const dataMemory: Record<number, number> = {};
+            const start = Math.max(0, startAddress - (startAddress % 4));
+            for (let i = 0; i < wordCount; i++) {
+                const address = start + i * 4;
+                dataMemory[address] = machine.dataMemory[address] ?? 0;
+            }
+            return { ...machine, dataMemory };
+        });
+        setMachineHighlight(emptyHighlight);
+    }
+
+    function handleResetMemory() {
+        setMachine((machine) => {
+            const addresses = Object.keys(machine.dataMemory).map(Number);
+            const dataMemory =
+                addresses.length > 0
+                    ? Object.fromEntries(
+                          addresses.map((address) => [address, 0]),
+                      )
+                    : createZeroedDataMemory();
+            return { ...machine, dataMemory };
+        });
+        setMachineHighlight(emptyHighlight);
+    }
+
+    return {
+        machine,
+        machineHighlight,
+        program,
+        programIndex,
+        programLoaded,
+        programFinished,
+        handleLoadProgram,
+        handleStepInstruction,
+        handleResetProgram,
+        handleRegisterChange,
+        handleResetRegisters,
+        handleMemoryChange,
+        handleMemoryRangeChange,
+        handleResetMemory,
+    };
+}

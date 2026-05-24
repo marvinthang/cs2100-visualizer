@@ -1,56 +1,44 @@
-import type {
-    DatapathInstructionFields,
-    DatapathMnemonic,
-} from '../../../types/mips';
-import { isDatapathMnemonic } from '../instruction/instructionSet';
+import type { MipsInstructionFields, MipsMnemonic } from '../../../types/mips';
+import { isMipsMnemonic } from '../instruction/instructionSet';
 import { parseRegister } from '../instruction/registers';
+import { parseImmediate, type ParseError } from './parseAssembly';
 
-export type ParsedInstruction = {
+export type ParsedMipsInstruction = {
     line: number; // 1-based source line number
     text: string; // original source text for this instruction
-    fields: DatapathInstructionFields;
+    fields: MipsInstructionFields;
 };
 
-export type ParseError = {
-    line: number;
-    message: string;
-};
-
-export type ParseResult = {
-    instructions: ParsedInstruction[];
+export type ParseMipsResult = {
+    instructions: ParsedMipsInstruction[];
     labels: Record<string, number>; // label name -> index into instructions
     errors: ParseError[];
 };
 
-// funct codes for the five datapath R-type instructions. Execution reads
-// instruction.funct to pick the ALU operation, so the parser must set it.
-const rTypeFunct: Partial<Record<DatapathMnemonic, number>> = {
+// funct codes for register-format instructions.
+const rTypeFunct: Partial<Record<MipsMnemonic, number>> = {
     add: 0x20,
     sub: 0x22,
     and: 0x24,
     or: 0x25,
+    nor: 0x27,
     slt: 0x2a,
 };
 
-// Resolve an immediate operand. Accepts decimal and 0x hex, both optionally
-// signed. Returns null if the token is not a valid number.
-export function parseImmediate(token: string): number | null {
-    const match = /^(-?)(0x[0-9a-fA-F]+|\d+)$/.exec(token);
-    if (!match) {
-        return null;
-    }
+const shiftFunct: Partial<Record<MipsMnemonic, number>> = {
+    sll: 0x00,
+    srl: 0x02,
+};
 
-    const sign = match[1] === '-' ? -1 : 1;
-    return sign * Number(match[2]);
-}
+const iTypeArithmetic: MipsMnemonic[] = ['addi', 'andi', 'ori'];
 
 // Build instruction fields from a mnemonic and its operand tokens. Returns the
 // fields on success, or an error message string describing what was wrong.
 function parseStatement(
-    mnemonic: DatapathMnemonic,
+    mnemonic: MipsMnemonic,
     operands: string[],
-): DatapathInstructionFields | string {
-    const fields: DatapathInstructionFields = {
+): MipsInstructionFields | string {
+    const fields: MipsInstructionFields = {
         mnemonic,
         rs: 0,
         rt: 0,
@@ -58,7 +46,7 @@ function parseStatement(
         immediate: 0,
     };
 
-    // R-type: add/sub/and/or/slt $rd, $rs, $rt
+    // Register format: add/sub/and/or/nor/slt $rd, $rs, $rt
     if (mnemonic in rTypeFunct) {
         if (operands.length !== 3) {
             return `${mnemonic} expects 3 operands: $rd, $rs, $rt`;
@@ -74,10 +62,28 @@ function parseStatement(
         return { ...fields, rd, rs, rt, funct: rTypeFunct[mnemonic] };
     }
 
-    // I-type arithmetic: addi $rt, $rs, immediate
-    if (mnemonic === 'addi') {
+    // Shift format: sll/srl $rd, $rt, shamt
+    if (mnemonic in shiftFunct) {
         if (operands.length !== 3) {
-            return 'addi expects 3 operands: $rt, $rs, immediate';
+            return `${mnemonic} expects 3 operands: $rd, $rt, shamt`;
+        }
+
+        const rd = parseRegister(operands[0]);
+        const rt = parseRegister(operands[1]);
+        const shamt = parseImmediate(operands[2]);
+        if (rd === null) return `invalid register: ${operands[0]}`;
+        if (rt === null) return `invalid register: ${operands[1]}`;
+        if (shamt === null || shamt < 0 || shamt > 31) {
+            return `shift amount must be 0-31: ${operands[2]}`;
+        }
+
+        return { ...fields, rd, rt, shamt, funct: shiftFunct[mnemonic] };
+    }
+
+    // Immediate format: addi/andi/ori $rt, $rs, immediate
+    if (iTypeArithmetic.includes(mnemonic)) {
+        if (operands.length !== 3) {
+            return `${mnemonic} expects 3 operands: $rt, $rs, immediate`;
         }
 
         const rt = parseRegister(operands[0]);
@@ -90,7 +96,21 @@ function parseStatement(
         return { ...fields, rt, rs, immediate };
     }
 
-    // Memory: lw/sw $rt, offset($rs)
+    // Load upper immediate: lui $rt, immediate
+    if (mnemonic === 'lui') {
+        if (operands.length !== 2) {
+            return 'lui expects 2 operands: $rt, immediate';
+        }
+
+        const rt = parseRegister(operands[0]);
+        const immediate = parseImmediate(operands[1]);
+        if (rt === null) return `invalid register: ${operands[0]}`;
+        if (immediate === null) return `invalid immediate: ${operands[1]}`;
+
+        return { ...fields, rt, immediate };
+    }
+
+    // Memory format: lw/sw $rt, offset($rs)
     if (mnemonic === 'lw' || mnemonic === 'sw') {
         if (operands.length !== 2) {
             return `${mnemonic} expects 2 operands: $rt, offset($rs)`;
@@ -114,7 +134,7 @@ function parseStatement(
         return { ...fields, rt, rs, immediate };
     }
 
-    // Branch: beq/bne $rs, $rt, label (offset resolved by the assembler)
+    // Branch format: beq/bne $rs, $rt, label (offset resolved by the assembler)
     if (mnemonic === 'beq' || mnemonic === 'bne') {
         if (operands.length !== 3) {
             return `${mnemonic} expects 3 operands: $rs, $rt, label`;
@@ -128,14 +148,23 @@ function parseStatement(
         return { ...fields, rs, rt, label: operands[2] };
     }
 
+    // Jump format: j label (address resolved by the assembler)
+    if (mnemonic === 'j') {
+        if (operands.length !== 1) {
+            return 'j expects 1 operand: label';
+        }
+
+        return { ...fields, label: operands[0] };
+    }
+
     return `unsupported instruction: ${mnemonic}`;
 }
 
 // Parse assembly source text into a list of instructions, a label table, and
 // any per-line errors. Comments (#...) are stripped; blank lines are skipped.
 // A leading `label:` records the index of the instruction it points to.
-export function parseAssembly(source: string): ParseResult {
-    const instructions: ParsedInstruction[] = [];
+export function parseMipsProgram(source: string): ParseMipsResult {
+    const instructions: ParsedMipsInstruction[] = [];
     const labels: Record<string, number> = {};
     const errors: ParseError[] = [];
 
@@ -178,7 +207,7 @@ export function parseAssembly(source: string): ParseResult {
             .map((operand) => operand.trim())
             .filter((operand) => operand !== '');
 
-        if (!isDatapathMnemonic(mnemonicToken)) {
+        if (!isMipsMnemonic(mnemonicToken)) {
             errors.push({
                 line: lineNumber,
                 message: `unknown instruction: ${mnemonicToken}`,
