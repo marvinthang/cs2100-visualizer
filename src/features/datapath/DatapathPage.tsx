@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { datapathMnemonics } from '../../core/mips/instruction/instructionSet';
+import SplitPane from '../../components/shared/SplitPane';
 import AssemblyEditor from './components/AssemblyEditor';
 import ControlSignalTable from './components/ControlSignalTable';
 import DatapathDiagram from './components/DatapathDiagram';
@@ -71,7 +72,7 @@ export default function DatapathPage() {
                     </p>
                 </header>
 
-                <div className="grid gap-4 xl:grid-cols-[250px_minmax(0,1fr)_270px] 2xl:grid-cols-[280px_minmax(0,1fr)_300px]">
+                <SplitPane initialSizes={[260, 1000, 290]}>
                     <aside className="space-y-4 xl:sticky xl:top-6 xl:h-[calc(100vh-3rem)] xl:overflow-y-auto">
                         <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
                             <h2 className="mb-4 text-sm font-semibold text-slate-900">
@@ -288,7 +289,7 @@ export default function DatapathPage() {
                             </div>
                         </section>
                     </aside>
-                </div>
+                </SplitPane>
             </div>
         </main>
     );

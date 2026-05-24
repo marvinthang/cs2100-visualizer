@@ -3,6 +3,11 @@ import {
     assembleMipsProgram,
     type AssembleMipsResult,
 } from '../../core/mips/assembly/assembleMipsProgram';
+import { encodeMipsInstructionWord } from '../../core/mips/instruction/encodeMipsInstruction';
+
+function toHex(word: number): string {
+    return `0x${(word >>> 0).toString(16).padStart(8, '0').toUpperCase()}`;
+}
 
 const EXAMPLE_SOURCE = `# 17 instructions supported
 lui $t0, 0x1
@@ -62,11 +67,20 @@ export default function MipsEditor({
                         return (
                             <li
                                 key={instruction.index}
-                                className={`rounded px-1 text-slate-700 ${
+                                className={`flex items-center justify-between gap-3 rounded px-1 ${
                                     isActive ? 'bg-amber-100' : ''
                                 }`}
                             >
-                                {instruction.text}
+                                <span className="text-slate-700">
+                                    {instruction.text}
+                                </span>
+                                <span className="text-slate-400">
+                                    {toHex(
+                                        encodeMipsInstructionWord(
+                                            instruction.fields,
+                                        ),
+                                    )}
+                                </span>
                             </li>
                         );
                     })}

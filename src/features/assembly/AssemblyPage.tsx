@@ -1,3 +1,4 @@
+import SplitPane from '../../components/shared/SplitPane';
 import MemoryTable from '../datapath/components/MemoryTable';
 import RegisterTable from '../datapath/components/RegisterTable';
 import MipsEditor from './MipsEditor';
@@ -33,7 +34,7 @@ export default function AssemblyPage() {
                     </p>
                 </header>
 
-                <div className="grid gap-4 lg:grid-cols-[380px_minmax(0,1fr)]">
+                <SplitPane initialSizes={[380, 800]}>
                     <aside className="space-y-4">
                         <MipsEditor
                             onLoad={handleLoadProgram}
@@ -71,7 +72,7 @@ export default function AssemblyPage() {
                         </section>
                     </aside>
 
-                    <div className="grid gap-4 md:grid-cols-2">
+                    <SplitPane initialSizes={[1, 1]}>
                         <RegisterTable
                             machine={machine}
                             onRegisterChange={handleRegisterChange}
@@ -86,8 +87,8 @@ export default function AssemblyPage() {
                             onResetMemory={handleResetMemory}
                             machineHighlight={machineHighlight}
                         />
-                    </div>
-                </div>
+                    </SplitPane>
+                </SplitPane>
             </div>
         </main>
     );
