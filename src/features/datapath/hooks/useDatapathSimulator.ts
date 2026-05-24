@@ -31,6 +31,11 @@ import { getDatapathHighlightState } from '../../../core/mips/single-cycle/highl
 import { getMachineStateHighlights } from '../../../core/mips/single-cycle/highlight/machineStateHighlights';
 import { datapathInstructionExamples } from '../../../core/mips/instruction/datapathInstructionExamples';
 import { encodeMipsInstruction } from '../../../core/mips/instruction/encodeMipsInstruction';
+import {
+    assembleProgram,
+    type AssembleResult,
+    type AssembledInstruction,
+} from '../../../core/mips/assembly/assembleProgram';
 import type { DatapathMnemonic, RegisterNumber } from '../../../types/mips';
 
 type StepSnapshot = {
@@ -40,9 +45,10 @@ type StepSnapshot = {
     signals: RuntimeControlSignals;
     stepIndex: number | null;
     warnings: string[];
+    programIndex: number;
 };
 
-export type DatapathSimulatorMode = 'explore' | 'simulate';
+export type DatapathSimulatorMode = 'explore' | 'simulate' | 'assembly';
 
 export function useDatapathSimulator() {
     const [mnemonic, setMnemonic] = useState<DatapathMnemonic>('add');
@@ -70,9 +76,27 @@ export function useDatapathSimulator() {
     const [warnings, setWarnings] = useState<string[]>([]);
     const [snapshots, setSnapshots] = useState<StepSnapshot[]>([]);
 
-    const instruction = datapathInstructionExamples[mnemonic];
+    // Assembly-program state: the loaded program, which instruction is being
+    // stepped (programIndex, not machine.pc, since pc advances mid-instruction
+    // during MEM), and the machine snapshot captured at load for Reset.
+    const [program, setProgram] = useState<AssembledInstruction[]>([]);
+    const [programIndex, setProgramIndex] = useState(0);
+    const [loadedMachine, setLoadedMachine] = useState<MachineState | null>(
+        null,
+    );
+
+    const isAssembly = mode === 'assembly';
+    const activeInstruction =
+        isAssembly && programIndex < program.length
+            ? program[programIndex]
+            : undefined;
+    const effectiveMnemonic = activeInstruction?.fields.mnemonic ?? mnemonic;
+    const instruction =
+        activeInstruction?.fields ?? datapathInstructionExamples[mnemonic];
     const bits = encodeMipsInstruction(instruction);
     const currentStep = getCurrentStep(stepIndex);
+    const programFinished =
+        isAssembly && program.length > 0 && machine.pc / 4 >= program.length;
 
     function resetExecutionState(nextMnemonic = mnemonic) {
         setCurrentContext(createEmptyExecutionContext());
@@ -101,7 +125,65 @@ export function useDatapathSimulator() {
 
     function handleModeChange(nextMode: DatapathSimulatorMode) {
         setMode(nextMode);
+        setProgramIndex(0);
         resetExecutionState();
+    }
+
+    // Assemble the editor source and load it as the running program. Returns the
+    // assemble result so the editor can show errors; only loads when clean.
+    function handleLoadProgram(source: string): AssembleResult {
+        const result = assembleProgram(source);
+        if (result.errors.length > 0 || result.instructions.length === 0) {
+            return result;
+        }
+
+        const initialMachine: MachineState = { ...machine, pc: 0 };
+        const firstMnemonic = result.instructions[0].fields.mnemonic;
+
+        setProgram(result.instructions);
+        setProgramIndex(0);
+        setLoadedMachine(initialMachine);
+        setMachine(initialMachine);
+        setStepIndex(null);
+        setSnapshots([]);
+        setCurrentContext(createEmptyExecutionContext());
+        setDefaultContext(createEmptyExecutionContext());
+        setWarnings([]);
+        setSignals(getDatapathControlSignals(firstMnemonic));
+        setDefaultSignals(getDatapathControlSignals(firstMnemonic));
+
+        return result;
+    }
+
+    // After an instruction's final step, fetch the next one. machine.pc already
+    // points at it (set during MEM), so the next index is pc / 4.
+    function advanceToNextInstruction() {
+        const nextIndex = machine.pc / 4;
+        if (nextIndex >= program.length) {
+            return;
+        }
+
+        setSnapshots((snapshots) => [
+            ...snapshots,
+            {
+                machine,
+                currentContext,
+                defaultContext,
+                signals: { ...signals },
+                stepIndex,
+                warnings,
+                programIndex,
+            },
+        ]);
+
+        const nextMnemonic = program[nextIndex].fields.mnemonic;
+        setProgramIndex(nextIndex);
+        setStepIndex(null);
+        setCurrentContext(createEmptyExecutionContext());
+        setDefaultContext(createEmptyExecutionContext());
+        setWarnings([]);
+        setSignals(getDatapathControlSignals(nextMnemonic));
+        setDefaultSignals(getDatapathControlSignals(nextMnemonic));
     }
 
     function handleRegisterChange(register: RegisterNumber, value: number) {
@@ -199,16 +281,23 @@ export function useDatapathSimulator() {
         setStepIndex(last_snapshot.stepIndex);
         setWarnings(last_snapshot.warnings);
         setSignals(last_snapshot.signals);
+        setProgramIndex(last_snapshot.programIndex);
 
         setSnapshots((snapshots) => snapshots.slice(0, -1));
     }
 
     function handleNextStep() {
-        const nextStepIndex = getNextStepIndex(stepIndex);
-
-        if (nextStepIndex === null) {
-            return;
+        if (isAssembly) {
+            if (program.length === 0) {
+                return;
+            }
+            if (isLastDatapathStep(stepIndex)) {
+                advanceToNextInstruction();
+                return;
+            }
         }
+
+        const nextStepIndex = getNextStepIndex(stepIndex);
 
         setSnapshots((snapshots) => [
             ...snapshots,
@@ -219,6 +308,7 @@ export function useDatapathSimulator() {
                 signals: { ...signals },
                 stepIndex,
                 warnings,
+                programIndex,
             },
         ]);
 
@@ -242,7 +332,7 @@ export function useDatapathSimulator() {
             instruction,
             signals,
             step,
-            mode === 'simulate',
+            mode === 'simulate' || isAssembly,
         );
 
         setMachine(currentResult.machineState);
@@ -254,6 +344,20 @@ export function useDatapathSimulator() {
     }
 
     function handleResetStep() {
+        if (isAssembly && loadedMachine) {
+            const firstMnemonic = program[0]?.fields.mnemonic ?? mnemonic;
+            setMachine(loadedMachine);
+            setProgramIndex(0);
+            setStepIndex(null);
+            setSnapshots([]);
+            setWarnings([]);
+            setCurrentContext(createEmptyExecutionContext());
+            setDefaultContext(createEmptyExecutionContext());
+            setSignals(getDatapathControlSignals(firstMnemonic));
+            setDefaultSignals(getDatapathControlSignals(firstMnemonic));
+            return;
+        }
+
         setCurrentContext(createEmptyExecutionContext());
         setDefaultContext(createEmptyExecutionContext());
 
@@ -265,7 +369,7 @@ export function useDatapathSimulator() {
         resetExecutionState();
     }
 
-    const basePaths = getActiveDatapathBasePaths(mnemonic);
+    const basePaths = getActiveDatapathBasePaths(effectiveMnemonic);
 
     const defaultSignalDrivenPaths =
         getControlSignalDrivenPaths(defaultSignals);
@@ -335,7 +439,14 @@ export function useDatapathSimulator() {
         bits,
         currentStep,
         isFirstStep: snapshots.length === 0,
-        isLastStep: isLastDatapathStep(stepIndex),
+        isLastStep: isAssembly
+            ? isLastDatapathStep(stepIndex) && programFinished
+            : isLastDatapathStep(stepIndex),
+        program,
+        programIndex,
+        programLoaded: program.length > 0,
+        programFinished,
+        handleLoadProgram,
         defaultActiveSegments,
         currentActiveSegments,
         modifiedActiveSegments,

@@ -6,6 +6,7 @@ import {
     getHighlightBackgroundClass,
     getHighlightTextClass,
 } from '../../../core/mips/single-cycle/highlight/datapathHighlightState';
+import Modal, { ExpandButton } from './Modal';
 
 const registerRows = [
     [0, '$zero'],
@@ -64,6 +65,7 @@ export default function RegisterTable({
     const [registerDrafts, setRegisterDrafts] = useState<
         Record<RegisterNumber, string>
     >(() => makeRegisterDrafts(machine));
+    const [isExpanded, setIsExpanded] = useState(false);
 
     useEffect(() => {
         setRegisterDrafts(makeRegisterDrafts(machine));
@@ -73,29 +75,9 @@ export default function RegisterTable({
     const pcTextClass = getHighlightTextClass(pcRole, 'text-slate-700');
     const pcBgClass = getHighlightBackgroundClass(pcRole, 'bg-slate-100');
 
-    return (
-        <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-            <div className="mb-3 flex items-center justify-between">
-                <h2 className="text-sm font-semibold text-slate-900">
-                    Registers
-                </h2>
-                <div className="flex items-center gap-2">
-                    <span
-                        className={`rounded-md ${pcBgClass} px-2 py-1 font-mono text-xs ${pcTextClass}`}
-                    >
-                        PC = {machine.pc}
-                    </span>
-                    <button
-                        type="button"
-                        onClick={onResetRegisters}
-                        className="rounded-md border border-slate-200 px-2 py-1 text-xs font-medium text-slate-700 hover:bg-slate-100"
-                    >
-                        Reset
-                    </button>
-                </div>
-            </div>
-
-            <div className="max-h-[200px] overflow-auto">
+    function renderTable(scrollClass: string) {
+        return (
+            <div className={`${scrollClass} overflow-auto`}>
                 <table className="w-full text-sm">
                     <thead className="sticky top-0 bg-white">
                         <tr className="border-b border-slate-200 text-left text-xs text-slate-500">
@@ -172,6 +154,42 @@ export default function RegisterTable({
                     </tbody>
                 </table>
             </div>
+        );
+    }
+
+    return (
+        <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+            <div className="mb-3 flex items-center justify-between">
+                <h2 className="text-sm font-semibold text-slate-900">
+                    Registers
+                </h2>
+                <div className="flex items-center gap-2">
+                    <span
+                        className={`rounded-md ${pcBgClass} px-2 py-1 font-mono text-xs ${pcTextClass}`}
+                    >
+                        PC = {machine.pc}
+                    </span>
+                    <button
+                        type="button"
+                        onClick={onResetRegisters}
+                        className="rounded-md border border-slate-200 px-2 py-1 text-xs font-medium text-slate-700 hover:bg-slate-100"
+                    >
+                        Reset
+                    </button>
+                    <ExpandButton onClick={() => setIsExpanded(true)} />
+                </div>
+            </div>
+
+            {renderTable('max-h-[200px]')}
+
+            {isExpanded && (
+                <Modal
+                    title="Registers"
+                    onClose={() => setIsExpanded(false)}
+                >
+                    {renderTable('max-h-[65vh]')}
+                </Modal>
+            )}
         </div>
     );
 }
