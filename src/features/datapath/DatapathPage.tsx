@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { datapathMnemonics } from '../../core/mips/instruction/instructionSet';
+import AssemblyEditor from './components/AssemblyEditor';
 import ControlSignalTable from './components/ControlSignalTable';
 import DatapathDiagram from './components/DatapathDiagram';
 import StepControls from './components/StepControls';
@@ -49,6 +50,10 @@ export default function DatapathPage() {
         handleNextStep,
         handleResetStep,
         resetControlSignals,
+        programLoaded,
+        programIndex,
+        programFinished,
+        handleLoadProgram,
     } = simulator;
 
     const logs = currentContext.logs ?? [];
@@ -73,29 +78,37 @@ export default function DatapathPage() {
                                 Instruction Setup
                             </h2>
 
-                            <div className="grid grid-cols-[80px_minmax(0,1fr)] items-end gap-4">
-                                <label className="block">
-                                    <span className="mb-1 block text-xs font-medium text-slate-600">
-                                        Instruction
-                                    </span>
+                            <div
+                                className={
+                                    mode === 'assembly'
+                                        ? 'grid grid-cols-1 items-end gap-4'
+                                        : 'grid grid-cols-[80px_minmax(0,1fr)] items-end gap-4'
+                                }
+                            >
+                                {mode !== 'assembly' && (
+                                    <label className="block">
+                                        <span className="mb-1 block text-xs font-medium text-slate-600">
+                                            Instruction
+                                        </span>
 
-                                    <select
-                                        value={mnemonic}
-                                        onChange={(event) =>
-                                            setMnemonic(
-                                                event.target
-                                                    .value as DatapathMnemonic,
-                                            )
-                                        }
-                                        className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900"
-                                    >
-                                        {datapathMnemonics.map((item) => (
-                                            <option key={item} value={item}>
-                                                {item}
-                                            </option>
-                                        ))}
-                                    </select>
-                                </label>
+                                        <select
+                                            value={mnemonic}
+                                            onChange={(event) =>
+                                                setMnemonic(
+                                                    event.target
+                                                        .value as DatapathMnemonic,
+                                                )
+                                            }
+                                            className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900"
+                                        >
+                                            {datapathMnemonics.map((item) => (
+                                                <option key={item} value={item}>
+                                                    {item}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </label>
+                                )}
 
                                 <label className="block">
                                     <span className="mb-1 block text-xs font-medium text-slate-600">
@@ -116,10 +129,22 @@ export default function DatapathPage() {
                                         <option value="simulate">
                                             Simulate
                                         </option>
+                                        <option value="assembly">
+                                            Assembly
+                                        </option>
                                     </select>
                                 </label>
                             </div>
                         </section>
+
+                        {mode === 'assembly' && (
+                            <AssemblyEditor
+                                onLoad={handleLoadProgram}
+                                programLoaded={programLoaded}
+                                programIndex={programIndex}
+                                programFinished={programFinished}
+                            />
+                        )}
 
                         <StepControls
                             step={currentStep}
