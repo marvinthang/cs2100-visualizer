@@ -106,8 +106,6 @@ The datapath visualizer also has its own Assembly mode for staged datapath execu
 
 ![Datapath stepping and control signals](public/screenshots/datapath-2.png)
 
-> TODO: Add Assembly simulator screenshot showing source code, hex machine code, registers, and data memory.
-
 ## 7. System Architecture
 
 The project is organized around two main feature modules:
