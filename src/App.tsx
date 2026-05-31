@@ -13,8 +13,8 @@ export default function App() {
     const [tab, setTab] = useState<Tab>('datapath');
 
     return (
-        <div>
-            <nav className="flex gap-1 border-b border-slate-200 bg-white px-6 py-2">
+        <div className="flex h-screen flex-col overflow-hidden">
+            <nav className="flex flex-none gap-1 border-b border-slate-200 bg-white px-6 py-2">
                 {tabs.map(({ id, label }) => (
                     <button
                         key={id}
@@ -31,7 +31,9 @@ export default function App() {
                 ))}
             </nav>
 
-            {tab === 'datapath' ? <DatapathPage /> : <AssemblyPage />}
+            <div className="min-h-0 flex-1 overflow-auto">
+                {tab === 'datapath' ? <DatapathPage /> : <AssemblyPage />}
+            </div>
         </div>
     );
 }

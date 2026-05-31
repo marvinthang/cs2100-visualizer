@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { datapathMnemonics } from '../../core/mips/instruction/instructionSet';
-import SplitPane from '../../components/shared/SplitPane';
 import AssemblyEditor from './components/AssemblyEditor';
 import ControlSignalTable from './components/ControlSignalTable';
 import DatapathDiagram from './components/DatapathDiagram';
@@ -60,9 +59,9 @@ export default function DatapathPage() {
     const logs = currentContext.logs ?? [];
 
     return (
-        <main className="min-h-screen bg-slate-50 p-6 text-slate-900">
-            <div className="mx-auto max-w-[1900px]">
-                <header className="mb-6">
+        <main className="flex h-full min-h-0 flex-col bg-slate-50 p-4 text-slate-900 xl:overflow-hidden">
+            <div className="mx-auto flex h-full min-h-0 w-full max-w-[1900px] flex-col">
+                <header className="mb-4 flex-none">
                     <h1 className="text-2xl font-bold">
                         MIPS Datapath Visualizer
                     </h1>
@@ -72,8 +71,8 @@ export default function DatapathPage() {
                     </p>
                 </header>
 
-                <SplitPane initialSizes={[260, 1000, 290]}>
-                    <aside className="space-y-4 xl:sticky xl:top-6 xl:h-[calc(100vh-3rem)] xl:overflow-y-auto">
+                <div className="grid min-h-0 flex-1 gap-4 xl:grid-cols-[300px_minmax(0,1fr)_340px] 2xl:grid-cols-[320px_minmax(0,1fr)_360px]">
+                    <aside className="min-h-0 space-y-4 xl:overflow-y-auto xl:pr-1">
                         <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
                             <h2 className="mb-4 text-sm font-semibold text-slate-900">
                                 Instruction Setup
@@ -191,8 +190,8 @@ export default function DatapathPage() {
                         </section>
                     </aside>
 
-                    <section className="min-w-0 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm xl:h-[calc(100vh-3rem)]">
-                        <div className="mb-3 flex items-center justify-between">
+                    <section className="flex min-h-0 min-w-0 flex-col rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+                        <div className="mb-3 flex flex-none items-center justify-between">
                             <h2 className="text-sm font-semibold text-slate-900">
                                 Datapath Diagram
                             </h2>
@@ -202,7 +201,7 @@ export default function DatapathPage() {
                             </span>
                         </div>
 
-                        <div className="h-[calc(100%-2.25rem)] overflow-auto rounded-xl border border-slate-200 bg-white">
+                        <div className="flex min-h-0 flex-1 items-center justify-center overflow-hidden rounded-xl border border-slate-200 bg-white p-2">
                             <DatapathDiagram
                                 bits={bits}
                                 defaultActiveSegments={defaultActiveSegments}
@@ -217,7 +216,7 @@ export default function DatapathPage() {
                         </div>
                     </section>
 
-                    <aside className="space-y-4 xl:sticky xl:top-6 xl:h-[calc(100vh-3rem)] xl:overflow-y-auto">
+                    <aside className="min-h-0 space-y-4 xl:overflow-y-auto xl:pr-1">
                         <InspectorPanel
                             id={selectedInspectId}
                             step={currentStep}
@@ -289,7 +288,7 @@ export default function DatapathPage() {
                             </div>
                         </section>
                     </aside>
-                </SplitPane>
+                </div>
             </div>
         </main>
     );

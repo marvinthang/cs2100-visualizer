@@ -1,4 +1,5 @@
 import type { MipsInstructionFields } from '../../../types/mips';
+import { encodeMipsInstructionWord } from '../instruction/encodeMipsInstruction';
 import {
     parseMipsProgram,
     type ParseMipsResult,
@@ -10,6 +11,7 @@ export type AssembledMipsInstruction = {
     line: number; // 1-based source line number
     text: string; // original source text
     fields: MipsInstructionFields;
+    word: number; // encoded 32-bit machine word
 };
 
 export type AssembleMipsResult = {
@@ -67,6 +69,7 @@ export function assembleMipsProgram(source: string): AssembleMipsResult {
             line: instruction.line,
             text: instruction.text,
             fields: resolved,
+            word: encodeMipsInstructionWord(resolved),
         });
     });
 

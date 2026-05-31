@@ -102,12 +102,11 @@ export default function StaticDatapathSvg({
 }) {
     return (
         <svg
-            width={789}
-            height={526}
             viewBox="0 0 900 600"
+            preserveAspectRatio="xMidYMid meet"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
-            className="rounded border bg-white"
+            className="h-full max-h-full w-full max-w-full bg-white"
         >
             <defs>
                 <marker

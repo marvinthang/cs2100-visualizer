@@ -22,12 +22,14 @@ export default function MemoryTable({
     onMemoryRangeChange,
     onResetMemory,
     machineHighlight,
+    tableMaxHeightClass = 'max-h-[200px]',
 }: {
     machine: MachineState;
     onMemoryChange: (address: number, value: number) => void;
     onMemoryRangeChange: (startAddress: number, wordCount: number) => void;
     onResetMemory: () => void;
     machineHighlight: MachineStateHighlightState;
+    tableMaxHeightClass?: string;
 }) {
     const [startAddressInput, setStartAddressInput] = useState('0');
     const [wordCountInput, setWordCountInput] = useState('16');
@@ -135,7 +137,7 @@ export default function MemoryTable({
     }
 
     return (
-        <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+        <div className="h-fit rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
             <div className="flex items-start justify-between gap-3">
                 <h2 className="text-sm font-semibold text-slate-900">
                     Data Memory
@@ -193,7 +195,7 @@ export default function MemoryTable({
                 </button>
             </div>
 
-            {renderTable('max-h-[200px]')}
+            {renderTable(tableMaxHeightClass)}
 
             {isExpanded && (
                 <Modal title="Data Memory" onClose={() => setIsExpanded(false)}>

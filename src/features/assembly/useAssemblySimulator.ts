@@ -8,36 +8,111 @@ import { executeInstruction } from '../../core/mips/execution/executeInstruction
 import {
     createInitialMachineState,
     createZeroedDataMemory,
+    readRegister,
     type MachineState,
 } from '../../core/mips/single-cycle/execution/machineState';
-import type { MachineStateHighlightState } from '../../core/mips/single-cycle/highlight/types';
-import type { RegisterNumber } from '../../types/mips';
+import type {
+    HighlightRole,
+    MachineStateHighlightState,
+} from '../../core/mips/single-cycle/highlight/types';
+import type { MipsInstructionFields, RegisterNumber } from '../../types/mips';
 
 const emptyHighlight: MachineStateHighlightState = {
     registers: {},
     memory: {},
 };
 
-// Mark every register/memory cell that changed between two machine states, so
-// the tables can highlight what the last instruction wrote.
-function diffHighlight(
-    before: MachineState,
-    after: MachineState,
+function setRole<T extends string | number>(
+    target: Partial<Record<T, HighlightRole>>,
+    key: T,
+    role: HighlightRole,
+) {
+    if (target[key] === 'output') {
+        return;
+    }
+    target[key] = role;
+}
+
+function setRegisterRole(
+    registers: MachineStateHighlightState['registers'],
+    register: RegisterNumber | undefined,
+    role: HighlightRole,
+) {
+    if (register === undefined) {
+        return;
+    }
+    if (role === 'output' && register === 0) {
+        return;
+    }
+    setRole(registers, register, role);
+}
+
+function setMemoryRole(
+    memory: MachineStateHighlightState['memory'],
+    address: number,
+    role: HighlightRole,
+) {
+    if (address % 4 !== 0) {
+        return;
+    }
+    setRole(memory, address, role);
+}
+
+// Highlight every register or memory cell related to the executed instruction:
+// inputs are read by the instruction, outputs are written by it.
+function getInstructionHighlights(
+    machine: MachineState,
+    fields: MipsInstructionFields,
 ): MachineStateHighlightState {
     const registers: MachineStateHighlightState['registers'] = {};
-    for (const key of Object.keys(after.registers)) {
-        const id = Number(key) as RegisterNumber;
-        if (after.registers[id] !== before.registers[id]) {
-            registers[id] = 'output';
-        }
-    }
-
     const memory: MachineStateHighlightState['memory'] = {};
-    for (const key of Object.keys(after.dataMemory)) {
-        const address = Number(key);
-        if (after.dataMemory[address] !== before.dataMemory[address]) {
-            memory[address] = 'output';
+
+    switch (fields.mnemonic) {
+        case 'add':
+        case 'sub':
+        case 'and':
+        case 'or':
+        case 'nor':
+        case 'slt':
+            setRegisterRole(registers, fields.rs, 'input');
+            setRegisterRole(registers, fields.rt, 'input');
+            setRegisterRole(registers, fields.rd, 'output');
+            break;
+        case 'sll':
+        case 'srl':
+            setRegisterRole(registers, fields.rt, 'input');
+            setRegisterRole(registers, fields.rd, 'output');
+            break;
+        case 'addi':
+        case 'andi':
+        case 'ori':
+            setRegisterRole(registers, fields.rs, 'input');
+            setRegisterRole(registers, fields.rt, 'output');
+            break;
+        case 'lui':
+            setRegisterRole(registers, fields.rt, 'output');
+            break;
+        case 'lw': {
+            const address = readRegister(machine, fields.rs) + fields.immediate;
+            setRegisterRole(registers, fields.rs, 'input');
+            setMemoryRole(memory, address, 'input');
+            setRegisterRole(registers, fields.rt, 'output');
+            break;
         }
+        case 'sw': {
+            const address = readRegister(machine, fields.rs) + fields.immediate;
+            setRegisterRole(registers, fields.rs, 'input');
+            setRegisterRole(registers, fields.rt, 'input');
+            setMemoryRole(memory, address, 'output');
+            break;
+        }
+        case 'beq':
+        case 'bne':
+            setRegisterRole(registers, fields.rs, 'input');
+            setRegisterRole(registers, fields.rt, 'input');
+            break;
+        case 'j':
+            break;
     }
 
     return { registers, memory, pc: 'output' };
@@ -87,7 +162,9 @@ export function useAssemblySimulator() {
             machine,
             program[programIndex].fields,
         );
-        setMachineHighlight(diffHighlight(machine, after));
+        setMachineHighlight(
+            getInstructionHighlights(machine, program[programIndex].fields),
+        );
         setMachine(after);
         setProgramIndex(after.pc / 4);
     }
