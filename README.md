@@ -88,17 +88,23 @@ Supported assembly mnemonics are:
 
 ## 6. Technical Proof of Concept
 
-The current technical proof of concept focuses on the interactive datapath visualizer.
+For Milestone 1, we reused our Liftoff poster and video as the high-level project pitch. The detailed technical proof of concept is documented here in the README.
 
-Users can select an instruction, view and edit control signals, step through IF/ID/EX/MEM/WB execution, observe dynamic wire highlighting, and inspect register, memory, datapath values, logs, and warnings.
+Our current proof of concept demonstrates the core datapath visualizer workflow:
 
-This demonstrates the core integrated workflow of the system:
+1. Users can select a supported MIPS instruction.
+2. The app generates the corresponding default control signals.
+3. Users can step through IF, ID, EX, MEM, and WB.
+4. Active datapath wires are highlighted dynamically.
+5. Register, memory, PC, datapath values, logs, and warnings update during execution.
+6. Users can edit control signals and observe how changed signals affect datapath behavior.
+7. Users can click datapath components such as PC, instruction memory, instruction register, ALU, register file, data memory, and MUXes to inspect current values.
 
-`instruction representation -> control signal modeling -> datapath simulation -> SVG visualization -> machine state updates`
+This shows that the essential parts of the system are integrated: instruction representation, control signal modeling, staged datapath execution, SVG visualization, machine-state updates, logs, warnings, and component inspection.
 
-The current app also includes a separate assembly simulator prototype. Users can type supported MIPS assembly, assemble and load a program with labels, view generated hex machine code, execute one instruction at a time, and observe register, memory, and PC updates.
+### Proof-of-Concept Demo
 
-The datapath visualizer also has its own Assembly mode for staged datapath execution. That mode is intentionally limited to the datapath instruction subset, while the standalone Assembly tab supports all 17 currently implemented assembly mnemonics.
+![Datapath step-by-step demo](docs/assets/datapath-demo.gif)
 
 ### Proof-of-Concept Screenshots
 
