@@ -436,6 +436,7 @@ export function useDatapathSimulator() {
         machine,
         currentContext,
         warnings,
+        instruction,
         bits,
         currentStep,
         isFirstStep: snapshots.length === 0,

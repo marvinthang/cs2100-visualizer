@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import type { MachineState } from '../../../core/mips/single-cycle/execution/machineState';
 import type { MachineStateHighlightState } from '../../../core/mips/single-cycle/highlight/types';
 import {
@@ -6,15 +6,6 @@ import {
     getHighlightTextClass,
 } from '../../../core/mips/single-cycle/highlight/datapathHighlightState';
 import Modal, { ExpandButton } from './Modal';
-
-function makeDataMemoryDrafts(machine: MachineState): Record<number, string> {
-    return Object.fromEntries(
-        Object.entries(machine.dataMemory).map(([address, value]) => [
-            address,
-            String(value),
-        ]),
-    ) as Record<number, string>;
-}
 
 export default function MemoryTable({
     machine,
@@ -34,13 +25,9 @@ export default function MemoryTable({
     const [startAddressInput, setStartAddressInput] = useState('0');
     const [wordCountInput, setWordCountInput] = useState('16');
     const [dataMemoryDrafts, setDataMemoryDrafts] = useState<
-        Record<number, string>
-    >(() => makeDataMemoryDrafts(machine));
+        Partial<Record<number, string>>
+    >({});
     const [isExpanded, setIsExpanded] = useState(false);
-
-    useEffect(() => {
-        setDataMemoryDrafts(makeDataMemoryDrafts(machine));
-    }, [machine.dataMemory]);
 
     const startAddress =
         startAddressInput === '' ? 0 : Number(startAddressInput);
@@ -71,6 +58,11 @@ export default function MemoryTable({
                                 machineHighlight.memory[address] ?? 'normal';
                             const textClass = getHighlightTextClass(role);
                             const bgClass = getHighlightBackgroundClass(role);
+                            const memoryValue = String(
+                                machine.dataMemory[address] ?? 0,
+                            );
+                            const draftValue =
+                                dataMemoryDrafts[address] ?? memoryValue;
                             return (
                                 <tr
                                     key={address}
@@ -91,7 +83,7 @@ export default function MemoryTable({
                                     >
                                         <input
                                             type="number"
-                                            value={dataMemoryDrafts[address]}
+                                            value={draftValue}
                                             onChange={(event) =>
                                                 setDataMemoryDrafts(
                                                     (drafts) => ({
@@ -103,25 +95,36 @@ export default function MemoryTable({
                                             }
                                             onBlur={() => {
                                                 const raw =
-                                                    dataMemoryDrafts[address];
+                                                    dataMemoryDrafts[
+                                                        address
+                                                    ] ?? memoryValue;
                                                 const value = Number(raw);
                                                 if (
                                                     raw.trim() === '' ||
                                                     Number.isNaN(value)
                                                 ) {
                                                     setDataMemoryDrafts(
-                                                        (drafts) => ({
-                                                            ...drafts,
-                                                            [address]: String(
-                                                                machine
-                                                                    .dataMemory[
-                                                                    address
-                                                                ] ?? 0,
-                                                            ),
-                                                        }),
+                                                        (drafts) => {
+                                                            const next = {
+                                                                ...drafts,
+                                                            };
+                                                            delete next[
+                                                                address
+                                                            ];
+                                                            return next;
+                                                        },
                                                     );
                                                     return;
                                                 }
+                                                setDataMemoryDrafts(
+                                                    (drafts) => {
+                                                        const next = {
+                                                            ...drafts,
+                                                        };
+                                                        delete next[address];
+                                                        return next;
+                                                    },
+                                                );
                                                 onMemoryChange(address, value);
                                             }}
                                             className="w-24 rounded-md border border-slate-200 px-2 py-1 text-left text-slate-900"
@@ -150,7 +153,10 @@ export default function MemoryTable({
                     </span>
                     <button
                         type="button"
-                        onClick={onResetMemory}
+                        onClick={() => {
+                            setDataMemoryDrafts({});
+                            onResetMemory();
+                        }}
                         className="rounded-md border border-slate-200 px-2 py-1 text-xs font-medium text-slate-700 hover:bg-slate-100"
                     >
                         Reset
@@ -188,7 +194,10 @@ export default function MemoryTable({
 
                 <button
                     type="button"
-                    onClick={() => onMemoryRangeChange(startAddress, wordCount)}
+                    onClick={() => {
+                        setDataMemoryDrafts({});
+                        onMemoryRangeChange(startAddress, wordCount);
+                    }}
                     className="self-end rounded-md bg-slate-900 px-3 py-1.5 text-sm font-medium text-white"
                 >
                     Apply

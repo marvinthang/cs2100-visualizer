@@ -1,7 +1,9 @@
 import type {
     DatapathInstructionFields,
     DatapathStep,
+    RegisterNumber,
 } from '../../../../types/mips';
+import { encodeMipsInstructionWord } from '../../instruction/encodeMipsInstruction';
 import type { ControlSignalId, RuntimeControlSignals } from '../control/types';
 import type { ExecutionContext } from './executionContext';
 import {
@@ -32,11 +34,35 @@ type ExecutionFrame = {
     newSignals: RuntimeControlSignals;
 };
 
+type IrFields = {
+    rs: RegisterNumber;
+    rt: RegisterNumber;
+    rd: RegisterNumber;
+    shamt: number;
+    funct: number;
+    immediate: number;
+};
+
 function toHex(num: number | undefined): string {
     if (num === undefined) {
         return 'UNDEFINED';
     }
     return `0x${(num >>> 0).toString(16).padStart(8, '0').toUpperCase()}`;
+}
+
+function decodeIrFields(instruction: DatapathInstructionFields): IrFields {
+    const word = encodeMipsInstructionWord(instruction);
+    const immediate16 = word & 0xffff;
+
+    return {
+        rs: ((word >>> 21) & 0x1f) as RegisterNumber,
+        rt: ((word >>> 16) & 0x1f) as RegisterNumber,
+        rd: ((word >>> 11) & 0x1f) as RegisterNumber,
+        shamt: (word >>> 6) & 0x1f,
+        funct: word & 0x3f,
+        immediate:
+            immediate16 & 0x8000 ? immediate16 | 0xffff0000 : immediate16,
+    };
 }
 
 function getBitSignal(
@@ -58,13 +84,14 @@ function getALUOperation(
     warnings: string[],
 ): 'add' | 'sub' | 'and' | 'or' | 'slt' | undefined {
     const aluOp = signals.ALUOp ?? '';
+    const { funct } = decodeIrFields(instruction);
     switch (aluOp) {
         case '00':
             return 'add';
         case '01':
             return 'sub';
         case '10':
-            switch (instruction.funct) {
+            switch (funct) {
                 case 32:
                     return 'add';
                 case 34:
@@ -77,7 +104,7 @@ function getALUOperation(
                     return 'slt';
                 default:
                     warnings.push(
-                        `[EX FAULT] Unsupported R-type funct=${instruction.funct}; ALU result is undefined.`,
+                        `[EX FAULT] Unsupported R-type funct=${funct}; ALU result is undefined.`,
                     );
                     return undefined;
             }
@@ -124,16 +151,17 @@ function executeIF(frame: ExecutionFrame): void {
 
 function executeID(frame: ExecutionFrame): void {
     const RegDst = getBitSignal(frame.signals, 'RegDst', frame.warnings);
-    const readReg1 = frame.instruction.rs;
-    const readReg2 = frame.instruction.rt;
+    const ir = decodeIrFields(frame.instruction);
+    const readReg1 = ir.rs;
+    const readReg2 = ir.rt;
     const readData1 = readRegister(frame.machineState, readReg1);
     const readData2 = readRegister(frame.machineState, readReg2);
     const writeReg =
         RegDst === undefined
             ? undefined
             : RegDst === 0
-              ? frame.instruction.rt
-              : frame.instruction.rd;
+              ? ir.rt
+              : ir.rd;
     frame.newContext = {
         ...frame.context,
         readReg1,
@@ -141,14 +169,14 @@ function executeID(frame: ExecutionFrame): void {
         readData1,
         readData2,
         writeReg: writeReg,
-        immediate: frame.instruction.immediate,
+        immediate: ir.immediate,
         logs: [
             ...frame.context.logs,
             `=== [ID] INSTRUCTION DECODE ===`,
             `├─ rs = $${readReg1} -> ${readData1} (${toHex(readData1)})`,
             `├─ rt = $${readReg2} -> ${readData2} (${toHex(readData2)})`,
             `├─ Write reg candidate (RegDst=${RegDst ?? 'X'}) -> $${writeReg ?? 'UNDEFINED'}`,
-            `└─ Sign-extended imm -> ${frame.instruction.immediate} (${toHex(frame.instruction.immediate)})`,
+            `└─ Sign-extended imm -> ${ir.immediate} (${toHex(ir.immediate)})`,
         ],
     };
 }

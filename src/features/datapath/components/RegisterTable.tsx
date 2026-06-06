@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import type { MachineState } from '../../../core/mips/single-cycle/execution/machineState';
 import type { MachineStateHighlightState } from '../../../core/mips/single-cycle/highlight/types';
 import type { RegisterNumber } from '../../../types/mips';
@@ -43,14 +43,6 @@ const registerRows = [
     [31, '$ra'],
 ] as const;
 
-function makeRegisterDrafts(
-    machine: MachineState,
-): Record<RegisterNumber, string> {
-    return Object.fromEntries(
-        registerRows.map(([id]) => [id, String(machine.registers[id] ?? 0)]),
-    ) as Record<RegisterNumber, string>;
-}
-
 export default function RegisterTable({
     machine,
     onRegisterChange,
@@ -65,13 +57,9 @@ export default function RegisterTable({
     tableMaxHeightClass?: string;
 }) {
     const [registerDrafts, setRegisterDrafts] = useState<
-        Record<RegisterNumber, string>
-    >(() => makeRegisterDrafts(machine));
+        Partial<Record<RegisterNumber, string>>
+    >({});
     const [isExpanded, setIsExpanded] = useState(false);
-
-    useEffect(() => {
-        setRegisterDrafts(makeRegisterDrafts(machine));
-    }, [machine.registers]);
 
     const pcRole = machineHighlight.pc ?? 'normal';
     const pcTextClass = getHighlightTextClass(pcRole, 'text-slate-700');
@@ -94,6 +82,11 @@ export default function RegisterTable({
                                 machineHighlight.registers[id] ?? 'normal';
                             const textClass = getHighlightTextClass(role);
                             const bgClass = getHighlightBackgroundClass(role);
+                            const registerValue = String(
+                                machine.registers[id] ?? 0,
+                            );
+                            const draftValue =
+                                registerDrafts[id] ?? registerValue;
                             return (
                                 <tr
                                     key={id}
@@ -112,7 +105,7 @@ export default function RegisterTable({
                                     >
                                         <input
                                             type="number"
-                                            value={registerDrafts[id]}
+                                            value={draftValue}
                                             disabled={id === 0}
                                             onChange={(event) =>
                                                 setRegisterDrafts((drafts) => ({
@@ -121,25 +114,28 @@ export default function RegisterTable({
                                                 }))
                                             }
                                             onBlur={() => {
-                                                const raw = registerDrafts[id];
+                                                const raw =
+                                                    registerDrafts[id] ??
+                                                    registerValue;
                                                 const value = Number(raw);
                                                 if (
                                                     raw.trim() === '' ||
                                                     Number.isNaN(value)
                                                 ) {
-                                                    setRegisterDrafts(
-                                                        (drafts) => ({
+                                                    setRegisterDrafts((drafts) => {
+                                                        const next = {
                                                             ...drafts,
-                                                            [id]: String(
-                                                                machine
-                                                                    .registers[
-                                                                    id
-                                                                ] ?? 0,
-                                                            ),
-                                                        }),
-                                                    );
+                                                        };
+                                                        delete next[id];
+                                                        return next;
+                                                    });
                                                     return;
                                                 }
+                                                setRegisterDrafts((drafts) => {
+                                                    const next = { ...drafts };
+                                                    delete next[id];
+                                                    return next;
+                                                });
                                                 onRegisterChange(id, value);
                                             }}
                                             onKeyDown={(event) => {
@@ -173,7 +169,10 @@ export default function RegisterTable({
                     </span>
                     <button
                         type="button"
-                        onClick={onResetRegisters}
+                        onClick={() => {
+                            setRegisterDrafts({});
+                            onResetRegisters();
+                        }}
                         className="rounded-md border border-slate-200 px-2 py-1 text-xs font-medium text-slate-700 hover:bg-slate-100"
                     >
                         Reset

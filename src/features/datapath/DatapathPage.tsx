@@ -7,6 +7,7 @@ import StepControls from './components/StepControls';
 import RegisterTable from './components/RegisterTable';
 import MemoryTable from './components/MemoryTable';
 import DatapathValueTable from './components/DatapathValueTable';
+import CurrentInstructionCard from './components/CurrentInstructionCard';
 import {
     type DatapathSimulatorMode,
     useDatapathSimulator,
@@ -31,6 +32,7 @@ export default function DatapathPage() {
         machine,
         currentContext,
         warnings,
+        instruction,
         bits,
         currentStep,
         isFirstStep,
@@ -143,6 +145,13 @@ export default function DatapathPage() {
                                 programLoaded={programLoaded}
                                 programIndex={programIndex}
                                 programFinished={programFinished}
+                            />
+                        )}
+
+                        {mode !== 'assembly' && (
+                            <CurrentInstructionCard
+                                instruction={instruction}
+                                bits={bits}
                             />
                         )}
 
