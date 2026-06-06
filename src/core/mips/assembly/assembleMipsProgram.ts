@@ -1,9 +1,6 @@
 import type { MipsInstructionFields } from '../../../types/mips';
 import { encodeMipsInstructionWord } from '../instruction/encodeMipsInstruction';
-import {
-    parseMipsProgram,
-    type ParseMipsResult,
-} from './parseMipsProgram';
+import { parseMipsProgram, type ParseMipsResult } from './parseMipsProgram';
 import type { ParseError } from './parseAssembly';
 
 export type AssembledMipsInstruction = {

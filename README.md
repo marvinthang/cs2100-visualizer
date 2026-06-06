@@ -30,10 +30,10 @@ This project aims to help students move from memorizing datapath diagrams to und
 
 ## 3. Target Users
 
-* CS2100 students learning MIPS, datapath design, and instruction execution.
-* Students revising MIPS assembly and single-cycle datapath behavior.
-* Tutors or teaching assistants who want a visual aid for explaining datapath flow.
-* Students who prefer interactive exploration over static diagrams.
+- CS2100 students learning MIPS, datapath design, and instruction execution.
+- Students revising MIPS assembly and single-cycle datapath behavior.
+- Tutors or teaching assistants who want a visual aid for explaining datapath flow.
+- Students who prefer interactive exploration over static diagrams.
 
 ## 4. Level of Achievement
 
@@ -65,11 +65,11 @@ Each step updates the visible datapath paths, datapath values, logs, warnings, a
 
 This helps students understand what each stage contributes:
 
-* `IF`: fetch instruction and compute PC + 4
-* `ID`: decode instruction and read registers
-* `EX`: compute ALU result and branch target
-* `MEM`: access memory and update branch/PC decision
-* `WB`: write result back to the register file
+- `IF`: fetch instruction and compute PC + 4
+- `ID`: decode instruction and read registers
+- `EX`: compute ALU result and branch target
+- `MEM`: access memory and update branch/PC decision
+- `WB`: write result back to the register file
 
 ### 5.3 Editable Control Signals
 
@@ -87,13 +87,13 @@ This makes the tool useful not only for seeing wires, but also for checking actu
 
 Users can click datapath components to inspect current values and signal-related information. The inspector currently supports datapath elements such as:
 
-* PC
-* Instruction memory
-* Instruction register
-* ALU
-* Register file
-* Data memory
-* MUXes
+- PC
+- Instruction memory
+- Instruction register
+- ALU
+- Register file
+- Data memory
+- MUXes
 
 Each component inspector focuses on the values owned by that component, such as ALU inputs and result for the ALU, or read/write register information for the register file.
 
@@ -103,10 +103,10 @@ The datapath page includes an execution log panel. Logs describe what happens du
 
 Examples of warning cases include:
 
-* undefined control signals
-* conflicting memory read/write signals
-* missing write-back data
-* invalid or unsupported ALU control behavior
+- undefined control signals
+- conflicting memory read/write signals
+- missing write-back data
+- invalid or unsupported ALU control behavior
 
 ### 5.7 MIPS Assembly Simulator
 
@@ -197,12 +197,12 @@ sub $t3, $t2, $t1
 
 Expected checks for this example:
 
-* `lui`, `ori`, `addi`, `sll`, and `sub` assemble without errors.
-* Each instruction displays a `0x........` machine-code word.
-* Source registers are highlighted as inputs.
-* Destination registers are highlighted as outputs.
-* The register values change after each executed instruction.
-* The program eventually reaches the finished state.
+- `lui`, `ori`, `addi`, `sll`, and `sub` assemble without errors.
+- Each instruction displays a `0x........` machine-code word.
+- Source registers are highlighted as inputs.
+- Destination registers are highlighted as outputs.
+- The register values change after each executed instruction.
+- The program eventually reaches the finished state.
 
 ### Proof-of-Concept Demo
 
@@ -222,12 +222,12 @@ The main difference is that this project is not only an instruction-level simula
 
 Key differentiators include:
 
-* Stage-by-stage IF/ID/EX/MEM/WB datapath visualization.
-* Dynamic wire highlighting based on instruction and control signals.
-* Editable control signals for experimentation.
-* Explicit `X` / undefined behavior when signals are invalid.
-* Component inspector for PC, instruction memory, instruction register, ALU, register file, data memory, and MUXes.
-* Execution logs and warnings that explain what happens during each stage.
+- Stage-by-stage IF/ID/EX/MEM/WB datapath visualization.
+- Dynamic wire highlighting based on instruction and control signals.
+- Editable control signals for experimentation.
+- Explicit `X` / undefined behavior when signals are invalid.
+- Component inspector for PC, instruction memory, instruction register, ALU, register file, data memory, and MUXes.
+- Execution logs and warnings that explain what happens during each stage.
 
 The goal is to help students understand the hardware-level execution process, not just the final output of an assembly program.
 
@@ -244,19 +244,19 @@ Both modules share core MIPS logic where appropriate, but they have separate UI 
 
 `UI -> useDatapathSimulator hook -> single-cycle simulator -> SVG/table/log output`
 
-* UI components collect user actions such as instruction selection, mode changes, step controls, control-signal edits, register edits, memory edits, and component inspection.
-* `useDatapathSimulator` coordinates UI state with simulator state, selected instruction, control signals, current step, warnings, logs, and highlighted datapath paths.
-* Core single-cycle modules handle control-signal defaults, datapath execution, machine state, highlight calculation, inspector logic, and diagram path mapping.
-* Outputs are rendered as the SVG datapath diagram, register table, memory table, datapath value table, inspector panel, control-signal table, execution logs, and warnings.
+- UI components collect user actions such as instruction selection, mode changes, step controls, control-signal edits, register edits, memory edits, and component inspection.
+- `useDatapathSimulator` coordinates UI state with simulator state, selected instruction, control signals, current step, warnings, logs, and highlighted datapath paths.
+- Core single-cycle modules handle control-signal defaults, datapath execution, machine state, highlight calculation, inspector logic, and diagram path mapping.
+- Outputs are rendered as the SVG datapath diagram, register table, memory table, datapath value table, inspector panel, control-signal table, execution logs, and warnings.
 
 ### 8.2 Assembly Simulator Flow
 
 `Assembly source -> parser/assembler -> instruction-level simulator -> register/memory/output view`
 
-* Users enter MIPS assembly in the assembly page.
-* The assembler parses the supported 17-instruction set, resolves labels, and produces 32-bit machine-code words.
-* The instruction-level simulator executes the program one instruction at a time.
-* PC, registers, memory, generated hex code, and input/output highlights are updated after execution.
+- Users enter MIPS assembly in the assembly page.
+- The assembler parses the supported 17-instruction set, resolves labels, and produces 32-bit machine-code words.
+- The instruction-level simulator executes the program one instruction at a time.
+- PC, registers, memory, generated hex code, and input/output highlights are updated after execution.
 
 ## 9. Code Structure
 
@@ -283,54 +283,54 @@ public/
 
 Important files:
 
-* `src/App.tsx` — switches between the Datapath and Assembly tabs.
-* `src/features/datapath/DatapathPage.tsx` — main datapath visualizer page.
-* `src/features/datapath/hooks/useDatapathSimulator.ts` — state and behavior for datapath stepping, control signals, datapath Assembly mode, and machine state.
-* `src/features/datapath/components/DatapathDiagram.tsx` — SVG datapath rendering.
-* `src/features/assembly/AssemblyPage.tsx` — standalone assembly simulator page.
-* `src/features/assembly/useAssemblySimulator.ts` — instruction-level assembly simulation state.
-* `src/core/mips/assembly/` — parsers and assemblers.
-* `src/core/mips/execution/` — shared MIPS execution logic.
-* `src/core/mips/instruction/` — instruction metadata, fields, and encoding.
-* `src/core/mips/single-cycle/` — single-cycle datapath control, execution, diagram paths, highlights, and inspector logic.
+- `src/App.tsx` — switches between the Datapath and Assembly tabs.
+- `src/features/datapath/DatapathPage.tsx` — main datapath visualizer page.
+- `src/features/datapath/hooks/useDatapathSimulator.ts` — state and behavior for datapath stepping, control signals, datapath Assembly mode, and machine state.
+- `src/features/datapath/components/DatapathDiagram.tsx` — SVG datapath rendering.
+- `src/features/assembly/AssemblyPage.tsx` — standalone assembly simulator page.
+- `src/features/assembly/useAssemblySimulator.ts` — instruction-level assembly simulation state.
+- `src/core/mips/assembly/` — parsers and assemblers.
+- `src/core/mips/execution/` — shared MIPS execution logic.
+- `src/core/mips/instruction/` — instruction metadata, fields, and encoding.
+- `src/core/mips/single-cycle/` — single-cycle datapath control, execution, diagram paths, highlights, and inspector logic.
 
 ## 10. Important Design Decisions
 
-* **Separate datapath and assembly surfaces:** The datapath visualizer focuses on staged hardware visualization, while the Assembly tab focuses on instruction-level program execution.
-* **Different instruction scopes:** The standalone Assembly tab supports all 17 currently implemented MIPS instructions, while the datapath visualizer supports only the instruction subset represented in the single-cycle datapath UI.
-* **Signal-based datapath simulator:** Control signals are modeled explicitly and drive datapath behavior.
-* **`X` signal behavior:** Undefined or invalid signal combinations can produce `X` values instead of being silently hidden.
-* **Logical paths vs SVG paths:** SVG drawing paths are separated from logical datapath paths, so visual highlighting can change without rewriting simulator logic.
-* **Explore vs Simulate modes:** Explore lets users experiment with signals without committing machine-state updates, while Simulate applies PC, register, and memory changes.
-* **Component inspector:** Datapath components can be inspected independently so students can understand what each component owns and outputs.
+- **Separate datapath and assembly surfaces:** The datapath visualizer focuses on staged hardware visualization, while the Assembly tab focuses on instruction-level program execution.
+- **Different instruction scopes:** The standalone Assembly tab supports all 17 currently implemented MIPS instructions, while the datapath visualizer supports only the instruction subset represented in the single-cycle datapath UI.
+- **Signal-based datapath simulator:** Control signals are modeled explicitly and drive datapath behavior.
+- **`X` signal behavior:** Undefined or invalid signal combinations can produce `X` values instead of being silently hidden.
+- **Logical paths vs SVG paths:** SVG drawing paths are separated from logical datapath paths, so visual highlighting can change without rewriting simulator logic.
+- **Explore vs Simulate modes:** Explore lets users experiment with signals without committing machine-state updates, while Simulate applies PC, register, and memory changes.
+- **Component inspector:** Datapath components can be inspected independently so students can understand what each component owns and outputs.
 
 ## 11. Tech Stack
 
-* React 19
-* TypeScript
-* Vite
-* Tailwind CSS
-* SVG
-* ESLint
-* Vitest
-* Prettier dependency is present in `package.json`
+- React 19
+- TypeScript
+- Vite
+- Tailwind CSS
+- SVG
+- ESLint
+- Vitest
+- Prettier dependency is present in `package.json`
 
 ## 12. Software Engineering Practices
 
 Current practices:
 
-* The repository includes configured scripts for development, production build, preview, and linting.
-* ESLint configuration is present.
-* Prettier is listed as a development dependency.
-* Vitest is configured for automated core logic tests.
-* Code is separated into core logic, feature modules, shared components, and type definitions.
+- The repository includes configured scripts for development, production build, preview, and linting.
+- ESLint configuration is present.
+- Prettier is listed as a development dependency.
+- Vitest is configured for automated core logic tests.
+- Code is separated into core logic, feature modules, shared components, and type definitions.
 
 Planned improvements:
 
-* Add clearer GitHub workflow documentation.
-* Use issues/milestones to track feature work.
-* Add PR templates and issue templates.
-* Add CI in later milestones.
+- Add clearer GitHub workflow documentation.
+- Use issues/milestones to track feature work.
+- Add PR templates and issue templates.
+- Add CI in later milestones.
 
 ## 13. Testing Strategy
 
@@ -338,12 +338,12 @@ The project uses Vitest for automated TypeScript tests.
 
 Current automated tests focus on pure MIPS core logic rather than browser/UI behavior. The test suite covers:
 
-* MIPS instruction parsing and encoding.
-* Branch and jump label resolution.
-* Instruction-level execution for arithmetic, memory, branch, and `$zero` behavior.
-* Single-cycle datapath step behavior for IF, ID, EX, MEM, and WB.
-* Datapath warning behavior for invalid or undefined control-signal cases.
-* Datapath path/highlight selection for ALU input, memory, write-back, and branch paths.
+- MIPS instruction parsing and encoding.
+- Branch and jump label resolution.
+- Instruction-level execution for arithmetic, memory, branch, and `$zero` behavior.
+- Single-cycle datapath step behavior for IF, ID, EX, MEM, and WB.
+- Datapath warning behavior for invalid or undefined control-signal cases.
+- Datapath path/highlight selection for ALU input, memory, write-back, and branch paths.
 
 Run the automated tests with:
 
@@ -361,9 +361,9 @@ Manual testing is still used for full datapath and assembly simulator workflows,
 
 Testing work that should be added later:
 
-* Integration tests for React hooks and feature-level simulator workflows.
-* UI or end-to-end tests for instruction stepping, assembly loading, register updates, memory updates, and warning display.
-* User testing with CS2100 students or tutors to check whether the visualization improves understanding.
+- Integration tests for React hooks and feature-level simulator workflows.
+- UI or end-to-end tests for instruction stepping, assembly loading, register updates, memory updates, and warning display.
+- User testing with CS2100 students or tutors to check whether the visualization improves understanding.
 
 ## 14. Setup Instructions
 
@@ -423,15 +423,15 @@ Milestone 1 focuses on proving that the core project idea is feasible.
 
 Planned / current deliverables:
 
-* Implement the SVG-based single-cycle datapath visualizer.
-* Support instruction selection for the datapath-supported MIPS subset.
-* Support IF/ID/EX/MEM/WB stepping.
-* Show active datapath paths, datapath values, control signals, registers, memory, logs, and warnings.
-* Add editable control signals and Explore/Simulate modes.
-* Add component inspection for key datapath components.
-* Add datapath Assembly mode for staged execution of datapath-supported assembly programs.
-* Add a separate Assembly tab with parsing, label handling, hex machine-code output, and instruction-level execution for the supported 17-instruction set.
-* Provide setup instructions, screenshots, poster, video, and project log.
+- Implement the SVG-based single-cycle datapath visualizer.
+- Support instruction selection for the datapath-supported MIPS subset.
+- Support IF/ID/EX/MEM/WB stepping.
+- Show active datapath paths, datapath values, control signals, registers, memory, logs, and warnings.
+- Add editable control signals and Explore/Simulate modes.
+- Add component inspection for key datapath components.
+- Add datapath Assembly mode for staged execution of datapath-supported assembly programs.
+- Add a separate Assembly tab with parsing, label handling, hex machine-code output, and instruction-level execution for the supported 17-instruction set.
+- Provide setup instructions, screenshots, poster, video, and project log.
 
 ### Milestone 2 — Core Reliability and K-map Visualizer
 
@@ -439,13 +439,13 @@ Milestone 2 focuses on improving correctness, strengthening the existing modules
 
 Planned work:
 
-* Improve the MIPS assembly parser and supported instruction coverage.
-* Connect assembly programs more tightly with datapath visualization where appropriate.
-* Add automated tests for parser, instruction execution, control signals, and datapath behavior.
-* Improve execution logs, warnings, and explanations.
-* Improve UI polish and layout consistency.
-* Start the Karnaugh-map visualizer module.
-* Conduct early informal testing with CS2100 students or peers.
+- Improve the MIPS assembly parser and supported instruction coverage.
+- Connect assembly programs more tightly with datapath visualization where appropriate.
+- Add automated tests for parser, instruction execution, control signals, and datapath behavior.
+- Improve execution logs, warnings, and explanations.
+- Improve UI polish and layout consistency.
+- Start the Karnaugh-map visualizer module.
+- Conduct early informal testing with CS2100 students or peers.
 
 ### Milestone 3 — Pipeline Visualization, Validation, and Polish
 
@@ -453,22 +453,22 @@ Milestone 3 focuses on validation, usability, and broader visualization support.
 
 Planned work:
 
-* Add pipeline visualization for instruction flow across cycles.
-* Show pipeline stage state, hazards, stalls, forwarding, and control behavior where feasible.
-* Complete or polish the Karnaugh-map visualizer.
-* Improve responsive UI layout and accessibility.
-* Add user testing with CS2100 students or tutors.
-* Add integration or end-to-end tests for key workflows.
-* Prepare final poster, video, and demo.
+- Add pipeline visualization for instruction flow across cycles.
+- Show pipeline stage state, hazards, stalls, forwarding, and control behavior where feasible.
+- Complete or polish the Karnaugh-map visualizer.
+- Improve responsive UI layout and accessibility.
+- Add user testing with CS2100 students or tutors.
+- Add integration or end-to-end tests for key workflows.
+- Prepare final poster, video, and demo.
 
 ## 16. Future Work
 
-* Additional MIPS instructions beyond the currently supported 17-instruction set.
-* Broader staged datapath support for assembly programs beyond the current datapath subset.
-* Pipeline visualization.
-* Cache behavior visualization.
-* Karnaugh-map tooling.
-* More tutorial-style examples for common CS2100 concepts.
+- Additional MIPS instructions beyond the currently supported 17-instruction set.
+- Broader staged datapath support for assembly programs beyond the current datapath subset.
+- Pipeline visualization.
+- Cache behavior visualization.
+- Karnaugh-map tooling.
+- More tutorial-style examples for common CS2100 concepts.
 
 ## 17. Project Log
 

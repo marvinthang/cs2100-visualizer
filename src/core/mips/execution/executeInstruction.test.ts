@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import type { MipsInstructionFields, RegisterNumber } from '../../../types/mips';
+import type {
+    MipsInstructionFields,
+    RegisterNumber,
+} from '../../../types/mips';
 import { executeInstruction } from './executeInstruction';
 import {
     createInitialMachineState,
@@ -31,7 +34,10 @@ describe('executeInstruction', () => {
             funct: 0x20,
         };
 
-        const result = executeInstruction(createMachine({ 9: 5, 10: 7 }), instruction);
+        const result = executeInstruction(
+            createMachine({ 9: 5, 10: 7 }),
+            instruction,
+        );
 
         expect(result.registers[8]).toBe(12);
         expect(result.pc).toBe(4);
@@ -79,7 +85,10 @@ describe('executeInstruction', () => {
             immediate: 4,
         };
 
-        const result = executeInstruction(createMachine({ 8: 42, 9: 100 }), instruction);
+        const result = executeInstruction(
+            createMachine({ 8: 42, 9: 100 }),
+            instruction,
+        );
 
         expect(result.dataMemory[104]).toBe(42);
         expect(result.pc).toBe(4);
@@ -129,7 +138,10 @@ describe('executeInstruction', () => {
             funct: 0x20,
         };
 
-        const result = executeInstruction(createMachine({ 9: 5, 10: 7 }), instruction);
+        const result = executeInstruction(
+            createMachine({ 9: 5, 10: 7 }),
+            instruction,
+        );
 
         expect(result.registers[0]).toBe(0);
         expect(result.pc).toBe(4);

@@ -28,6 +28,43 @@ function toHex(num: number | undefined): string {
     return `0x${(num >>> 0).toString(16).padStart(8, '0').toUpperCase()}`;
 }
 
+function getUnsignedFieldValue(num: number, bits: 16 | 32): number {
+    return bits === 16 ? num & 0xffff : num >>> 0;
+}
+
+function getSignedFieldValue(num: number, bits: 16 | 32): number {
+    return bits === 16 ? (num << 16) >> 16 : num | 0;
+}
+
+function formatSignedField(
+    num: number | undefined,
+    bits: 16 | 32,
+    format: InstructionDisplayFormat,
+): string {
+    if (num === undefined) {
+        return 'UNDEFINED';
+    }
+
+    const unsignedValue = getUnsignedFieldValue(num, bits);
+
+    if (format === 'hex') {
+        return `0x${unsignedValue
+            .toString(16)
+            .padStart(bits / 4, '0')
+            .toUpperCase()}`;
+    }
+
+    if (format === 'bin') {
+        return unsignedValue.toString(2).padStart(bits, '0');
+    }
+
+    return `${getSignedFieldValue(num, bits)} (${formatSignedField(
+        num,
+        bits,
+        'hex',
+    )})`;
+}
+
 function getPCRole(step: DatapathStep | null): string {
     if (step === 'IF') {
         return 'Outputs the current instruction address.';
@@ -547,14 +584,19 @@ function getSignExtendInspectInfo(
         rows: [
             {
                 label: 'Input immediate',
-                value: frame.decToBaseN(
+                value: formatSignedField(
                     frame.context.instruction?.immediate,
                     16,
+                    frame.instructionDisplayFormat,
                 ),
             },
             {
                 label: 'Output',
-                value: frame.decToBaseN(frame.context.immediate),
+                value: formatSignedField(
+                    frame.context.immediate,
+                    32,
+                    frame.instructionDisplayFormat,
+                ),
             },
             {
                 label: 'Current role',

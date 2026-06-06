@@ -39,7 +39,9 @@ export const registerNames = [
 // Resolve a register operand to its number. Accepts an ABI name ($t0) or a
 // numeric form ($8). Returns null if the token is not a valid register.
 export function parseRegister(token: string): RegisterNumber | null {
-    const aliasIndex = registerNames.indexOf(token as (typeof registerNames)[number]);
+    const aliasIndex = registerNames.indexOf(
+        token as (typeof registerNames)[number],
+    );
     if (aliasIndex !== -1) {
         return aliasIndex as RegisterNumber;
     }

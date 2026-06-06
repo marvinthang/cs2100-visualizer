@@ -158,10 +158,7 @@ export function useAssemblySimulator() {
             return;
         }
 
-        const after = executeInstruction(
-            machine,
-            program[programIndex].fields,
-        );
+        const after = executeInstruction(machine, program[programIndex].fields);
         setMachineHighlight(
             getInstructionHighlights(machine, program[programIndex].fields),
         );
@@ -190,7 +187,9 @@ export function useAssemblySimulator() {
     }
 
     function handleResetRegisters() {
-        setMachine((machine) => ({ ...machine, registers: {} }) as MachineState);
+        setMachine(
+            (machine) => ({ ...machine, registers: {} }) as MachineState,
+        );
         setMachineHighlight(emptyHighlight);
     }
 

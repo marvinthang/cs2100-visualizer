@@ -43,86 +43,94 @@ export default function ControlSignalTable({
     }
 
     return (
-        <table className="rounded w-full text-sm">
-            <thead className="bg-slate-100">
-                <tr>
-                    <th className="border border-slate-300 px-4 py-2 text-left">
-                        Signal
-                    </th>
-                    <th className="border border-slate-300 px-4 py-2 text-center">
-                        Value
-                    </th>
-                </tr>
-            </thead>
+        <div className="overflow-hidden rounded-lg border border-slate-200">
+            <table className="w-full text-sm">
+                <thead className="bg-slate-50">
+                    <tr className="border-b border-slate-200 text-xs text-slate-500">
+                        <th className="px-3 py-2 text-left font-semibold">
+                            Signal
+                        </th>
+                        <th className="px-3 py-2 text-right font-semibold">
+                            Value
+                        </th>
+                    </tr>
+                </thead>
 
-            <tbody>
-                {(
-                    Object.entries(signals) as [
-                        ControlSignalId,
-                        RuntimeControlSignals[ControlSignalId],
-                    ][]
-                ).map(([signal, value]) => {
-                    const isModified = value !== defaultSignals[signal];
-                    const role = datapathHighlight.controls[signal];
-                    const bgClass =
-                        role === undefined
-                            ? isModified
-                                ? 'bg-orange-100'
-                                : undefined
-                            : 'bg-blue-100';
-                    return (
-                        <tr
-                            key={signal}
-                            className={`border border-slate-300 ${bgClass}`}
-                        >
-                            <td className="border border-slate-300 px-4 py-2 font-medium">
-                                {signal}
-                            </td>
-                            <td
-                                className={`border border-slate-300 px-4 py-2 font-semibold text-center ${isModified ? 'text-red-600' : 'text-green-600'}`}
+                <tbody>
+                    {(
+                        Object.entries(signals) as [
+                            ControlSignalId,
+                            RuntimeControlSignals[ControlSignalId],
+                        ][]
+                    ).map(([signal, value]) => {
+                        const isModified = value !== defaultSignals[signal];
+                        const role = datapathHighlight.controls[signal];
+                        const bgClass =
+                            role === undefined
+                                ? isModified
+                                    ? 'bg-amber-50'
+                                    : 'bg-white'
+                                : 'bg-blue-50';
+                        const valueClass = isModified
+                            ? 'text-red-600'
+                            : 'text-emerald-700';
+
+                        return (
+                            <tr
+                                key={signal}
+                                className={`border-b border-slate-100 last:border-b-0 ${bgClass}`}
                             >
-                                {editable &&
-                                signal != 'ALUOp' &&
-                                signal != 'PCSrc' ? (
-                                    <select
-                                        value={String(value)}
-                                        onChange={(event) => {
-                                            updateSignal(
-                                                signal,
-                                                parseControlValue(
+                                <td className="px-3 py-1.5 font-mono text-xs font-semibold text-slate-700">
+                                    {signal}
+                                </td>
+                                <td
+                                    className={`px-3 py-1.5 text-right font-mono text-xs font-semibold ${valueClass}`}
+                                >
+                                    {editable &&
+                                    signal !== 'ALUOp' &&
+                                    signal !== 'PCSrc' ? (
+                                        <select
+                                            value={String(value)}
+                                            onChange={(event) => {
+                                                updateSignal(
                                                     signal,
-                                                    event.target.value,
+                                                    parseControlValue(
+                                                        signal,
+                                                        event.target.value,
+                                                    ),
+                                                );
+                                            }}
+                                            className="rounded-md border border-slate-200 bg-white px-2 py-1 text-xs text-slate-900 shadow-sm"
+                                        >
+                                            {controlSignalOptions[signal].map(
+                                                (option) => (
+                                                    <option
+                                                        key={String(option)}
+                                                        value={String(option)}
+                                                        className={
+                                                            option !==
+                                                            defaultSignals[
+                                                                signal
+                                                            ]
+                                                                ? 'text-red-600'
+                                                                : 'text-green-600'
+                                                        }
+                                                    >
+                                                        {option}
+                                                    </option>
                                                 ),
-                                            );
-                                        }}
-                                        className="rounded border px-2 py-1"
-                                    >
-                                        {controlSignalOptions[signal].map(
-                                            (option) => (
-                                                <option
-                                                    key={String(option)}
-                                                    value={String(option)}
-                                                    className={
-                                                        option !==
-                                                        defaultSignals[signal]
-                                                            ? 'text-red-600'
-                                                            : 'text-green-600'
-                                                    }
-                                                >
-                                                    {option}
-                                                </option>
-                                            ),
-                                        )}
-                                    </select>
-                                ) : (
-                                    <span>{value}</span>
-                                )}
-                            </td>
-                        </tr>
-                    );
-                })}
-            </tbody>
-        </table>
+                                            )}
+                                        </select>
+                                    ) : (
+                                        <span>{value}</span>
+                                    )}
+                                </td>
+                            </tr>
+                        );
+                    })}
+                </tbody>
+            </table>
+        </div>
     );
 }
 

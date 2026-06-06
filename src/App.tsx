@@ -1,12 +1,14 @@
 import { useState } from 'react';
 import DatapathPage from './features/datapath/DatapathPage';
 import AssemblyPage from './features/assembly/AssemblyPage';
+import KMapPage from './features/kmap/KMapPage';
 
-type Tab = 'datapath' | 'assembly';
+type Tab = 'datapath' | 'assembly' | 'kmap';
 
 const tabs: { id: Tab; label: string }[] = [
     { id: 'datapath', label: 'Datapath' },
     { id: 'assembly', label: 'Assembly' },
+    { id: 'kmap', label: 'Karnaugh Maps' },
 ];
 
 export default function App() {
@@ -32,7 +34,13 @@ export default function App() {
             </nav>
 
             <div className="min-h-0 flex-1 overflow-auto">
-                {tab === 'datapath' ? <DatapathPage /> : <AssemblyPage />}
+                {tab === 'datapath' ? (
+                    <DatapathPage />
+                ) : tab === 'assembly' ? (
+                    <AssemblyPage />
+                ) : (
+                    <KMapPage />
+                )}
             </div>
         </div>
     );

@@ -20,9 +20,7 @@ describe('MIPS instruction encoding', () => {
 
         expect(encodeMipsInstructionWord(instruction)).toBe(0x012a4020);
         expect(encoded.full.hex).toBe('0x012A4020');
-        expect(encoded.full.bin).toBe(
-            '00000001001010100100000000100000',
-        );
+        expect(encoded.full.bin).toBe('00000001001010100100000000100000');
         expect(encoded.rs.dec).toBe('9');
         expect(encoded.rt.dec).toBe('10');
         expect(encoded.rd.dec).toBe('8');

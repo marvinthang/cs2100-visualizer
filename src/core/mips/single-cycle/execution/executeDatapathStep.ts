@@ -157,11 +157,7 @@ function executeID(frame: ExecutionFrame): void {
     const readData1 = readRegister(frame.machineState, readReg1);
     const readData2 = readRegister(frame.machineState, readReg2);
     const writeReg =
-        RegDst === undefined
-            ? undefined
-            : RegDst === 0
-              ? ir.rt
-              : ir.rd;
+        RegDst === undefined ? undefined : RegDst === 0 ? ir.rt : ir.rd;
     frame.newContext = {
         ...frame.context,
         readReg1,

@@ -35,11 +35,11 @@ export default function DatapathValueTable({
     ] as const;
 
     return (
-        <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+        <div className="rounded-xl border border-slate-200 bg-white p-3 shadow-sm">
             <h2 className="mb-3 text-sm font-semibold text-slate-900">
                 Datapath Values
             </h2>
-            <div className="max-h-[200px] overflow-auto">
+            <div className="max-h-[170px] overflow-auto">
                 <table className="w-full text-sm">
                     <thead>
                         <tr className="border-b border-slate-200 text-left text-xs text-slate-500">

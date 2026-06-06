@@ -8,9 +8,7 @@ import { getDatapathControlSignals } from './control/datapathControl';
 import type { RuntimeControlSignals } from './control/types';
 import { executeDatapathStep } from './execution/executeDatapathStep';
 import type { ExecutionContext } from './execution/executionContext';
-import {
-    createEmptyExecutionContext,
-} from './execution/executionContext';
+import { createEmptyExecutionContext } from './execution/executionContext';
 import {
     createInitialMachineState,
     type MachineState,

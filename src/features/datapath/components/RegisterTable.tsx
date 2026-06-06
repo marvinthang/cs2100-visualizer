@@ -122,13 +122,15 @@ export default function RegisterTable({
                                                     raw.trim() === '' ||
                                                     Number.isNaN(value)
                                                 ) {
-                                                    setRegisterDrafts((drafts) => {
-                                                        const next = {
-                                                            ...drafts,
-                                                        };
-                                                        delete next[id];
-                                                        return next;
-                                                    });
+                                                    setRegisterDrafts(
+                                                        (drafts) => {
+                                                            const next = {
+                                                                ...drafts,
+                                                            };
+                                                            delete next[id];
+                                                            return next;
+                                                        },
+                                                    );
                                                     return;
                                                 }
                                                 setRegisterDrafts((drafts) => {
@@ -156,7 +158,7 @@ export default function RegisterTable({
     }
 
     return (
-        <div className="h-fit rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+        <div className="h-fit rounded-xl border border-slate-200 bg-white p-3 shadow-sm">
             <div className="mb-3 flex items-center justify-between">
                 <h2 className="text-sm font-semibold text-slate-900">
                     Registers
@@ -173,7 +175,7 @@ export default function RegisterTable({
                             setRegisterDrafts({});
                             onResetRegisters();
                         }}
-                        className="rounded-md border border-slate-200 px-2 py-1 text-xs font-medium text-slate-700 hover:bg-slate-100"
+                        className="rounded-md border border-slate-200 px-2 py-1 text-xs font-semibold text-slate-700 hover:bg-slate-100"
                     >
                         Reset
                     </button>
@@ -184,10 +186,7 @@ export default function RegisterTable({
             {renderTable(tableMaxHeightClass)}
 
             {isExpanded && (
-                <Modal
-                    title="Registers"
-                    onClose={() => setIsExpanded(false)}
-                >
+                <Modal title="Registers" onClose={() => setIsExpanded(false)}>
                     {renderTable('max-h-[65vh]')}
                 </Modal>
             )}
