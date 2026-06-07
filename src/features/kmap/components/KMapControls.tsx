@@ -1,4 +1,5 @@
 import type { VariableCount } from '../../../core/kmap/kmapModel';
+import type { KMapPracticeDifficulty } from '../../../core/kmap/kmapPracticeGenerator';
 import type { KMapSolveForm } from '../../../core/kmap/kmapSolver';
 
 const modeOptions: Array<{ value: 'edit' | 'group'; label: string }> = [
@@ -13,6 +14,15 @@ const formOptions: Array<{
 }> = [
     { value: 'SOP', label: 'SOP', target: 'group 1 + X' },
     { value: 'POS', label: 'POS', target: 'group 0 + X' },
+];
+
+const practiceDifficultyOptions: Array<{
+    value: KMapPracticeDifficulty;
+    label: string;
+}> = [
+    { value: 'easy', label: 'Easy' },
+    { value: 'medium', label: 'Medium' },
+    { value: 'hard', label: 'Hard' },
 ];
 
 function getSelectedGroupMessage({
@@ -49,6 +59,7 @@ type KMapControlsProps = {
     selectedValuesAreGroupable: boolean;
     selectedGroupIsAllDontCare: boolean;
     groupTargetValue: 0 | 1;
+    practiceDifficulty: KMapPracticeDifficulty;
     groupLiteralInput: string;
     groupLiteralError: string | null;
     onModeChange: (mode: 'edit' | 'group') => void;
@@ -58,6 +69,8 @@ type KMapControlsProps = {
     onMintermInputChange: (value: string) => void;
     onDontCareInputChange: (value: string) => void;
     onApplyValueInputs: () => void;
+    onPracticeDifficultyChange: (difficulty: KMapPracticeDifficulty) => void;
+    onGeneratePracticeMap: () => void;
     onAddGroup: () => void;
     onClearSelectedGroup: () => void;
     onResetMap: () => void;
@@ -79,6 +92,7 @@ export default function KMapControls({
     selectedValuesAreGroupable,
     selectedGroupIsAllDontCare,
     groupTargetValue,
+    practiceDifficulty,
     groupLiteralInput,
     groupLiteralError,
     onModeChange,
@@ -88,6 +102,8 @@ export default function KMapControls({
     onMintermInputChange,
     onDontCareInputChange,
     onApplyValueInputs,
+    onPracticeDifficultyChange,
+    onGeneratePracticeMap,
     onAddGroup,
     onClearSelectedGroup,
     onResetMap,
@@ -222,7 +238,7 @@ export default function KMapControls({
                     Function Values
                 </h3>
 
-                <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] items-end gap-2">
+                <div className="space-y-2">
                     <label className="block">
                         <span className="mb-1 block text-xs font-medium text-slate-600">
                             1 cells
@@ -256,7 +272,7 @@ export default function KMapControls({
                     <button
                         type="button"
                         onClick={onApplyValueInputs}
-                        className="rounded-md bg-slate-900 px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:bg-slate-800"
+                        className="w-full rounded-md bg-slate-900 px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:bg-slate-800"
                     >
                         Apply
                     </button>
@@ -267,6 +283,46 @@ export default function KMapControls({
                         {valueInputError}
                     </p>
                 )}
+            </div>
+
+            <div className="mt-3 rounded-lg border border-slate-200 bg-slate-50 p-3">
+                <h3 className="mb-3 text-xs font-semibold uppercase tracking-wide text-slate-500">
+                    Practice
+                </h3>
+
+                <div className="space-y-2">
+                    <div>
+                        <span className="mb-1 block text-xs font-medium text-slate-600">
+                            Difficulty
+                        </span>
+                        <div className="grid grid-cols-3 gap-1 rounded-lg bg-white p-1 ring-1 ring-slate-200">
+                            {practiceDifficultyOptions.map((option) => (
+                                <button
+                                    key={option.value}
+                                    type="button"
+                                    onClick={() =>
+                                        onPracticeDifficultyChange(option.value)
+                                    }
+                                    className={`rounded-md px-2 py-1.5 text-xs font-semibold transition ${
+                                        practiceDifficulty === option.value
+                                            ? 'bg-slate-900 text-white shadow-sm'
+                                            : 'text-slate-500 hover:bg-slate-100 hover:text-slate-900'
+                                    }`}
+                                >
+                                    {option.label}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    <button
+                        type="button"
+                        onClick={onGeneratePracticeMap}
+                        className="w-full rounded-md bg-slate-900 px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:bg-slate-800"
+                    >
+                        Generate
+                    </button>
+                </div>
             </div>
 
             <div className="mt-3 rounded-lg border border-slate-200 bg-slate-50 p-3">
