@@ -1,23 +1,28 @@
-import type { KMapGroup, KMapModel } from '../../../core/kmap/kmapModel';
+import type { CSSProperties } from 'react';
+import type {
+    KMapCell,
+    KMapGroup,
+    KMapModel,
+} from '../../../core/kmap/kmapModel';
 import type { KMapCellValue } from '../../../core/kmap/kmapModel';
 import { getKMap2DArray } from '../../../core/kmap/kmapModel';
 
-const groupColors = [
-    'border-emerald-500 bg-emerald-50',
-    'border-amber-500 bg-amber-50',
-    'border-rose-500 bg-rose-50',
-    'border-violet-500 bg-violet-50',
-    'border-cyan-500 bg-cyan-50',
-    'border-lime-500 bg-lime-50',
+const groupOutlineColors = [
+    '#10b981',
+    '#f59e0b',
+    '#f43f5e',
+    '#8b5cf6',
+    '#06b6d4',
+    '#84cc16',
 ];
 
 const groupDotColors = [
-    'bg-emerald-600',
-    'bg-amber-600',
-    'bg-rose-600',
-    'bg-violet-600',
-    'bg-cyan-600',
-    'bg-lime-600',
+    'bg-emerald-600 ring-2 ring-white',
+    'bg-amber-600 ring-2 ring-white',
+    'bg-rose-600 ring-2 ring-white',
+    'bg-violet-600 ring-2 ring-white',
+    'bg-cyan-600 ring-2 ring-white',
+    'bg-lime-600 ring-2 ring-white',
 ];
 
 function getCellValueClass(value: KMapCellValue): string {
@@ -42,6 +47,53 @@ function getValueBadgeClass(value: KMapCellValue): string {
     }
 
     return 'bg-slate-200 text-slate-600';
+}
+
+function getGroupOutlineStyle({
+    cell,
+    group,
+    rows,
+    colorIndex,
+}: {
+    cell: KMapCell;
+    group: KMapGroup;
+    rows: KMapCell[][];
+    colorIndex: number;
+}): CSSProperties {
+    const rowCount = rows.length;
+    const colCount = rows[0]?.length ?? 0;
+    const mintermSet = new Set(group.minterms);
+    // check if the whole row is covered
+    const hasFullRow = Array.from({ length: colCount }, (_, col) => rows[cell.row][col].minterm).every((minterm) => mintermSet.has(minterm));
+
+    const hasFullCol = Array.from({ length: rowCount }, (_, row) => rows[row][cell.col].minterm).every((minterm) => mintermSet.has(minterm));
+
+    const hasTopNeighbor = !(
+        (hasFullCol && cell.row == 0) ||
+        !mintermSet.has(rows[(cell.row - 1 + rowCount) % rowCount][cell.col].minterm)
+    )
+    const hasRightNeighbor = !(
+        (hasFullRow && cell.col == colCount - 1) ||
+        !mintermSet.has(rows[cell.row][(cell.col + 1) % colCount].minterm)
+    );
+    const hasBottomNeighbor = !(
+        (hasFullCol && cell.row == rowCount - 1) ||
+        !mintermSet.has(rows[(cell.row + 1) % rowCount][cell.col].minterm)
+    )
+    const hasLeftNeighbor = !(
+        (hasFullRow && cell.col == 0) ||
+        !mintermSet.has(rows[cell.row][(cell.col - 1 + colCount) % colCount].minterm)
+    )
+    const color = groupOutlineColors[colorIndex % groupOutlineColors.length];
+    const stackOffset = -5 + (colorIndex % 6) * 3;
+
+    return {
+        inset: `${stackOffset}px`,
+        borderTopColor: hasTopNeighbor ? 'transparent' : color,
+        borderRightColor: hasRightNeighbor ? 'transparent' : color,
+        borderBottomColor: hasBottomNeighbor ? 'transparent' : color,
+        borderLeftColor: hasLeftNeighbor ? 'transparent' : color,
+    };
 }
 
 export default function KMapGrid({
@@ -111,6 +163,7 @@ export default function KMapGrid({
                                         group.minterms.includes(cell.minterm)
                                             ? {
                                                   id: group.id,
+                                                  group,
                                                   colorIndex:
                                                       group.colorIndex ?? index,
                                               }
@@ -121,15 +174,6 @@ export default function KMapGrid({
                                     activeGroup?.minterms.includes(
                                         cell.minterm,
                                     ) ?? false;
-                                const firstGroupIndex =
-                                    cellGroups[0]?.colorIndex;
-                                const groupClass =
-                                    firstGroupIndex === undefined
-                                        ? ''
-                                        : groupColors[
-                                              firstGroupIndex %
-                                                  groupColors.length
-                                          ];
                                 const valueClass = getCellValueClass(
                                     cell.value,
                                 );
@@ -150,9 +194,9 @@ export default function KMapGrid({
                                             onClick={() =>
                                                 onCellClick(cell.minterm)
                                             }
-                                            className={`relative flex h-16 w-16 flex-col items-center justify-center rounded-lg border-2 border-slate-200 transition ${
+                                            className={`relative isolate flex h-16 w-16 flex-col items-center justify-center rounded-lg border-2 border-slate-200 transition ${
                                                 valueClass
-                                            } ${groupClass} ${
+                                            } ${
                                                 isSelected
                                                     ? 'bg-blue-100 ring-2 ring-blue-500'
                                                     : ''
@@ -162,16 +206,23 @@ export default function KMapGrid({
                                                     : ''
                                             }`}
                                         >
-                                            <span
-                                                className={`rounded px-2 py-0.5 text-lg font-bold ${valueBadgeClass}`}
-                                            >
-                                                {cell.value}
-                                            </span>
-                                            <span className="mt-1 text-[10px] text-slate-400">
-                                                m{cell.minterm}
-                                            </span>
+                                            {cellGroups.map((group) => (
+                                                <span
+                                                    key={group.id}
+                                                    className="pointer-events-none absolute z-20 rounded-xl border-[3px] border-transparent"
+                                                    style={getGroupOutlineStyle(
+                                                        {
+                                                            cell,
+                                                            group: group.group,
+                                                            rows,
+                                                            colorIndex:
+                                                                group.colorIndex,
+                                                        },
+                                                    )}
+                                                />
+                                            ))}
                                             {cellGroups.length > 0 && (
-                                                <span className="absolute right-1 top-1 flex items-center gap-0.5">
+                                                <span className="absolute right-1 top-1 z-30 flex items-center gap-1 rounded-full bg-white/85 px-1 py-0.5 shadow-sm">
                                                     {visibleCellGroups.map(
                                                         (group) => (
                                                             <span
@@ -192,6 +243,14 @@ export default function KMapGrid({
                                                     )}
                                                 </span>
                                             )}
+                                                <span
+                                                    className={`relative z-0 rounded px-2 py-0.5 text-lg font-bold ${valueBadgeClass}`}
+                                                >
+                                                    {cell.value}
+                                                </span>
+                                                <span className="relative z-0 mt-1 text-[10px] text-slate-400">
+                                                    m{cell.minterm}
+                                                </span>
                                         </button>
                                     </td>
                                 );
