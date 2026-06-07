@@ -3,6 +3,7 @@ import type {
     KMapModel,
     VariableCount,
 } from '../../core/kmap/kmapModel';
+import { canCreateKMapGroup } from '../../core/kmap/kmapModel';
 import type { KMapSolveForm, KMapSolvePI } from '../../core/kmap/kmapSolver';
 
 export const defaultVariableNames = ['A', 'B', 'C', 'D'];
@@ -52,6 +53,278 @@ export function hasOverlap(left: number[], right: number[]): boolean {
     return left.some((minterm) => right.includes(minterm));
 }
 
+type BooleanExpressionToken =
+    | { type: 'var'; value: string }
+    | { type: 'apostrophe' }
+    | { type: 'and' }
+    | { type: 'or' }
+    | { type: 'lparen' }
+    | { type: 'rparen' }
+    | { type: 'eof' };
+
+type BooleanExpressionNode =
+    | { type: 'var'; name: string }
+    | { type: 'not'; child: BooleanExpressionNode }
+    | { type: 'and'; left: BooleanExpressionNode; right: BooleanExpressionNode }
+    | { type: 'or'; left: BooleanExpressionNode; right: BooleanExpressionNode };
+
+function tokenizeBooleanExpression(
+    input: string,
+    variableNames: string[],
+): { tokens: BooleanExpressionToken[]; error: string | null } {
+    const variableSet = new Set(variableNames);
+    const tokens: BooleanExpressionToken[] = [];
+
+    for (let index = 0; index < input.length; index++) {
+        const char = input[index];
+
+        if (/\s/.test(char)) {
+            continue;
+        }
+
+        if (/^[A-Za-z]$/.test(char)) {
+            if (!variableSet.has(char)) {
+                return {
+                    tokens: [],
+                    error: `Unknown variable: ${char}`,
+                };
+            }
+
+            tokens.push({ type: 'var', value: char });
+            continue;
+        }
+
+        if (char === "'") {
+            tokens.push({ type: 'apostrophe' });
+            continue;
+        }
+
+        if (char === '.') {
+            tokens.push({ type: 'and' });
+            continue;
+        }
+
+        if (char === '+') {
+            tokens.push({ type: 'or' });
+            continue;
+        }
+
+        if (char === '(') {
+            tokens.push({ type: 'lparen' });
+            continue;
+        }
+
+        if (char === ')') {
+            tokens.push({ type: 'rparen' });
+            continue;
+        }
+
+        return {
+            tokens: [],
+            error: `Invalid character: ${char}`,
+        };
+    }
+
+    tokens.push({ type: 'eof' });
+    return { tokens, error: null };
+}
+
+function parseBooleanExpressionTokens(tokens: BooleanExpressionToken[]): {
+    node: BooleanExpressionNode | null;
+    error: string | null;
+} {
+    let index = 0;
+
+    function current() {
+        return tokens[index];
+    }
+
+    function consume() {
+        return tokens[index++];
+    }
+
+    function isFactorStart(token: BooleanExpressionToken): boolean {
+        return token.type === 'var' || token.type === 'lparen';
+    }
+
+    function parseOr(): BooleanExpressionNode | null {
+        let node = parseAnd();
+
+        if (node === null) {
+            return null;
+        }
+
+        while (current().type === 'or') {
+            consume();
+            const right = parseAnd();
+
+            if (right === null) {
+                return null;
+            }
+
+            node = { type: 'or', left: node, right };
+        }
+
+        return node;
+    }
+
+    function parseAnd(): BooleanExpressionNode | null {
+        let node = parseNot();
+
+        if (node === null) {
+            return null;
+        }
+
+        while (current().type === 'and' || isFactorStart(current())) {
+            if (current().type === 'and') {
+                consume();
+            }
+
+            const right = parseNot();
+
+            if (right === null) {
+                return null;
+            }
+
+            node = { type: 'and', left: node, right };
+        }
+
+        return node;
+    }
+
+    function parseNot(): BooleanExpressionNode | null {
+        let node = parsePrimary();
+
+        if (node === null) {
+            return null;
+        }
+
+        while (current().type === 'apostrophe') {
+            consume();
+            node = { type: 'not', child: node };
+        }
+
+        return node;
+    }
+
+    function parsePrimary(): BooleanExpressionNode | null {
+        const token = consume();
+
+        if (token.type === 'var') {
+            return { type: 'var', name: token.value };
+        }
+
+        if (token.type === 'lparen') {
+            const node = parseOr();
+
+            if (node === null) {
+                return null;
+            }
+
+            if (current().type !== 'rparen') {
+                return null;
+            }
+
+            consume();
+            return node;
+        }
+
+        return null;
+    }
+
+    const node = parseOr();
+
+    if (node === null) {
+        return { node: null, error: 'Invalid boolean expression.' };
+    }
+
+    if (current().type !== 'eof') {
+        return { node: null, error: 'Invalid boolean expression.' };
+    }
+
+    return { node, error: null };
+}
+
+function evaluateBooleanExpressionNode(
+    node: BooleanExpressionNode,
+    values: Record<string, boolean>,
+): boolean {
+    if (node.type === 'var') {
+        return values[node.name] ?? false;
+    }
+
+    if (node.type === 'not') {
+        return !evaluateBooleanExpressionNode(node.child, values);
+    }
+
+    if (node.type === 'and') {
+        return (
+            evaluateBooleanExpressionNode(node.left, values) &&
+            evaluateBooleanExpressionNode(node.right, values)
+        );
+    }
+
+    return (
+        evaluateBooleanExpressionNode(node.left, values) ||
+        evaluateBooleanExpressionNode(node.right, values)
+    );
+}
+
+export function parseBooleanExpressionInput(
+    input: string,
+    model: KMapModel,
+    variableNames: string[],
+): { minterms: number[]; error: string | null } {
+    const text = input.trim();
+
+    if (text === '') {
+        return {
+            minterms: [],
+            error: 'Enter a boolean expression.',
+        };
+    }
+
+    if (
+        variableNames.length !== model.variableCount ||
+        variableNames.some((name) => !/^[A-Za-z]$/.test(name))
+    ) {
+        return {
+            minterms: [],
+            error: 'Each variable name must be one letter.',
+        };
+    }
+
+    const tokenResult = tokenizeBooleanExpression(text, variableNames);
+
+    if (tokenResult.error !== null) {
+        return { minterms: [], error: tokenResult.error };
+    }
+
+    const parseResult = parseBooleanExpressionTokens(tokenResult.tokens);
+
+    if (parseResult.error !== null || parseResult.node === null) {
+        return {
+            minterms: [],
+            error: parseResult.error ?? 'Invalid boolean expression.',
+        };
+    }
+
+    const expressionNode = parseResult.node;
+    const minterms = model.cells
+        .filter((cell) => {
+            const bits = model.rowLabels[cell.row] + model.colLabels[cell.col];
+            const values = Object.fromEntries(
+                variableNames.map((name, index) => [name, bits[index] === '1']),
+            );
+
+            return evaluateBooleanExpressionNode(expressionNode, values);
+        })
+        .map((cell) => cell.minterm)
+        .sort((a, b) => a - b);
+
+    return { minterms, error: null };
+}
+
 export function parseVariableNamesInput(
     input: string,
     variableCount: VariableCount,
@@ -99,7 +372,7 @@ export function formatSolverTerm(
         return '1';
     }
 
-    return [...term]
+    const literals = [...term]
         .map((char, index) => {
             if (char === '_') {
                 return '';
@@ -109,7 +382,9 @@ export function formatSolverTerm(
                 ? variableNames[index]
                 : `${variableNames[index]}'`;
         })
-        .join('');
+        .filter(Boolean);
+
+    return literals.join('.');
 }
 
 export function formatExpression(
@@ -124,7 +399,7 @@ export function formatExpression(
     if (form === 'POS') {
         return `F = ${solution
             .map((implicant) => formatPosTerm(implicant.term, variableNames))
-            .join(' ')}`;
+            .join('.')}`;
     }
 
     return `F = ${solution
@@ -223,7 +498,7 @@ export function formatManualGroupsExpression(
         return form === 'SOP' ? 'F = 0' : 'F = 1';
     }
 
-    return `F = ${terms.join(form === 'SOP' ? ' + ' : ' ')}`;
+    return `F = ${terms.join(form === 'SOP' ? ' + ' : '.')}`;
 }
 
 export type KMapGroupExpressionType =
@@ -359,6 +634,13 @@ export function parseGroupLiteralInput(
         }
     } else {
         for (let i = 0; i < normalized.length; ++i) {
+            if (normalized[i] === '.') {
+                return {
+                    minterms: [],
+                    error: 'An AND separator must appear between literals.',
+                };
+            }
+
             const variableName = normalized[i];
 
             if (variableName === "'") {
@@ -398,6 +680,17 @@ export function parseGroupLiteralInput(
                     error: `${variableName} has too many complement marks.`,
                 };
             }
+
+            if (i + 1 < normalized.length && normalized[i + 1] === '.') {
+                i++;
+
+                if (i + 1 >= normalized.length) {
+                    return {
+                        minterms: [],
+                        error: 'A literal must follow an AND separator.',
+                    };
+                }
+            }
         }
     }
 
@@ -420,5 +713,201 @@ export function parseGroupLiteralInput(
     return {
         minterms,
         error: null,
+    };
+}
+
+export type ParsedGroupExpressionTerm = {
+    input: string;
+    minterms: number[];
+};
+
+export function parseGroupExpressionInput(
+    input: string,
+    model: KMapModel,
+    variableNames: string[],
+    form: KMapSolveForm = 'SOP',
+): { terms: ParsedGroupExpressionTerm[]; error: string | null } {
+    const text = input.trim();
+
+    if (text === '') {
+        return {
+            terms: [],
+            error: `Enter a ${form} expression.`,
+        };
+    }
+
+    const normalized = text.replace(/\s+/g, '');
+    const termResult =
+        form === 'SOP'
+            ? splitSopExpressionTerms(normalized)
+            : splitPosExpressionTerms(normalized);
+
+    if (termResult.error !== null) {
+        return {
+            terms: [],
+            error: termResult.error,
+        };
+    }
+
+    const terms: ParsedGroupExpressionTerm[] = [];
+
+    for (const termInput of termResult.terms) {
+        const result = parseGroupLiteralInput(
+            termInput,
+            model,
+            variableNames,
+            form,
+        );
+
+        if (result.error !== null) {
+            return {
+                terms: [],
+                error: `${termInput}: ${result.error}`,
+            };
+        }
+
+        terms.push({
+            input: termInput,
+            minterms: result.minterms,
+        });
+    }
+
+    return {
+        terms,
+        error: null,
+    };
+}
+
+function splitSopExpressionTerms(input: string): {
+    terms: string[];
+    error: string | null;
+} {
+    if (input === '0') {
+        return { terms: [], error: null };
+    }
+
+    const terms = input.split('+');
+
+    if (terms.some((term) => term === '')) {
+        return {
+            terms: [],
+            error: 'SOP terms must be separated by +.',
+        };
+    }
+
+    return {
+        terms,
+        error: null,
+    };
+}
+
+function splitPosExpressionTerms(input: string): {
+    terms: string[];
+    error: string | null;
+} {
+    if (input === '1') {
+        return { terms: [], error: null };
+    }
+
+    const terms: string[] = [];
+    let depth = 0;
+    let termStart = 0;
+
+    for (let index = 0; index < input.length; index++) {
+        const char = input[index];
+
+        if (char === '(') {
+            depth++;
+            continue;
+        }
+
+        if (char === ')') {
+            depth--;
+
+            if (depth < 0) {
+                return {
+                    terms: [],
+                    error: 'POS terms must use matching parentheses.',
+                };
+            }
+
+            if (depth === 0 && input[index + 1] === '(') {
+                terms.push(input.slice(termStart, index + 1));
+                termStart = index + 1;
+            }
+
+            continue;
+        }
+
+        if (char === '.' && depth === 0) {
+            terms.push(input.slice(termStart, index));
+            termStart = index + 1;
+        }
+    }
+
+    if (depth !== 0) {
+        return {
+            terms: [],
+            error: 'POS terms must use matching parentheses.',
+        };
+    }
+
+    terms.push(input.slice(termStart));
+
+    if (terms.some((term) => term === '')) {
+        return {
+            terms: [],
+            error: 'POS terms must be separated by .',
+        };
+    }
+
+    return {
+        terms,
+        error: null,
+    };
+}
+
+export type GroupExpressionCheck = {
+    isCorrect: boolean;
+    missingMinterms: number[];
+    invalidMinterms: number[];
+    invalidGroupIndexes: number[];
+};
+
+export function checkGroupExpression(
+    model: KMapModel,
+    groups: number[][],
+    form: KMapSolveForm = 'SOP',
+): GroupExpressionCheck {
+    const targetValue = form === 'SOP' ? 1 : 0;
+    const invalidValue = form === 'SOP' ? 0 : 1;
+    const coveredMinterms = new Set(groups.flat());
+    const requiredMinterms = model.cells
+        .filter((cell) => cell.value === targetValue)
+        .map((cell) => cell.minterm);
+    const missingMinterms = requiredMinterms.filter(
+        (minterm) => !coveredMinterms.has(minterm),
+    );
+    const invalidMinterms = model.cells
+        .filter(
+            (cell) =>
+                cell.value === invalidValue &&
+                coveredMinterms.has(cell.minterm),
+        )
+        .map((cell) => cell.minterm);
+    const invalidGroupIndexes = groups
+        .map((minterms, index) =>
+            canCreateKMapGroup(model, minterms, targetValue) ? -1 : index,
+        )
+        .filter((index) => index !== -1);
+
+    return {
+        isCorrect:
+            missingMinterms.length === 0 &&
+            invalidMinterms.length === 0 &&
+            invalidGroupIndexes.length === 0,
+        missingMinterms,
+        invalidMinterms,
+        invalidGroupIndexes,
     };
 }

@@ -34,26 +34,26 @@ type AxisBrace = {
 
 function getCellValueClass(value: KMapCellValue): string {
     if (value === 1) {
-        return 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100';
+        return 'bg-emerald-50 text-emerald-800 hover:bg-emerald-100';
     }
 
     if (value === 'X') {
-        return 'bg-amber-50 text-amber-700 hover:bg-amber-100';
+        return 'bg-amber-50 text-amber-800 hover:bg-amber-100';
     }
 
-    return 'bg-slate-50 text-slate-500 hover:bg-slate-100';
+    return 'bg-white text-slate-500 hover:bg-slate-50';
 }
 
 function getValueBadgeClass(value: KMapCellValue): string {
     if (value === 1) {
-        return 'bg-emerald-100 text-emerald-800';
+        return 'text-emerald-800';
     }
 
     if (value === 'X') {
-        return 'bg-amber-100 text-amber-800';
+        return 'text-amber-800';
     }
 
-    return 'bg-slate-200 text-slate-600';
+    return 'text-slate-500';
 }
 
 function getGroupOutlineStyle({
@@ -103,16 +103,17 @@ function getGroupOutlineStyle({
         )
     );
     const color = groupOutlineColors[colorIndex % groupOutlineColors.length];
-    const stackOffset = -5 + (colorIndex % 6) * 3;
+    const stackOffset = 4 + (colorIndex % 4) * 4;
 
     return {
         inset: `${stackOffset}px`,
+        color,
         borderTopColor: hasTopNeighbor ? 'transparent' : color,
         borderRightColor: hasRightNeighbor ? 'transparent' : color,
         borderBottomColor: hasBottomNeighbor ? 'transparent' : color,
         borderLeftColor: hasLeftNeighbor ? 'transparent' : color,
         opacity: isDimmed ? 0.2 : 1,
-        filter: isHoveredGroup ? 'drop-shadow(0 0 4px currentColor)' : 'none',
+        filter: isHoveredGroup ? `drop-shadow(0 0 5px ${color})` : 'none',
     };
 }
 
@@ -282,12 +283,12 @@ export default function KMapGrid({
     const hasGroupEmphasis = hoveredMinterm !== null || activeGroupId !== null;
 
     return (
-        <div className="overflow-auto py-2">
+        <div className="overflow-auto bg-[#f7f9fa] px-3 py-5">
             <div
-                className="mx-auto grid w-fit gap-1 font-mono text-sm"
+                className="mx-auto grid w-fit gap-0 font-mono text-sm"
                 style={{
-                    gridTemplateColumns: `2.5rem 3.5rem repeat(${colCount}, 4rem) 2.5rem`,
-                    gridTemplateRows: `2rem 2.5rem repeat(${rowCount}, 4rem) 2rem`,
+                    gridTemplateColumns: `2.75rem 3.75rem repeat(${colCount}, minmax(4.5rem, 5rem)) 2.75rem`,
+                    gridTemplateRows: `2.25rem 2.75rem repeat(${rowCount}, minmax(4.5rem, 5rem)) 2.25rem`,
                 }}
             >
                 {colBraces.map((brace) => (
@@ -307,7 +308,7 @@ export default function KMapGrid({
                 ))}
 
                 <div
-                    className="relative flex h-full w-full flex-col justify-center rounded-md bg-slate-900 px-2 text-[10px] font-semibold text-white"
+                    className="relative flex h-full w-full flex-col justify-center border border-slate-950 bg-slate-950 px-2 text-[10px] font-semibold text-white"
                     style={{ gridColumn: 2, gridRow: 2 }}
                 >
                     <span className="block text-right">{colVariableLabel}</span>
@@ -318,7 +319,7 @@ export default function KMapGrid({
                 {model.colLabels.map((label, colIndex) => (
                     <div
                         key={label}
-                        className="flex h-full w-full flex-col items-center justify-center rounded-md bg-slate-100 text-xs font-semibold text-slate-600"
+                        className="flex h-full w-full flex-col items-center justify-center border border-l-0 border-slate-300 bg-slate-100 text-xs font-semibold text-slate-700"
                         style={{ gridColumn: 3 + colIndex, gridRow: 2 }}
                     >
                         <span className="text-[10px] text-slate-400">
@@ -331,7 +332,7 @@ export default function KMapGrid({
                 {model.rowLabels.map((label, rowIndex) => (
                     <div
                         key={label}
-                        className="flex h-full w-full flex-col items-center justify-center rounded-md bg-slate-100 text-xs font-semibold text-slate-600"
+                        className="flex h-full w-full flex-col items-center justify-center border border-t-0 border-slate-300 bg-slate-100 text-xs font-semibold text-slate-700"
                         style={{ gridColumn: 2, gridRow: 3 + rowIndex }}
                     >
                         <span className="text-[10px] text-slate-400">
@@ -362,6 +363,16 @@ export default function KMapGrid({
                         const visibleCellGroups = cellGroups.slice(0, 3);
                         const hiddenGroupCount =
                             cellGroups.length - visibleCellGroups.length;
+                        const hasEmphasizedGroup = cellGroups.some((group) =>
+                            hoveredMinterm !== null
+                                ? hoveredGroupIds.has(group.id)
+                                : activeGroupId === group.id,
+                        );
+                        const cellLayerClass = hasEmphasizedGroup
+                            ? 'z-30'
+                            : cellGroups.length > 0
+                              ? 'z-20'
+                              : 'z-0';
 
                         return (
                             <button
@@ -374,11 +385,11 @@ export default function KMapGrid({
                                 onMouseLeave={() => setHoveredMinterm(null)}
                                 onFocus={() => setHoveredMinterm(cell.minterm)}
                                 onBlur={() => setHoveredMinterm(null)}
-                                className={`relative isolate flex h-full w-full flex-col items-center justify-center rounded-lg border-2 border-slate-200 transition ${
+                                className={`relative isolate flex h-full w-full flex-col items-center justify-center border border-l-0 border-t-0 border-slate-300 transition ${cellLayerClass} ${
                                     valueClass
                                 } ${
                                     isSelected
-                                        ? 'bg-blue-100 ring-2 ring-blue-500'
+                                        ? 'ring-2 ring-slate-950 ring-inset'
                                         : ''
                                 }`}
                                 style={{
@@ -402,8 +413,8 @@ export default function KMapGrid({
                                             key={group.id}
                                             className={`pointer-events-none absolute rounded-xl border-transparent transition ${
                                                 isEmphasizedGroup
-                                                    ? 'z-30 border-[4px]'
-                                                    : 'z-20 border-[3px]'
+                                                    ? 'z-40 border-[4px]'
+                                                    : 'z-30 border-[3px]'
                                             }`}
                                             style={getGroupOutlineStyle({
                                                 cell,
@@ -420,7 +431,7 @@ export default function KMapGrid({
                                     );
                                 })}
                                 {cellGroups.length > 0 && (
-                                    <span className="absolute right-1 top-1 z-30 flex items-center gap-1 rounded-full bg-white/85 px-1 py-0.5 shadow-sm">
+                                    <span className="absolute bottom-1 right-1 z-30 flex items-center gap-1 rounded bg-white/90 px-1 py-0.5 ring-1 ring-slate-200/80">
                                         {visibleCellGroups.map((group) => (
                                             <span
                                                 key={group.id}
@@ -440,7 +451,7 @@ export default function KMapGrid({
                                     </span>
                                 )}
                                 <span
-                                    className={`relative z-0 rounded px-2 py-0.5 text-lg font-bold ${valueBadgeClass}`}
+                                    className={`relative z-0 text-2xl font-bold ${valueBadgeClass}`}
                                 >
                                     {cell.value}
                                 </span>

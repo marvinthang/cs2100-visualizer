@@ -1,8 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { createKMapModel } from '../../core/kmap/kmapModel';
+import { createKMapModel, updateKMapCell } from '../../core/kmap/kmapModel';
 import {
+    checkGroupExpression,
     formatExpression,
     formatManualGroupsExpression,
+    parseBooleanExpressionInput,
+    parseGroupExpressionInput,
     parseGroupLiteralInput,
     parseVariableNamesInput,
 } from './kmapPageUtils';
@@ -33,6 +36,34 @@ describe('parseGroupLiteralInput', () => {
             minterms: [0, 1],
             error: null,
         });
+    });
+
+    it('allows dot separators in an SOP product literal', () => {
+        const model = createKMapModel(3);
+
+        expect(parseGroupLiteralInput("A.B'", model, ['A', 'B', 'C'])).toEqual({
+            minterms: [4, 5],
+            error: null,
+        });
+        expect(parseGroupLiteralInput("A'.C", model, ['A', 'B', 'C'])).toEqual({
+            minterms: [1, 3],
+            error: null,
+        });
+        expect(parseGroupLiteralInput('AB', model, ['A', 'B', 'C'])).toEqual({
+            minterms: [6, 7],
+            error: null,
+        });
+    });
+
+    it('rejects misplaced SOP AND separators', () => {
+        const model = createKMapModel(2);
+
+        expect(parseGroupLiteralInput('A.', model, ['A', 'B']).error).toBe(
+            'A literal must follow an AND separator.',
+        );
+        expect(parseGroupLiteralInput('.A', model, ['A', 'B']).error).toBe(
+            'An AND separator must appear between literals.',
+        );
     });
 
     it('selects cells from a POS maxterm literal', () => {
@@ -66,8 +97,162 @@ describe('parseGroupLiteralInput', () => {
     });
 });
 
+describe('parseBooleanExpressionInput', () => {
+    it('evaluates SOP expressions with dot AND', () => {
+        const model = createKMapModel(2);
+
+        expect(
+            parseBooleanExpressionInput("A'.B + A.B'", model, ['A', 'B']),
+        ).toEqual({
+            minterms: [1, 2],
+            error: null,
+        });
+    });
+
+    it('evaluates parenthesized POS-style expressions', () => {
+        const model = createKMapModel(2);
+
+        expect(
+            parseBooleanExpressionInput("(A + B').B", model, ['A', 'B']),
+        ).toEqual({
+            minterms: [3],
+            error: null,
+        });
+    });
+
+    it('supports postfix complement with dot AND', () => {
+        const model = createKMapModel(3);
+
+        expect(
+            parseBooleanExpressionInput("A'.C", model, ['A', 'B', 'C']),
+        ).toEqual({
+            minterms: [1, 3],
+            error: null,
+        });
+    });
+
+    it('allows implicit AND', () => {
+        const model = createKMapModel(2);
+
+        expect(parseBooleanExpressionInput('AB', model, ['A', 'B'])).toEqual({
+            minterms: [3],
+            error: null,
+        });
+        expect(
+            parseBooleanExpressionInput("(A + B')B", model, ['A', 'B']),
+        ).toEqual({
+            minterms: [3],
+            error: null,
+        });
+    });
+
+    it('rejects redundant operator aliases', () => {
+        const model = createKMapModel(2);
+
+        expect(
+            parseBooleanExpressionInput('A&B', model, ['A', 'B']).error,
+        ).toBe('Invalid character: &');
+    });
+
+    it('rejects variables outside the current variable list', () => {
+        const model = createKMapModel(2);
+
+        expect(parseBooleanExpressionInput('A + C', model, ['A', 'B'])).toEqual(
+            {
+                minterms: [],
+                error: 'Unknown variable: C',
+            },
+        );
+    });
+});
+
+describe('parseGroupExpressionInput', () => {
+    it('splits SOP expressions into group terms', () => {
+        const model = createKMapModel(2);
+
+        expect(
+            parseGroupExpressionInput("A'B + AB'", model, ['A', 'B'], 'SOP'),
+        ).toEqual({
+            terms: [
+                { input: "A'B", minterms: [1] },
+                { input: "AB'", minterms: [2] },
+            ],
+            error: null,
+        });
+    });
+
+    it('splits POS expressions by dot or adjacent factors', () => {
+        const model = createKMapModel(2);
+
+        expect(
+            parseGroupExpressionInput(
+                "(A + B').(A' + B)",
+                model,
+                ['A', 'B'],
+                'POS',
+            ),
+        ).toEqual({
+            terms: [
+                { input: "(A+B')", minterms: [1] },
+                { input: "(A'+B)", minterms: [2] },
+            ],
+            error: null,
+        });
+
+        expect(
+            parseGroupExpressionInput(
+                "(A + B')(A' + B)",
+                model,
+                ['A', 'B'],
+                'POS',
+            ).terms.map((term) => term.minterms),
+        ).toEqual([[1], [2]]);
+    });
+});
+
+describe('checkGroupExpression', () => {
+    it('accepts SOP groups that cover all 1-cells and no 0-cells', () => {
+        let model = createKMapModel(2);
+        model = updateKMapCell(model, 1, 1);
+        model = updateKMapCell(model, 2, 1);
+
+        expect(checkGroupExpression(model, [[1], [2]], 'SOP')).toEqual({
+            isCorrect: true,
+            missingMinterms: [],
+            invalidMinterms: [],
+            invalidGroupIndexes: [],
+        });
+    });
+
+    it('reports missing and invalid SOP cells', () => {
+        let model = createKMapModel(2);
+        model = updateKMapCell(model, 1, 1);
+        model = updateKMapCell(model, 2, 1);
+
+        expect(checkGroupExpression(model, [[0, 1]], 'SOP')).toEqual({
+            isCorrect: false,
+            missingMinterms: [2],
+            invalidMinterms: [0],
+            invalidGroupIndexes: [0],
+        });
+    });
+
+    it('accepts POS groups that cover all 0-cells and no 1-cells', () => {
+        let model = createKMapModel(2);
+        model = updateKMapCell(model, 1, 1);
+        model = updateKMapCell(model, 2, 1);
+
+        expect(checkGroupExpression(model, [[0], [3]], 'POS')).toEqual({
+            isCorrect: true,
+            missingMinterms: [],
+            invalidMinterms: [],
+            invalidGroupIndexes: [],
+        });
+    });
+});
+
 describe('formatExpression', () => {
-    it('formats POS factors with readable spacing', () => {
+    it('formats POS factors with dot separators', () => {
         expect(
             formatExpression(
                 [
@@ -87,7 +272,7 @@ describe('formatExpression', () => {
                 ['A', 'B'],
                 'POS',
             ),
-        ).toBe('F = (A) (B)');
+        ).toBe('F = (A).(B)');
     });
 });
 
@@ -105,7 +290,7 @@ describe('formatManualGroupsExpression', () => {
                 ['A', 'B'],
                 'SOP',
             ),
-        ).toBe("F = A' + AB'");
+        ).toBe("F = A' + A.B'");
     });
 
     it('formats all manual POS groups as one expression', () => {
@@ -121,6 +306,6 @@ describe('formatManualGroupsExpression', () => {
                 ['A', 'B'],
                 'POS',
             ),
-        ).toBe('F = (A) (B)');
+        ).toBe('F = (A).(B)');
     });
 });

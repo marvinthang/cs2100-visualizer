@@ -11,10 +11,9 @@ const modeOptions: Array<{ value: 'edit' | 'group'; label: string }> = [
 const formOptions: Array<{
     value: KMapSolveForm;
     label: string;
-    target: string;
 }> = [
-    { value: 'SOP', label: 'SOP', target: 'group 1 + X' },
-    { value: 'POS', label: 'POS', target: 'group 0 + X' },
+    { value: 'SOP', label: 'SOP' },
+    { value: 'POS', label: 'POS' },
 ];
 
 const practiceDifficultyOptions: Array<{
@@ -27,12 +26,12 @@ const practiceDifficultyOptions: Array<{
 ];
 
 const inputClass =
-    'w-full rounded-md border border-slate-200 bg-white px-2 py-1.5 text-xs text-slate-900 shadow-sm';
+    'w-full rounded-md border border-slate-300 bg-white px-2.5 py-1.5 text-xs text-slate-900 shadow-sm outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-100';
 const monoInputClass = `${inputClass} font-mono`;
 const primaryButtonClass =
-    'rounded-md bg-slate-900 px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-40';
+    'rounded-md bg-slate-900 px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-40';
 const secondaryButtonClass =
-    'rounded-md border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 shadow-sm hover:bg-slate-100';
+    'rounded-md border border-slate-300 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 shadow-sm transition hover:border-slate-400 hover:bg-slate-50';
 function ControlSection({
     title,
     meta,
@@ -44,8 +43,8 @@ function ControlSection({
 }) {
     return (
         <div className="border-t border-slate-200 pt-3 first:border-t-0 first:pt-0">
-            <div className="mb-3 flex items-center justify-between gap-3">
-                <h3 className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+            <div className="mb-2 flex items-center justify-between gap-3">
+                <h3 className="text-[11px] font-bold uppercase tracking-wide text-slate-500">
                     {title}
                 </h3>
                 {meta}
@@ -64,6 +63,8 @@ type KMapControlsProps = {
     mintermInput: string;
     dontCareInput: string;
     valueInputError: string | null;
+    booleanExpressionInput: string;
+    booleanExpressionError: string | null;
     groupTargetValue: 0 | 1;
     practiceDifficulty: KMapPracticeDifficulty;
     onModeChange: (mode: 'edit' | 'group') => void;
@@ -74,6 +75,8 @@ type KMapControlsProps = {
     onDontCareInputChange: (value: string) => void;
     onApplyValueInputs: () => void;
     onClearMapValues: () => void;
+    onBooleanExpressionInputChange: (value: string) => void;
+    onApplyBooleanExpression: () => void;
     onPracticeDifficultyChange: (difficulty: KMapPracticeDifficulty) => void;
     onGeneratePracticeMap: () => void;
 };
@@ -87,6 +90,8 @@ export default function KMapControls({
     mintermInput,
     dontCareInput,
     valueInputError,
+    booleanExpressionInput,
+    booleanExpressionError,
     groupTargetValue,
     practiceDifficulty,
     onModeChange,
@@ -97,25 +102,29 @@ export default function KMapControls({
     onDontCareInputChange,
     onApplyValueInputs,
     onClearMapValues,
+    onBooleanExpressionInputChange,
+    onApplyBooleanExpression,
     onPracticeDifficultyChange,
     onGeneratePracticeMap,
 }: KMapControlsProps) {
     return (
-        <section className="h-fit rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-            <div className="mb-4 flex items-center justify-between gap-3">
-                <h2 className="text-sm font-semibold text-slate-900">
-                    Controls
-                </h2>
-                <span className="rounded-full bg-blue-50 px-2 py-0.5 text-xs font-semibold text-blue-700 ring-1 ring-blue-100">
+        <section className="h-fit rounded-lg border border-slate-300 bg-[#fbfcfd] shadow-sm">
+            <div className="flex items-center justify-between gap-3 border-b border-slate-200 px-3 py-2.5">
+                <div>
+                    <h2 className="text-sm font-semibold text-slate-950">
+                        Controls
+                    </h2>
+                </div>
+                <span className="rounded-md bg-sky-50 px-2 py-1 text-xs font-semibold text-sky-700 ring-1 ring-sky-100">
                     {solverForm}
                 </span>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-3 p-3">
                 <ControlSection
                     title="Expression"
                     meta={
-                        <span className="font-mono text-[10px] text-blue-700">
+                        <span className="font-mono text-[10px] font-semibold text-emerald-700">
                             target {groupTargetValue}/X
                         </span>
                     }
@@ -126,29 +135,26 @@ export default function KMapControls({
                                 key={option.value}
                                 type="button"
                                 onClick={() => onSolverFormChange(option.value)}
-                                className={`rounded-lg border px-3 py-2 text-left transition ${
+                                className={`rounded-md border px-3 py-1.5 text-center transition ${
                                     solverForm === option.value
-                                        ? 'border-blue-500 bg-blue-50 shadow-sm ring-2 ring-blue-100'
-                                        : 'border-slate-200 bg-white hover:bg-slate-50'
+                                        ? 'border-sky-400 bg-sky-50 shadow-sm ring-2 ring-sky-100'
+                                        : 'border-slate-300 bg-white hover:border-slate-400 hover:bg-slate-50'
                                 }`}
                             >
                                 <span className="block text-sm font-semibold text-slate-900">
                                     {option.label}
                                 </span>
-                                <span className="mt-0.5 block text-[10px] font-medium text-slate-500">
-                                    {option.target}
-                                </span>
                             </button>
                         ))}
                     </div>
 
-                    <div className="mt-2 grid grid-cols-2 rounded-lg bg-slate-100 p-1">
+                    <div className="mt-2 grid grid-cols-2 rounded-md bg-slate-100 p-1">
                         {modeOptions.map((option) => (
                             <button
                                 key={option.value}
                                 type="button"
                                 onClick={() => onModeChange(option.value)}
-                                className={`rounded-md px-3 py-1.5 text-sm font-medium transition ${
+                                className={`rounded px-3 py-1 text-xs font-semibold transition ${
                                     mode === option.value
                                         ? 'bg-white text-slate-900 shadow-sm'
                                         : 'text-slate-500 hover:text-slate-900'
@@ -182,7 +188,7 @@ export default function KMapControls({
                                         ) as VariableCount,
                                     )
                                 }
-                                className="w-full rounded-lg border border-slate-200 bg-white px-2 py-2 text-sm text-slate-900 shadow-sm"
+                                className="w-full rounded-md border border-slate-300 bg-white px-2.5 py-1.5 text-xs text-slate-900 shadow-sm outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-100"
                             >
                                 <option value={2}>2 variables</option>
                                 <option value={3}>3 variables</option>
@@ -203,7 +209,7 @@ export default function KMapControls({
                                     )
                                 }
                                 placeholder="A B C"
-                                className="w-full rounded-lg border border-slate-200 bg-white px-2 py-2 font-mono text-xs text-slate-900 shadow-sm"
+                                className={monoInputClass}
                             />
                         </label>
                     </div>
@@ -215,37 +221,73 @@ export default function KMapControls({
                     )}
                 </ControlSection>
 
-                <ControlSection title="Function Values">
-                    <div className="space-y-2">
-                        <label className="block">
-                            <span className="mb-1 block text-xs font-medium text-slate-600">
-                                1 cells
-                            </span>
+                <ControlSection title="Boolean Expression">
+                    <div className="flex gap-2">
+                        <label className="min-w-0 flex-1">
                             <input
                                 type="text"
-                                value={mintermInput}
+                                value={booleanExpressionInput}
                                 onChange={(event) =>
-                                    onMintermInputChange(event.target.value)
+                                    onBooleanExpressionInputChange(
+                                        event.target.value,
+                                    )
                                 }
-                                placeholder="1,2"
+                                placeholder="A'B + C.D"
                                 className={monoInputClass}
                             />
                         </label>
 
-                        <label className="block">
-                            <span className="mb-1 block text-xs font-medium text-slate-600">
-                                X cells
-                            </span>
-                            <input
-                                type="text"
-                                value={dontCareInput}
-                                onChange={(event) =>
-                                    onDontCareInputChange(event.target.value)
-                                }
-                                placeholder="4,5"
-                                className={monoInputClass}
-                            />
-                        </label>
+                        <button
+                            type="button"
+                            onClick={onApplyBooleanExpression}
+                            className={primaryButtonClass}
+                        >
+                            Apply
+                        </button>
+                    </div>
+
+                    {booleanExpressionError !== null && (
+                        <p className="mt-2 text-xs text-red-600">
+                            {booleanExpressionError}
+                        </p>
+                    )}
+                </ControlSection>
+
+                <ControlSection title="Function Values">
+                    <div className="space-y-2">
+                        <div className="grid grid-cols-2 gap-2">
+                            <label className="block">
+                                <span className="mb-1 block text-xs font-medium text-slate-600">
+                                    1 cells
+                                </span>
+                                <input
+                                    type="text"
+                                    value={mintermInput}
+                                    onChange={(event) =>
+                                        onMintermInputChange(event.target.value)
+                                    }
+                                    placeholder="1,2"
+                                    className={monoInputClass}
+                                />
+                            </label>
+
+                            <label className="block">
+                                <span className="mb-1 block text-xs font-medium text-slate-600">
+                                    X cells
+                                </span>
+                                <input
+                                    type="text"
+                                    value={dontCareInput}
+                                    onChange={(event) =>
+                                        onDontCareInputChange(
+                                            event.target.value,
+                                        )
+                                    }
+                                    placeholder="4,5"
+                                    className={monoInputClass}
+                                />
+                            </label>
+                        </div>
 
                         <div className="grid grid-cols-2 gap-2">
                             <button
@@ -273,37 +315,30 @@ export default function KMapControls({
                 </ControlSection>
 
                 <ControlSection title="Practice">
-                    <div className="space-y-2">
-                        <div>
-                            <span className="mb-1 block text-xs font-medium text-slate-600">
-                                Difficulty
-                            </span>
-                            <div className="grid grid-cols-3 gap-1 rounded-lg bg-slate-100 p-1">
-                                {practiceDifficultyOptions.map((option) => (
-                                    <button
-                                        key={option.value}
-                                        type="button"
-                                        onClick={() =>
-                                            onPracticeDifficultyChange(
-                                                option.value,
-                                            )
-                                        }
-                                        className={`rounded-md px-2 py-1.5 text-xs font-semibold transition ${
-                                            practiceDifficulty === option.value
-                                                ? 'bg-white text-slate-900 shadow-sm'
-                                                : 'text-slate-500 hover:text-slate-900'
-                                        }`}
-                                    >
-                                        {option.label}
-                                    </button>
-                                ))}
-                            </div>
+                    <div className="grid grid-cols-[1fr_auto] gap-2">
+                        <div className="grid grid-cols-3 gap-1 rounded-md bg-slate-100 p-1">
+                            {practiceDifficultyOptions.map((option) => (
+                                <button
+                                    key={option.value}
+                                    type="button"
+                                    onClick={() =>
+                                        onPracticeDifficultyChange(option.value)
+                                    }
+                                    className={`rounded px-2 py-1 text-xs font-semibold transition ${
+                                        practiceDifficulty === option.value
+                                            ? 'bg-white text-slate-900 shadow-sm'
+                                            : 'text-slate-500 hover:text-slate-900'
+                                    }`}
+                                >
+                                    {option.label}
+                                </button>
+                            ))}
                         </div>
 
                         <button
                             type="button"
                             onClick={onGeneratePracticeMap}
-                            className={`${primaryButtonClass} w-full`}
+                            className={primaryButtonClass}
                         >
                             Generate
                         </button>

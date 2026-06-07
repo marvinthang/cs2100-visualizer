@@ -1,11 +1,11 @@
 import type { KMapSolveForm } from '../../../core/kmap/kmapSolver';
 
 const monoInputClass =
-    'w-full rounded-md border border-slate-200 bg-white px-2 py-1.5 font-mono text-xs text-slate-900 shadow-sm';
+    'w-full rounded-md border border-slate-300 bg-white px-2.5 py-2 font-mono text-xs text-slate-900 shadow-sm outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-100';
 const primaryButtonClass =
-    'rounded-md bg-slate-900 px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-40';
+    'rounded-md bg-slate-900 px-3 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-40';
 const secondaryButtonClass =
-    'rounded-md border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 shadow-sm hover:bg-slate-100';
+    'rounded-md border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-700 shadow-sm transition hover:border-slate-400 hover:bg-slate-50';
 
 function getSelectedGroupMessage({
     groupTargetValue,
@@ -38,7 +38,6 @@ type KMapGroupingPanelProps = {
     groupLiteralError: string | null;
     onAddGroup: () => void;
     onClearSelectedGroup: () => void;
-    onResetMap: () => void;
     onGroupLiteralInputChange: (value: string) => void;
     onApplyGroupLiteral: () => void;
 };
@@ -54,7 +53,6 @@ export default function KMapGroupingPanel({
     groupLiteralError,
     onAddGroup,
     onClearSelectedGroup,
-    onResetMap,
     onGroupLiteralInputChange,
     onApplyGroupLiteral,
 }: KMapGroupingPanelProps) {
@@ -68,23 +66,28 @@ export default function KMapGroupingPanel({
                   .join(', ');
 
     return (
-        <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-            <div className="mb-3 flex items-center justify-between gap-3">
-                <h2 className="text-sm font-semibold text-slate-900">
-                    Grouping
-                </h2>
-                <span className="rounded-full bg-slate-100 px-2 py-0.5 font-mono text-xs text-slate-500">
+        <section className="rounded-lg border border-slate-300 bg-[#fbfcfd] shadow-sm">
+            <div className="flex items-center justify-between gap-3 border-b border-slate-200 px-4 py-3">
+                <div>
+                    <h2 className="text-sm font-semibold text-slate-950">
+                        Grouping
+                    </h2>
+                    <p className="text-xs text-slate-500">
+                        Select cells, then save the group.
+                    </p>
+                </div>
+                <span className="rounded-md border border-slate-300 bg-white px-2 py-1 font-mono text-xs font-semibold text-slate-700">
                     {selectedMinterms.length} selected
                 </span>
             </div>
 
-            <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_minmax(220px,0.75fr)]">
+            <div className="grid gap-3 p-4 md:grid-cols-[minmax(0,1fr)_minmax(250px,0.85fr)]">
                 <div>
-                    <div className="rounded-md border border-slate-200 bg-slate-50 p-2">
+                    <div className="rounded-md border border-slate-300 bg-white px-3 py-2">
                         <div className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-slate-400">
                             Selected group
                         </div>
-                        <div className="min-h-5 break-words font-mono text-xs text-slate-600">
+                        <div className="min-h-5 break-words font-mono text-xs font-medium text-slate-700">
                             {selectedGroupText}
                         </div>
                     </div>
@@ -116,7 +119,7 @@ export default function KMapGroupingPanel({
                                 }
                                 placeholder={
                                     solverForm === 'SOP'
-                                        ? "A'B or AB'"
+                                        ? "A'B or A.B'"
                                         : "(A + B')"
                                 }
                                 className={`min-w-0 flex-1 ${monoInputClass}`}
@@ -137,7 +140,7 @@ export default function KMapGroupingPanel({
                         </p>
                     )}
 
-                    <div className="grid grid-cols-3 gap-2">
+                    <div className="grid grid-cols-2 gap-2">
                         <button
                             type="button"
                             onClick={onAddGroup}
@@ -153,14 +156,6 @@ export default function KMapGroupingPanel({
                             className={secondaryButtonClass}
                         >
                             Clear
-                        </button>
-
-                        <button
-                            type="button"
-                            onClick={onResetMap}
-                            className={secondaryButtonClass}
-                        >
-                            Reset
                         </button>
                     </div>
                 </div>

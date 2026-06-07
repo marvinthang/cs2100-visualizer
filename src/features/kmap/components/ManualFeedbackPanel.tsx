@@ -34,14 +34,19 @@ export default function ManualFeedbackPanel({
               : 'Incomplete';
 
     return (
-        <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-            <div className="mb-3 flex items-center justify-between gap-3">
-                <h2 className="text-sm font-semibold text-slate-900">
-                    Manual Feedback
-                </h2>
+        <div className="rounded-lg border border-slate-300 bg-[#fbfcfd] shadow-sm">
+            <div className="flex items-center justify-between gap-3 border-b border-slate-200 px-4 py-3">
+                <div>
+                    <h2 className="text-sm font-semibold text-slate-950">
+                        Manual Feedback
+                    </h2>
+                    <p className="text-xs text-slate-500">
+                        Coverage and minimality checks.
+                    </p>
+                </div>
 
                 <span
-                    className={`rounded-full px-2 py-0.5 text-xs font-semibold ring-1 ${
+                    className={`rounded-md px-2 py-1 text-xs font-semibold ring-1 ${
                         analysis.isComplete && analysis.matchesSolverGroupCount
                             ? 'bg-emerald-50 text-emerald-700 ring-emerald-100'
                             : 'bg-amber-50 text-amber-700 ring-amber-100'
@@ -51,7 +56,7 @@ export default function ManualFeedbackPanel({
                 </span>
             </div>
 
-            <div className="divide-y divide-slate-200 rounded-lg border border-slate-200 bg-slate-50 text-xs">
+            <div className="divide-y divide-slate-200 text-xs">
                 <FeedbackRow
                     label="Coverage"
                     ok={analysis.isComplete}
@@ -100,11 +105,11 @@ function FeedbackRow({
     text: string;
 }) {
     return (
-        <div className="p-3">
+        <div className="px-4 py-3">
             <div className="flex items-center justify-between gap-2">
                 <span className="font-semibold text-slate-700">{label}</span>
                 <span
-                    className={`rounded-full px-2 py-0.5 font-semibold ${
+                    className={`rounded px-2 py-0.5 font-semibold ${
                         ok
                             ? 'bg-emerald-100 text-emerald-700'
                             : 'bg-amber-100 text-amber-700'
