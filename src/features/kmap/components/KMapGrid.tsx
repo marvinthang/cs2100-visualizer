@@ -1,4 +1,4 @@
-import type { CSSProperties } from 'react';
+import { useState, type CSSProperties } from 'react';
 import type {
     KMapCell,
     KMapGroup,
@@ -61,11 +61,15 @@ function getGroupOutlineStyle({
     group,
     rows,
     colorIndex,
+    isHoveredGroup,
+    isDimmed,
 }: {
     cell: KMapCell;
     group: KMapGroup;
     rows: KMapCell[][];
     colorIndex: number;
+    isHoveredGroup: boolean;
+    isDimmed: boolean;
 }): CSSProperties {
     const rowCount = rows.length;
     const colCount = rows[0]?.length ?? 0;
@@ -107,6 +111,8 @@ function getGroupOutlineStyle({
         borderRightColor: hasRightNeighbor ? 'transparent' : color,
         borderBottomColor: hasBottomNeighbor ? 'transparent' : color,
         borderLeftColor: hasLeftNeighbor ? 'transparent' : color,
+        opacity: isDimmed ? 0.2 : 1,
+        filter: isHoveredGroup ? 'drop-shadow(0 0 4px currentColor)' : 'none',
     };
 }
 
@@ -263,9 +269,17 @@ export default function KMapGrid({
     const colVariableNames = variableNames.slice(rowBitCount);
     const rowVariableLabel = rowVariableNames.join('');
     const colVariableLabel = colVariableNames.join('');
-    const activeGroup = groups.find((group) => group.id === activeGroupId);
     const colBraces = getColumnBraces(model.colLabels, colVariableNames);
     const rowBraces = getRowBraces(model.rowLabels, rowVariableNames);
+    const [hoveredMinterm, setHoveredMinterm] = useState<number | null>(null);
+    const hoveredGroupIds = new Set(
+        hoveredMinterm === null
+            ? []
+            : groups
+                  .filter((group) => group.minterms.includes(hoveredMinterm))
+                  .map((group) => group.id),
+    );
+    const hasGroupEmphasis = hoveredMinterm !== null || activeGroupId !== null;
 
     return (
         <div className="overflow-auto py-2">
@@ -343,9 +357,6 @@ export default function KMapGrid({
                                     : null,
                             )
                             .filter((group) => group !== null);
-                        const isActiveGroupCell =
-                            activeGroup?.minterms.includes(cell.minterm) ??
-                            false;
                         const valueClass = getCellValueClass(cell.value);
                         const valueBadgeClass = getValueBadgeClass(cell.value);
                         const visibleCellGroups = cellGroups.slice(0, 3);
@@ -357,15 +368,17 @@ export default function KMapGrid({
                                 key={cell.minterm}
                                 type="button"
                                 onClick={() => onCellClick(cell.minterm)}
+                                onMouseEnter={() =>
+                                    setHoveredMinterm(cell.minterm)
+                                }
+                                onMouseLeave={() => setHoveredMinterm(null)}
+                                onFocus={() => setHoveredMinterm(cell.minterm)}
+                                onBlur={() => setHoveredMinterm(null)}
                                 className={`relative isolate flex h-full w-full flex-col items-center justify-center rounded-lg border-2 border-slate-200 transition ${
                                     valueClass
                                 } ${
                                     isSelected
                                         ? 'bg-blue-100 ring-2 ring-blue-500'
-                                        : ''
-                                } ${
-                                    isActiveGroupCell
-                                        ? 'z-10 ring-4 ring-blue-400 ring-offset-2'
                                         : ''
                                 }`}
                                 style={{
@@ -373,18 +386,39 @@ export default function KMapGrid({
                                     gridRow: 3 + cell.row,
                                 }}
                             >
-                                {cellGroups.map((group) => (
-                                    <span
-                                        key={group.id}
-                                        className="pointer-events-none absolute z-20 rounded-xl border-[3px] border-transparent"
-                                        style={getGroupOutlineStyle({
-                                            cell,
-                                            group: group.group,
-                                            rows,
-                                            colorIndex: group.colorIndex,
-                                        })}
-                                    />
-                                ))}
+                                {cellGroups.map((group) => {
+                                    const isHoveredGroup = hoveredGroupIds.has(
+                                        group.id,
+                                    );
+                                    const isActiveGroup =
+                                        activeGroupId === group.id;
+                                    const isEmphasizedGroup =
+                                        hoveredMinterm !== null
+                                            ? isHoveredGroup
+                                            : isActiveGroup;
+
+                                    return (
+                                        <span
+                                            key={group.id}
+                                            className={`pointer-events-none absolute rounded-xl border-transparent transition ${
+                                                isEmphasizedGroup
+                                                    ? 'z-30 border-[4px]'
+                                                    : 'z-20 border-[3px]'
+                                            }`}
+                                            style={getGroupOutlineStyle({
+                                                cell,
+                                                group: group.group,
+                                                rows,
+                                                colorIndex: group.colorIndex,
+                                                isHoveredGroup:
+                                                    isEmphasizedGroup,
+                                                isDimmed:
+                                                    hasGroupEmphasis &&
+                                                    !isEmphasizedGroup,
+                                            })}
+                                        />
+                                    );
+                                })}
                                 {cellGroups.length > 0 && (
                                     <span className="absolute right-1 top-1 z-30 flex items-center gap-1 rounded-full bg-white/85 px-1 py-0.5 shadow-sm">
                                         {visibleCellGroups.map((group) => (

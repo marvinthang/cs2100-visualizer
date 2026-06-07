@@ -31,6 +31,8 @@ const inputClass =
 const monoInputClass = `${inputClass} font-mono`;
 const primaryButtonClass =
     'rounded-md bg-slate-900 px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-40';
+const secondaryButtonClass =
+    'rounded-md border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 shadow-sm hover:bg-slate-100';
 function ControlSection({
     title,
     meta,
@@ -71,6 +73,7 @@ type KMapControlsProps = {
     onMintermInputChange: (value: string) => void;
     onDontCareInputChange: (value: string) => void;
     onApplyValueInputs: () => void;
+    onClearMapValues: () => void;
     onPracticeDifficultyChange: (difficulty: KMapPracticeDifficulty) => void;
     onGeneratePracticeMap: () => void;
 };
@@ -93,6 +96,7 @@ export default function KMapControls({
     onMintermInputChange,
     onDontCareInputChange,
     onApplyValueInputs,
+    onClearMapValues,
     onPracticeDifficultyChange,
     onGeneratePracticeMap,
 }: KMapControlsProps) {
@@ -243,13 +247,22 @@ export default function KMapControls({
                             />
                         </label>
 
-                        <button
-                            type="button"
-                            onClick={onApplyValueInputs}
-                            className={`${primaryButtonClass} w-full`}
-                        >
-                            Apply
-                        </button>
+                        <div className="grid grid-cols-2 gap-2">
+                            <button
+                                type="button"
+                                onClick={onApplyValueInputs}
+                                className={primaryButtonClass}
+                            >
+                                Apply
+                            </button>
+                            <button
+                                type="button"
+                                onClick={onClearMapValues}
+                                className={secondaryButtonClass}
+                            >
+                                Clear
+                            </button>
+                        </div>
                     </div>
 
                     {valueInputError !== null && (

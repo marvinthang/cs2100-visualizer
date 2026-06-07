@@ -185,6 +185,20 @@ export default function KMapPage() {
         setGroupLiteralError(null);
     }
 
+    function handleClearMapValues() {
+        setModel(createKMapModel(variableCount));
+        setSelectedGroupMinterms([]);
+        setGroups([]);
+        setActiveGroupId(null);
+        setGroupView('manual');
+        setNextGroupId(1);
+        setMintermInput('');
+        setDontCareInput('');
+        setGroupLiteralInput('');
+        setValueInputError(null);
+        setGroupLiteralError(null);
+    }
+
     function formatMintermInput(minterms: number[]): string {
         return minterms.join(',');
     }
@@ -293,6 +307,11 @@ export default function KMapPage() {
         setGroupLiteralError(null);
     }
 
+    function handleSolverPrimeListViewChange(view: 'expression' | 'all') {
+        setSolverPrimeListView(view);
+        setActiveGroupId(null);
+    }
+
     return (
         <main className="min-h-full bg-slate-50 p-4 text-slate-900 md:p-6">
             <div className="mx-auto flex max-w-[1200px] flex-col gap-4">
@@ -343,6 +362,7 @@ export default function KMapPage() {
                         onMintermInputChange={setMintermInput}
                         onDontCareInputChange={setDontCareInput}
                         onApplyValueInputs={handleApplyValueInputs}
+                        onClearMapValues={handleClearMapValues}
                         onPracticeDifficultyChange={setPracticeDifficulty}
                         onGeneratePracticeMap={handleGeneratePracticeMap}
                     />
@@ -421,7 +441,9 @@ export default function KMapPage() {
                             solverSolution={solverSolution}
                             solverPrimeListView={solverPrimeListView}
                             variableNames={variableNameResult.names}
-                            onSolverPrimeListViewChange={setSolverPrimeListView}
+                            onSolverPrimeListViewChange={
+                                handleSolverPrimeListViewChange
+                            }
                             onGroupViewChange={setGroupView}
                             onActiveGroupChange={setActiveGroupId}
                         />
