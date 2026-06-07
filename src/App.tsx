@@ -18,12 +18,23 @@ export default function App() {
         <div className="flex h-screen flex-col overflow-hidden bg-[#eef2f3]">
             <nav className="flex flex-none border-b border-slate-200 bg-[#fbfcfd] px-3 py-2 shadow-sm sm:px-4 lg:px-6">
                 <div className="mx-auto flex w-full max-w-[1760px] flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                    <div>
-                        <div className="text-sm font-bold tracking-tight text-slate-950">
-                            CS2100 Visualizer
+                    <div className="flex items-center gap-3">
+                        <div className="flex h-9 w-9 items-center justify-center rounded-md border border-slate-200 bg-white shadow-sm">
+                            <img
+                                src="/logo.png"
+                                alt=""
+                                className="h-6 w-6"
+                                aria-hidden="true"
+                            />
                         </div>
-                        <div className="text-[11px] font-medium uppercase tracking-wide text-slate-400">
-                            MIPS and logic practice
+
+                        <div>
+                            <div className="text-sm font-bold tracking-tight text-slate-950">
+                                CS2100 Visualizer
+                            </div>
+                            <div className="text-[11px] font-medium uppercase tracking-wide text-slate-400">
+                                MIPS and logic practice
+                            </div>
                         </div>
                     </div>
 
