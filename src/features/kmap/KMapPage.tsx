@@ -374,25 +374,32 @@ export default function KMapPage() {
 
         if (check.missingMinterms.length > 0) {
             messages.push(
-                `Missing: ${formatMintermLabels(check.missingMinterms)}`,
+                `Missing ${targetLabel}: ${formatMintermLabels(
+                    check.missingMinterms,
+                )}`,
             );
         }
 
         if (check.invalidMinterms.length > 0) {
             messages.push(
-                `Wrong cells: ${formatMintermLabels(check.invalidMinterms)}`,
+                `Cells that should not be covered: ${formatMintermLabels(
+                    check.invalidMinterms,
+                )}`,
             );
         }
 
         if (check.invalidGroupIndexes.length > 0) {
+            const termLabel =
+                check.invalidGroupIndexes.length === 1 ? 'Term' : 'Terms';
+
             messages.push(
-                `Invalid terms: ${check.invalidGroupIndexes
+                `${termLabel} not shaped like valid K-map groups: ${check.invalidGroupIndexes
                     .map((index) => index + 1)
                     .join(', ')}.`,
             );
         }
 
-        return `Needs work. ${messages.join(' ')}`;
+        return ['Needs work.', ...messages].join('\n');
     }
 
     function formatMintermLabels(minterms: number[]) {

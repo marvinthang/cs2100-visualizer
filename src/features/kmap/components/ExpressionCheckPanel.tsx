@@ -83,7 +83,7 @@ export default function ExpressionCheckPanel({
                                 : groupExpressionFeedback.status === 'incorrect'
                                   ? 'bg-amber-50 text-amber-700 ring-1 ring-amber-100'
                                   : 'bg-rose-50 text-rose-700 ring-1 ring-rose-100'
-                        }`}
+                        } whitespace-pre-line`}
                     >
                         {groupExpressionFeedback.message}
                     </p>
