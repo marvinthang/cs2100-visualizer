@@ -15,22 +15,35 @@ export default function App() {
     const [tab, setTab] = useState<Tab>('datapath');
 
     return (
-        <div className="flex h-screen flex-col overflow-hidden">
-            <nav className="flex flex-none gap-1 border-b border-slate-200 bg-white px-6 py-2">
-                {tabs.map(({ id, label }) => (
-                    <button
-                        key={id}
-                        type="button"
-                        onClick={() => setTab(id)}
-                        className={`rounded-lg px-4 py-2 text-sm font-medium ${
-                            tab === id
-                                ? 'bg-slate-900 text-white'
-                                : 'text-slate-700 hover:bg-slate-100'
-                        }`}
-                    >
-                        {label}
-                    </button>
-                ))}
+        <div className="flex h-screen flex-col overflow-hidden bg-[#eef2f3]">
+            <nav className="flex flex-none border-b border-slate-200 bg-[#fbfcfd] px-3 py-2 shadow-sm sm:px-4 lg:px-6">
+                <div className="mx-auto flex w-full max-w-[1760px] flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                        <div className="text-sm font-bold tracking-tight text-slate-950">
+                            CS2100 Visualizer
+                        </div>
+                        <div className="text-[11px] font-medium uppercase tracking-wide text-slate-400">
+                            MIPS and logic practice
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-3 rounded-md bg-slate-100 p-1 ring-1 ring-slate-200">
+                        {tabs.map(({ id, label }) => (
+                            <button
+                                key={id}
+                                type="button"
+                                onClick={() => setTab(id)}
+                                className={`rounded-md px-3 py-1.5 text-xs font-semibold transition sm:px-4 ${
+                                    tab === id
+                                        ? 'bg-slate-900 text-white shadow-sm'
+                                        : 'text-slate-600 hover:bg-white/70 hover:text-slate-950'
+                                }`}
+                            >
+                                {label}
+                            </button>
+                        ))}
+                    </div>
+                </div>
             </nav>
 
             <div className="min-h-0 flex-1 overflow-auto">

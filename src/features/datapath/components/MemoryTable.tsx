@@ -7,6 +7,25 @@ import {
 } from '../../../core/mips/single-cycle/highlight/datapathHighlightState';
 import Modal, { ExpandButton } from './Modal';
 
+function PanelMetric({
+    label,
+    value,
+}: {
+    label: string;
+    value: string | number;
+}) {
+    return (
+        <div className="rounded-md border border-slate-200 bg-white px-3 py-2 shadow-sm">
+            <div className="text-[10px] font-semibold uppercase tracking-wide text-slate-400">
+                {label}
+            </div>
+            <div className="mt-0.5 font-mono text-sm font-bold text-slate-900">
+                {value}
+            </div>
+        </div>
+    );
+}
+
 export default function MemoryTable({
     machine,
     onMemoryChange,
@@ -40,16 +59,26 @@ export default function MemoryTable({
             value,
         }))
         .sort((a, b) => a.address - b.address);
+    const memoryRange =
+        memoryRows.length > 0
+            ? `${memoryRows[0].address} - ${
+                  memoryRows[memoryRows.length - 1].address
+              }`
+            : 'Empty';
 
     function renderTable(scrollClass: string) {
         return (
-            <div className={`${scrollClass} overflow-auto`}>
+            <div
+                className={`${scrollClass} overflow-auto rounded-md border border-slate-200`}
+            >
                 <table className="w-full text-sm">
-                    <thead className="sticky top-0 bg-white">
+                    <thead className="sticky top-0 bg-[#fbfcfd]">
                         <tr className="border-b border-slate-200 text-left text-xs text-slate-500">
-                            <th className="py-2 pr-2">Addr</th>
-                            <th className="py-2 pr-2">Hex</th>
-                            <th className="py-2 text-right">Value</th>
+                            <th className="px-3 py-2 font-semibold">Addr</th>
+                            <th className="px-3 py-2 font-semibold">Hex</th>
+                            <th className="px-3 py-2 text-right font-semibold">
+                                Value
+                            </th>
                         </tr>
                     </thead>
                     <tbody>
@@ -66,12 +95,12 @@ export default function MemoryTable({
                             return (
                                 <tr
                                     key={address}
-                                    className={`border-b border-slate-100 font-mono text-xs ${bgClass}`}
+                                    className={`border-b border-slate-100 font-mono text-xs last:border-b-0 ${bgClass}`}
                                 >
-                                    <td className={`py-1.5 pr-2 ${textClass}`}>
+                                    <td className={`px-3 py-1.5 ${textClass}`}>
                                         {address}
                                     </td>
-                                    <td className={`py-1.5 pr-2 ${textClass}`}>
+                                    <td className={`px-3 py-1.5 ${textClass}`}>
                                         0x
                                         {Number(address)
                                             .toString(16)
@@ -79,7 +108,7 @@ export default function MemoryTable({
                                             .padStart(8, '0')}
                                     </td>
                                     <td
-                                        className={`py-1.5 text-right ${textClass}`}
+                                        className={`px-3 py-1.5 text-right ${textClass}`}
                                     >
                                         <input
                                             type="number"
@@ -139,17 +168,17 @@ export default function MemoryTable({
     }
 
     return (
-        <div className="h-fit rounded-lg border border-slate-200 bg-white p-3 shadow-sm">
-            <div className="mb-3 flex items-start justify-between gap-3">
-                <h2 className="text-sm font-semibold text-slate-900">
-                    Data Memory
-                </h2>
-                <div className="flex flex-wrap items-center justify-end gap-2">
-                    <span className="rounded-md border border-slate-200 bg-white px-2 py-1 font-mono text-xs font-semibold text-slate-700">
-                        {memoryRows.length > 0
-                            ? `Addr range: ${memoryRows[0].address} - ${memoryRows[memoryRows.length - 1].address}`
-                            : 'Empty'}
-                    </span>
+        <div className="h-fit overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
+            <div className="flex items-center justify-between gap-3 border-b border-slate-200 bg-[#fbfcfd] px-4 py-3">
+                <div>
+                    <h2 className="text-sm font-semibold text-slate-900">
+                        Data Memory
+                    </h2>
+                    <p className="mt-0.5 text-xs text-slate-500">
+                        Word-addressable data segment
+                    </p>
+                </div>
+                <div className="flex items-center gap-2">
                     <button
                         type="button"
                         onClick={() => {
@@ -163,47 +192,57 @@ export default function MemoryTable({
                     <ExpandButton onClick={() => setIsExpanded(true)} />
                 </div>
             </div>
-            <div className="mb-3 grid grid-cols-[1fr_1fr_auto] gap-2">
-                <label className="text-xs font-medium text-slate-600">
-                    Start addr
-                    <input
-                        type="number"
-                        min={0}
-                        step={4}
-                        value={startAddressInput}
-                        onChange={(event) =>
-                            setStartAddressInput(event.target.value)
-                        }
-                        className="mt-1 w-full rounded-md border border-slate-300 bg-white px-2 py-1 font-mono text-xs shadow-sm outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-100"
-                    />
-                </label>
 
-                <label className="text-xs font-medium text-slate-600">
-                    Words
-                    <input
-                        type="number"
-                        min={1}
-                        value={wordCountInput}
-                        onChange={(event) =>
-                            setWordCountInput(event.target.value)
-                        }
-                        className="mt-1 w-full rounded-md border border-slate-300 bg-white px-2 py-1 font-mono text-xs shadow-sm outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-100"
-                    />
-                </label>
+            <div className="space-y-3 p-3">
+                <div className="grid grid-cols-2 gap-2">
+                    <PanelMetric label="Addr range" value={memoryRange} />
+                    <PanelMetric label="Words" value={memoryRows.length} />
+                </div>
 
-                <button
-                    type="button"
-                    onClick={() => {
-                        setDataMemoryDrafts({});
-                        onMemoryRangeChange(startAddress, wordCount);
-                    }}
-                    className="self-end rounded-md bg-slate-900 px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition hover:bg-slate-800"
-                >
-                    Apply
-                </button>
+                <div className="rounded-md border border-slate-200 bg-[#fbfcfd] p-2">
+                    <div className="grid grid-cols-[1fr_1fr_auto] gap-2">
+                        <label className="text-xs font-medium text-slate-600">
+                            Start addr
+                            <input
+                                type="number"
+                                min={0}
+                                step={4}
+                                value={startAddressInput}
+                                onChange={(event) =>
+                                    setStartAddressInput(event.target.value)
+                                }
+                                className="mt-1 w-full rounded-md border border-slate-300 bg-white px-2 py-1 font-mono text-xs shadow-sm outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-100"
+                            />
+                        </label>
+
+                        <label className="text-xs font-medium text-slate-600">
+                            Words
+                            <input
+                                type="number"
+                                min={1}
+                                value={wordCountInput}
+                                onChange={(event) =>
+                                    setWordCountInput(event.target.value)
+                                }
+                                className="mt-1 w-full rounded-md border border-slate-300 bg-white px-2 py-1 font-mono text-xs shadow-sm outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-100"
+                            />
+                        </label>
+
+                        <button
+                            type="button"
+                            onClick={() => {
+                                setDataMemoryDrafts({});
+                                onMemoryRangeChange(startAddress, wordCount);
+                            }}
+                            className="self-end rounded-md bg-slate-900 px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition hover:bg-slate-800"
+                        >
+                            Apply
+                        </button>
+                    </div>
+                </div>
+
+                {renderTable(tableMaxHeightClass)}
             </div>
-
-            {renderTable(tableMaxHeightClass)}
 
             {isExpanded && (
                 <Modal title="Data Memory" onClose={() => setIsExpanded(false)}>

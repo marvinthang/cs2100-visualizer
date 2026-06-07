@@ -5,4 +5,32 @@
 
 body {
     font-family: 'Inter', sans-serif;
+    background: #eef2f3;
+}
+
+* {
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e1 transparent;
+}
+
+*::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+*::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border: 3px solid transparent;
+    border-radius: 999px;
+    background-clip: content-box;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+    border: 3px solid transparent;
+    background-clip: content-box;
 }
