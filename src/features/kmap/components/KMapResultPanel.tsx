@@ -54,6 +54,8 @@ type KMapResultPanelProps = {
     groupView: 'manual' | 'solver';
     solverForm: KMapSolveForm;
     activeGroupId: number | null;
+    manualGroups: KMapGroup[];
+    manualExpression: string;
     activeManualGroup: KMapGroup | undefined;
     activeManualExpression: string | null;
     solverAnalysis: KMapSolveAnalysis;
@@ -69,6 +71,8 @@ export default function KMapResultPanel({
     groupView,
     solverForm,
     activeGroupId,
+    manualGroups,
+    manualExpression,
     activeManualGroup,
     activeManualExpression,
     solverAnalysis,
@@ -121,6 +125,8 @@ export default function KMapResultPanel({
 
             {groupView === 'manual' ? (
                 <ManualResult
+                    manualGroups={manualGroups}
+                    manualExpression={manualExpression}
                     activeManualGroup={activeManualGroup}
                     activeManualExpression={activeManualExpression}
                 />
@@ -142,28 +148,49 @@ export default function KMapResultPanel({
 }
 
 function ManualResult({
+    manualGroups,
+    manualExpression,
     activeManualGroup,
     activeManualExpression,
 }: {
+    manualGroups: KMapGroup[];
+    manualExpression: string;
     activeManualGroup: KMapGroup | undefined;
     activeManualExpression: string | null;
 }) {
     return (
         <div className="mt-3">
-            {activeManualGroup === undefined ? (
-                <p className="rounded-lg bg-slate-50 p-3 text-xs text-slate-500">
-                    Select a manual group to show its expression.
+            <div className="rounded-lg bg-slate-950 p-4 font-mono text-sm text-slate-100">
+                {manualExpression}
+            </div>
+
+            {manualGroups.length === 0 ? (
+                <p className="mt-3 rounded-lg bg-slate-50 p-3 text-xs text-slate-500">
+                    Add manual groups to build an expression.
                 </p>
             ) : (
                 <>
-                    <div className="rounded-lg bg-slate-950 p-4 font-mono text-sm text-slate-100">
-                        {activeManualExpression}
-                    </div>
                     <p className="mt-2 font-mono text-xs text-slate-600">
-                        {activeManualGroup.minterms
-                            .map((minterm) => `m${minterm}`)
-                            .join(', ')}
+                        {manualGroups.length} manual{' '}
+                        {manualGroups.length === 1 ? 'group' : 'groups'}:{' '}
+                        {manualGroups.map((group) => `G${group.id}`).join(', ')}
                     </p>
+
+                    {activeManualGroup !== undefined && (
+                        <div className="mt-3 rounded-lg border border-slate-200 bg-slate-50 p-3">
+                            <div className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-slate-400">
+                                Selected group expression
+                            </div>
+                            <p className="font-mono text-xs text-slate-700">
+                                {activeManualExpression}
+                            </p>
+                            <p className="mt-1 font-mono text-xs text-slate-500">
+                                {activeManualGroup.minterms
+                                    .map((minterm) => `m${minterm}`)
+                                    .join(', ')}
+                            </p>
+                        </div>
+                    )}
                 </>
             )}
         </div>

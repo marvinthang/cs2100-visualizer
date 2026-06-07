@@ -14,27 +14,31 @@ import {
     type KMapPracticeDifficulty,
 } from '../../core/kmap/kmapPracticeGenerator';
 import { analyzeKMap, type KMapSolveForm } from '../../core/kmap/kmapSolver';
+import { analyzeManualGroups } from '../../core/kmap/manualGroupAnalysis';
 import KMapControls from './components/KMapControls';
 import KMapGrid from './components/KMapGrid';
+import KMapGroupingPanel from './components/KMapGroupingPanel';
 import KMapResultPanel from './components/KMapResultPanel';
 import ManualGroupsPanel from './components/ManualGroupsPanel';
 import {
     defaultVariableNames,
     formatGroupExpression,
+    formatManualGroupsExpression,
     hasOverlap,
     parseMintermsInput,
     parseVariableNamesInput,
     parseGroupLiteralInput,
 } from './kmapPageUtils';
+import ManualFeedbackPanel from './components/ManualFeedbackPanel';
 
 export default function KMapPage() {
-    const [variableCount, setVariableCount] = useState<VariableCount>(2);
+    const [variableCount, setVariableCount] = useState<VariableCount>(4);
     const [model, setModel] = useState(createKMapModel(variableCount));
 
     const [selectedMinterms, setSelectedMinterms] = useState<number[]>([]);
     const [mintermInput, setMintermInput] = useState('');
     const [dontCareInput, setDontCareInput] = useState('');
-    const [variableNameInput, setVariableNameInput] = useState('A B');
+    const [variableNameInput, setVariableNameInput] = useState('A B C D');
     const [valueInputError, setValueInputError] = useState<string | null>(null);
     const [groups, setGroups] = useState<KMapGroup[]>([]);
     const [activeGroupId, setActiveGroupId] = useState<number | null>(null);
@@ -107,7 +111,19 @@ export default function KMapPage() {
                   variableNameResult.names,
                   solverForm,
               );
+    const manualExpression = formatManualGroupsExpression(
+        model,
+        groups,
+        variableNameResult.names,
+        solverForm,
+    );
     const visibleGroups = groupView === 'manual' ? groups : solverGroups;
+    const manualGroupAnalysis = analyzeManualGroups(
+        model,
+        groups,
+        solverForm,
+        solverSolution,
+    );
 
     function setSelectedGroupMinterms(minterms: number[]) {
         const sortedMinterms = [...minterms].sort((a, b) => a - b);
@@ -305,7 +321,7 @@ export default function KMapPage() {
                     </div>
                 </header>
 
-                <div className="grid gap-4 xl:grid-cols-[320px_minmax(360px,440px)_minmax(320px,380px)] xl:items-start xl:justify-center">
+                <div className="grid gap-4 xl:grid-cols-[300px_minmax(400px,480px)_minmax(300px,380px)] xl:items-start xl:justify-center">
                     <KMapControls
                         mode={mode}
                         solverForm={solverForm}
@@ -315,14 +331,8 @@ export default function KMapPage() {
                         mintermInput={mintermInput}
                         dontCareInput={dontCareInput}
                         valueInputError={valueInputError}
-                        selectedMinterms={selectedMinterms}
-                        canSaveSelectedGroup={canSaveSelectedGroup}
-                        selectedValuesAreGroupable={selectedValuesAreGroupable}
-                        selectedGroupIsAllDontCare={selectedGroupIsAllDontCare}
                         groupTargetValue={groupTargetValue}
                         practiceDifficulty={practiceDifficulty}
-                        groupLiteralInput={groupLiteralInput}
-                        groupLiteralError={groupLiteralError}
                         onModeChange={setMode}
                         onSolverFormChange={handleSolverFormChange}
                         onVariableCountChange={(newVariableCount) => {
@@ -335,49 +345,67 @@ export default function KMapPage() {
                         onApplyValueInputs={handleApplyValueInputs}
                         onPracticeDifficultyChange={setPracticeDifficulty}
                         onGeneratePracticeMap={handleGeneratePracticeMap}
-                        onAddGroup={handleAddGroup}
-                        onClearSelectedGroup={() =>
-                            setSelectedGroupMinterms([])
-                        }
-                        onResetMap={() => resetMap()}
-                        onGroupLiteralInputChange={setGroupLiteralInput}
-                        onApplyGroupLiteral={handleApplyGroupLiteral}
                     />
 
-                    <section className="rounded-xl border border-slate-200 bg-white p-3 shadow-sm">
-                        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-                            <div>
-                                <h2 className="text-sm font-semibold text-slate-900">
-                                    K-map Grid
-                                </h2>
-                                <p className="mt-1 text-xs text-slate-500">
-                                    Edit values or select rectangular groups.
-                                </p>
+                    <section className="space-y-4">
+                        <div className="rounded-xl border border-slate-200 bg-white p-3 shadow-sm">
+                            <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+                                <div>
+                                    <h2 className="text-sm font-semibold text-slate-900">
+                                        K-map Grid
+                                    </h2>
+                                    <p className="mt-1 text-xs text-slate-500">
+                                        Edit values or select rectangular
+                                        groups.
+                                    </p>
+                                </div>
+
+                                <div className="flex gap-2 text-xs">
+                                    <span className="rounded-full bg-slate-100 px-2 py-1 text-slate-600">
+                                        0
+                                    </span>
+                                    <span className="rounded-full bg-emerald-100 px-2 py-1 text-emerald-700">
+                                        1
+                                    </span>
+                                    <span className="rounded-full bg-amber-100 px-2 py-1 text-amber-700">
+                                        X
+                                    </span>
+                                </div>
                             </div>
 
-                            <div className="flex gap-2 text-xs">
-                                <span className="rounded-full bg-slate-100 px-2 py-1 text-slate-600">
-                                    0
-                                </span>
-                                <span className="rounded-full bg-emerald-100 px-2 py-1 text-emerald-700">
-                                    1
-                                </span>
-                                <span className="rounded-full bg-amber-100 px-2 py-1 text-amber-700">
-                                    X
-                                </span>
+                            <div className="rounded-lg border border-slate-100 bg-slate-50 p-2">
+                                <KMapGrid
+                                    model={model}
+                                    variableNames={variableNameResult.names}
+                                    selectedMinterms={selectedMinterms}
+                                    groups={visibleGroups}
+                                    activeGroupId={activeGroupId}
+                                    onCellClick={handleCellClick}
+                                />
                             </div>
                         </div>
 
-                        <div className="rounded-lg border border-slate-100 bg-slate-50 p-2">
-                            <KMapGrid
-                                model={model}
-                                variableNames={variableNameResult.names}
-                                selectedMinterms={selectedMinterms}
-                                groups={visibleGroups}
-                                activeGroupId={activeGroupId}
-                                onCellClick={handleCellClick}
-                            />
-                        </div>
+                        <KMapGroupingPanel
+                            solverForm={solverForm}
+                            selectedMinterms={selectedMinterms}
+                            canSaveSelectedGroup={canSaveSelectedGroup}
+                            selectedValuesAreGroupable={
+                                selectedValuesAreGroupable
+                            }
+                            selectedGroupIsAllDontCare={
+                                selectedGroupIsAllDontCare
+                            }
+                            groupTargetValue={groupTargetValue}
+                            groupLiteralInput={groupLiteralInput}
+                            groupLiteralError={groupLiteralError}
+                            onAddGroup={handleAddGroup}
+                            onClearSelectedGroup={() =>
+                                setSelectedGroupMinterms([])
+                            }
+                            onResetMap={() => resetMap()}
+                            onGroupLiteralInputChange={setGroupLiteralInput}
+                            onApplyGroupLiteral={handleApplyGroupLiteral}
+                        />
                     </section>
 
                     <section className="h-fit space-y-4">
@@ -385,6 +413,8 @@ export default function KMapPage() {
                             groupView={groupView}
                             activeGroupId={activeGroupId}
                             solverForm={solverForm}
+                            manualGroups={groups}
+                            manualExpression={manualExpression}
                             activeManualGroup={activeManualGroup}
                             activeManualExpression={activeManualExpression}
                             solverAnalysis={solverAnalysis}
@@ -407,6 +437,11 @@ export default function KMapPage() {
                             onRemoveGroup={handleRemoveGroup}
                             onSelectGroup={setActiveGroupId}
                             onGroupViewChange={setGroupView}
+                        />
+
+                        <ManualFeedbackPanel
+                            analysis={manualGroupAnalysis}
+                            solverForm={solverForm}
                         />
                     </section>
                 </div>

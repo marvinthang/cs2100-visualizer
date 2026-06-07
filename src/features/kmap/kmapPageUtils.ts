@@ -1,4 +1,8 @@
-import type { KMapModel, VariableCount } from '../../core/kmap/kmapModel';
+import type {
+    KMapGroup,
+    KMapModel,
+    VariableCount,
+} from '../../core/kmap/kmapModel';
 import type { KMapSolveForm, KMapSolvePI } from '../../core/kmap/kmapSolver';
 
 export const defaultVariableNames = ['A', 'B', 'C', 'D'];
@@ -194,6 +198,32 @@ export function formatGroupExpression(
             ? formatSolverTerm(term, variableNames)
             : formatPosTerm(term, variableNames)
     }`;
+}
+
+export function formatManualGroupsExpression(
+    model: KMapModel,
+    groups: KMapGroup[],
+    variableNames: string[],
+    form: KMapSolveForm = 'SOP',
+): string {
+    if (groups.length === 0) {
+        return form === 'SOP' ? 'F = 0' : 'F = 1';
+    }
+
+    const terms = groups
+        .map((group) => getGroupTerm(model, group.minterms))
+        .filter((term) => term !== null)
+        .map((term) =>
+            form === 'SOP'
+                ? formatSolverTerm(term, variableNames)
+                : formatPosTerm(term, variableNames),
+        );
+
+    if (terms.length === 0) {
+        return form === 'SOP' ? 'F = 0' : 'F = 1';
+    }
+
+    return `F = ${terms.join(form === 'SOP' ? ' + ' : ' ')}`;
 }
 
 export type KMapGroupExpressionType =

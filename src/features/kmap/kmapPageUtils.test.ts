@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { createKMapModel } from '../../core/kmap/kmapModel';
 import {
     formatExpression,
+    formatManualGroupsExpression,
     parseGroupLiteralInput,
     parseVariableNamesInput,
 } from './kmapPageUtils';
@@ -82,6 +83,40 @@ describe('formatExpression', () => {
                         term: '_0',
                         isEPI: true,
                     },
+                ],
+                ['A', 'B'],
+                'POS',
+            ),
+        ).toBe('F = (A) (B)');
+    });
+});
+
+describe('formatManualGroupsExpression', () => {
+    it('formats all manual SOP groups as one expression', () => {
+        const model = createKMapModel(2);
+
+        expect(
+            formatManualGroupsExpression(
+                model,
+                [
+                    { id: 1, minterms: [0, 1] },
+                    { id: 2, minterms: [2] },
+                ],
+                ['A', 'B'],
+                'SOP',
+            ),
+        ).toBe("F = A' + AB'");
+    });
+
+    it('formats all manual POS groups as one expression', () => {
+        const model = createKMapModel(2);
+
+        expect(
+            formatManualGroupsExpression(
+                model,
+                [
+                    { id: 1, minterms: [0, 1] },
+                    { id: 2, minterms: [0, 2] },
                 ],
                 ['A', 'B'],
                 'POS',
