@@ -9,6 +9,10 @@ import {
     updateKMapCell,
     type VariableCount,
 } from '../../core/kmap/kmapModel';
+import {
+    generatePracticeKMap,
+    type KMapPracticeDifficulty,
+} from '../../core/kmap/kmapPracticeGenerator';
 import { analyzeKMap, type KMapSolveForm } from '../../core/kmap/kmapSolver';
 import KMapControls from './components/KMapControls';
 import KMapGrid from './components/KMapGrid';
@@ -41,6 +45,8 @@ export default function KMapPage() {
         'expression' | 'all'
     >('all');
     const [solverForm, setSolverForm] = useState<KMapSolveForm>('SOP');
+    const [practiceDifficulty, setPracticeDifficulty] =
+        useState<KMapPracticeDifficulty>('medium');
     const [groupLiteralInput, setGroupLiteralInput] = useState('');
     const [groupLiteralError, setGroupLiteralError] = useState<string | null>(
         null,
@@ -159,6 +165,35 @@ export default function KMapPage() {
         setActiveGroupId(null);
         setGroupView('manual');
         setNextGroupId(1);
+        setValueInputError(null);
+        setGroupLiteralError(null);
+    }
+
+    function formatMintermInput(minterms: number[]): string {
+        return minterms.join(',');
+    }
+
+    function handleGeneratePracticeMap() {
+        const practiceMap = generatePracticeKMap({
+            variableCount,
+            form: solverForm,
+            difficulty: practiceDifficulty,
+        });
+        const oneMinterms = practiceMap.model.cells
+            .filter((cell) => cell.value === 1)
+            .map((cell) => cell.minterm)
+            .sort((a, b) => a - b);
+
+        setModel(practiceMap.model);
+        setMintermInput(formatMintermInput(oneMinterms));
+        setDontCareInput(formatMintermInput(practiceMap.dontCareMinterms));
+        setSelectedGroupMinterms([]);
+        setGroups([]);
+        setActiveGroupId(null);
+        setGroupView('manual');
+        setNextGroupId(1);
+        setMode('group');
+        setSolverPrimeListView('expression');
         setValueInputError(null);
         setGroupLiteralError(null);
     }
@@ -285,6 +320,7 @@ export default function KMapPage() {
                         selectedValuesAreGroupable={selectedValuesAreGroupable}
                         selectedGroupIsAllDontCare={selectedGroupIsAllDontCare}
                         groupTargetValue={groupTargetValue}
+                        practiceDifficulty={practiceDifficulty}
                         groupLiteralInput={groupLiteralInput}
                         groupLiteralError={groupLiteralError}
                         onModeChange={setMode}
@@ -297,6 +333,8 @@ export default function KMapPage() {
                         onMintermInputChange={setMintermInput}
                         onDontCareInputChange={setDontCareInput}
                         onApplyValueInputs={handleApplyValueInputs}
+                        onPracticeDifficultyChange={setPracticeDifficulty}
+                        onGeneratePracticeMap={handleGeneratePracticeMap}
                         onAddGroup={handleAddGroup}
                         onClearSelectedGroup={() =>
                             setSelectedGroupMinterms([])
