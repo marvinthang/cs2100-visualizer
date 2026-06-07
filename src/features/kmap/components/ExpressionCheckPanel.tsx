@@ -1,11 +1,9 @@
 import type { KMapSolveForm } from '../../../core/kmap/kmapSolver';
-
-const monoInputClass =
-    'w-full rounded-md border border-slate-300 bg-white px-2.5 py-2 font-mono text-xs text-slate-900 shadow-sm outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-100';
-const primaryButtonClass =
-    'rounded-md bg-slate-900 px-3 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-slate-800';
-const secondaryButtonClass =
-    'rounded-md border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-700 shadow-sm transition hover:border-slate-400 hover:bg-slate-50';
+import {
+    monoInputClass,
+    primaryButtonClass,
+    secondaryButtonClass,
+} from './kmapUiClasses';
 
 type GroupExpressionFeedback = {
     status: 'correct' | 'incorrect' | 'error';

@@ -102,8 +102,9 @@ function getGroupOutlineStyle({
             rows[cell.row][(cell.col - 1 + colCount) % colCount].minterm,
         )
     );
-    const color = groupOutlineColors[colorIndex % groupOutlineColors.length];
-    const stackOffset = 4 + (colorIndex % 4) * 4;
+    const paletteSize = groupOutlineColors.length;
+    const color = groupOutlineColors[colorIndex % paletteSize];
+    const stackOffset = 4 + (colorIndex % paletteSize) * 4;
 
     return {
         inset: `${stackOffset}px`,
@@ -348,25 +349,28 @@ export default function KMapGrid({
                             cell.minterm,
                         );
                         const cellGroups = groups
-                            .map((group, index) =>
-                                group.minterms.includes(cell.minterm)
+                            .map((candidateGroup, index) =>
+                                candidateGroup.minterms.includes(cell.minterm)
                                     ? {
-                                          id: group.id,
-                                          group,
-                                          colorIndex: group.colorIndex ?? index,
+                                          id: candidateGroup.id,
+                                          group: candidateGroup,
+                                          colorIndex:
+                                              candidateGroup.colorIndex ??
+                                              index,
                                       }
                                     : null,
                             )
-                            .filter((group) => group !== null);
+                            .filter((cellGroup) => cellGroup !== null);
                         const valueClass = getCellValueClass(cell.value);
                         const valueBadgeClass = getValueBadgeClass(cell.value);
                         const visibleCellGroups = cellGroups.slice(0, 3);
                         const hiddenGroupCount =
                             cellGroups.length - visibleCellGroups.length;
-                        const hasEmphasizedGroup = cellGroups.some((group) =>
-                            hoveredMinterm !== null
-                                ? hoveredGroupIds.has(group.id)
-                                : activeGroupId === group.id,
+                        const hasEmphasizedGroup = cellGroups.some(
+                            (cellGroup) =>
+                                hoveredMinterm !== null
+                                    ? hoveredGroupIds.has(cellGroup.id)
+                                    : activeGroupId === cellGroup.id,
                         );
                         const cellLayerClass = hasEmphasizedGroup
                             ? 'z-30'
@@ -397,12 +401,12 @@ export default function KMapGrid({
                                     gridRow: 3 + cell.row,
                                 }}
                             >
-                                {cellGroups.map((group) => {
+                                {cellGroups.map((cellGroup) => {
                                     const isHoveredGroup = hoveredGroupIds.has(
-                                        group.id,
+                                        cellGroup.id,
                                     );
                                     const isActiveGroup =
-                                        activeGroupId === group.id;
+                                        activeGroupId === cellGroup.id;
                                     const isEmphasizedGroup =
                                         hoveredMinterm !== null
                                             ? isHoveredGroup
@@ -410,7 +414,7 @@ export default function KMapGrid({
 
                                     return (
                                         <span
-                                            key={group.id}
+                                            key={cellGroup.id}
                                             className={`pointer-events-none absolute rounded-xl border-transparent transition ${
                                                 isEmphasizedGroup
                                                     ? 'z-40 border-[4px]'
@@ -418,9 +422,10 @@ export default function KMapGrid({
                                             }`}
                                             style={getGroupOutlineStyle({
                                                 cell,
-                                                group: group.group,
+                                                group: cellGroup.group,
                                                 rows,
-                                                colorIndex: group.colorIndex,
+                                                colorIndex:
+                                                    cellGroup.colorIndex,
                                                 isHoveredGroup:
                                                     isEmphasizedGroup,
                                                 isDimmed:
@@ -432,12 +437,12 @@ export default function KMapGrid({
                                 })}
                                 {cellGroups.length > 0 && (
                                     <span className="absolute bottom-1 right-1 z-30 flex items-center gap-1 rounded bg-white/90 px-1 py-0.5 ring-1 ring-slate-200/80">
-                                        {visibleCellGroups.map((group) => (
+                                        {visibleCellGroups.map((cellGroup) => (
                                             <span
-                                                key={group.id}
+                                                key={cellGroup.id}
                                                 className={`h-1.5 w-1.5 rounded-full ${
                                                     groupDotColors[
-                                                        group.colorIndex %
+                                                        cellGroup.colorIndex %
                                                             groupDotColors.length
                                                     ]
                                                 }`}

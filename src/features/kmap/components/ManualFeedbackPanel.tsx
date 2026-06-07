@@ -1,8 +1,9 @@
 import type { ManualGroupAnalysis } from '../../../core/kmap/manualGroupAnalysis';
+import type { KMapSolveForm } from '../../../core/kmap/kmapSolver';
 
 type ManualFeedbackPanelProps = {
     analysis: ManualGroupAnalysis;
-    solverForm: 'SOP' | 'POS';
+    solverForm: KMapSolveForm;
 };
 
 function formatMinterms(minterms: number[]): string {

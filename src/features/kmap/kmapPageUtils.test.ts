@@ -164,6 +164,15 @@ describe('parseBooleanExpressionInput', () => {
             },
         );
     });
+
+    it('rejects duplicate variable names', () => {
+        const model = createKMapModel(2);
+
+        expect(parseBooleanExpressionInput('A', model, ['A', 'A'])).toEqual({
+            minterms: [],
+            error: 'Variable names must be unique.',
+        });
+    });
 });
 
 describe('parseGroupExpressionInput', () => {

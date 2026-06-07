@@ -87,7 +87,7 @@ export default function KMapPage() {
         selectedMinterms,
         groupTargetValue,
     );
-    const selectedValuesAreGroupable = areKMapGroupCellsValid(
+    const selectedCellsHaveValidValues = areKMapGroupCellsValid(
         model,
         selectedMinterms,
         groupTargetValue,
@@ -266,13 +266,13 @@ export default function KMapPage() {
             form: solverForm,
             difficulty: practiceDifficulty,
         });
-        const oneMinterms = practiceMap.model.cells
+        const actualOneMinterms = practiceMap.model.cells
             .filter((cell) => cell.value === 1)
             .map((cell) => cell.minterm)
             .sort((a, b) => a - b);
 
         setModel(practiceMap.model);
-        setMintermInput(formatMintermInput(oneMinterms));
+        setMintermInput(formatMintermInput(actualOneMinterms));
         setDontCareInput(formatMintermInput(practiceMap.dontCareMinterms));
         setBooleanExpressionInput('');
         setSelectedGroupMinterms([]);
@@ -632,8 +632,8 @@ export default function KMapPage() {
                             solverForm={solverForm}
                             selectedMinterms={selectedMinterms}
                             canSaveSelectedGroup={canSaveSelectedGroup}
-                            selectedValuesAreGroupable={
-                                selectedValuesAreGroupable
+                            selectedCellsHaveValidValues={
+                                selectedCellsHaveValidValues
                             }
                             selectedGroupIsAllDontCare={
                                 selectedGroupIsAllDontCare

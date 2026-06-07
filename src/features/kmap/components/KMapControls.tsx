@@ -2,6 +2,12 @@ import type { ReactNode } from 'react';
 import type { VariableCount } from '../../../core/kmap/kmapModel';
 import type { KMapPracticeDifficulty } from '../../../core/kmap/kmapPracticeGenerator';
 import type { KMapSolveForm } from '../../../core/kmap/kmapSolver';
+import {
+    compactInputClass,
+    compactMonoInputClass,
+    compactPrimaryButtonClass,
+    compactSecondaryButtonClass,
+} from './kmapUiClasses';
 
 const modeOptions: Array<{ value: 'edit' | 'group'; label: string }> = [
     { value: 'edit', label: 'Edit' },
@@ -25,13 +31,6 @@ const practiceDifficultyOptions: Array<{
     { value: 'hard', label: 'Hard' },
 ];
 
-const inputClass =
-    'w-full rounded-md border border-slate-300 bg-white px-2.5 py-1.5 text-xs text-slate-900 shadow-sm outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-100';
-const monoInputClass = `${inputClass} font-mono`;
-const primaryButtonClass =
-    'rounded-md bg-slate-900 px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-40';
-const secondaryButtonClass =
-    'rounded-md border border-slate-300 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 shadow-sm transition hover:border-slate-400 hover:bg-slate-50';
 function ControlSection({
     title,
     meta,
@@ -188,7 +187,7 @@ export default function KMapControls({
                                         ) as VariableCount,
                                     )
                                 }
-                                className="w-full rounded-md border border-slate-300 bg-white px-2.5 py-1.5 text-xs text-slate-900 shadow-sm outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-100"
+                                className={compactInputClass}
                             >
                                 <option value={2}>2 variables</option>
                                 <option value={3}>3 variables</option>
@@ -209,7 +208,7 @@ export default function KMapControls({
                                     )
                                 }
                                 placeholder="A B C"
-                                className={monoInputClass}
+                                className={compactMonoInputClass}
                             />
                         </label>
                     </div>
@@ -233,14 +232,14 @@ export default function KMapControls({
                                     )
                                 }
                                 placeholder="A'B + C.D"
-                                className={monoInputClass}
+                                className={compactMonoInputClass}
                             />
                         </label>
 
                         <button
                             type="button"
                             onClick={onApplyBooleanExpression}
-                            className={primaryButtonClass}
+                            className={compactPrimaryButtonClass}
                         >
                             Apply
                         </button>
@@ -267,7 +266,7 @@ export default function KMapControls({
                                         onMintermInputChange(event.target.value)
                                     }
                                     placeholder="1,2"
-                                    className={monoInputClass}
+                                    className={compactMonoInputClass}
                                 />
                             </label>
 
@@ -284,7 +283,7 @@ export default function KMapControls({
                                         )
                                     }
                                     placeholder="4,5"
-                                    className={monoInputClass}
+                                    className={compactMonoInputClass}
                                 />
                             </label>
                         </div>
@@ -293,14 +292,14 @@ export default function KMapControls({
                             <button
                                 type="button"
                                 onClick={onApplyValueInputs}
-                                className={primaryButtonClass}
+                                className={compactPrimaryButtonClass}
                             >
                                 Apply
                             </button>
                             <button
                                 type="button"
                                 onClick={onClearMapValues}
-                                className={secondaryButtonClass}
+                                className={compactSecondaryButtonClass}
                             >
                                 Clear
                             </button>
@@ -338,7 +337,7 @@ export default function KMapControls({
                         <button
                             type="button"
                             onClick={onGeneratePracticeMap}
-                            className={primaryButtonClass}
+                            className={compactPrimaryButtonClass}
                         >
                             Generate
                         </button>

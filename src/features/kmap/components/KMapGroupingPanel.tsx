@@ -1,26 +1,24 @@
 import type { KMapSolveForm } from '../../../core/kmap/kmapSolver';
-
-const monoInputClass =
-    'w-full rounded-md border border-slate-300 bg-white px-2.5 py-2 font-mono text-xs text-slate-900 shadow-sm outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-100';
-const primaryButtonClass =
-    'rounded-md bg-slate-900 px-3 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-40';
-const secondaryButtonClass =
-    'rounded-md border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-700 shadow-sm transition hover:border-slate-400 hover:bg-slate-50';
+import {
+    monoInputClass,
+    primaryButtonClass,
+    secondaryButtonClass,
+} from './kmapUiClasses';
 
 function getSelectedGroupMessage({
     groupTargetValue,
     selectedGroupIsAllDontCare,
-    selectedValuesAreGroupable,
+    selectedCellsHaveValidValues,
 }: {
     groupTargetValue: 0 | 1;
     selectedGroupIsAllDontCare: boolean;
-    selectedValuesAreGroupable: boolean;
+    selectedCellsHaveValidValues: boolean;
 }): string {
     if (selectedGroupIsAllDontCare) {
         return `Group must include at least one ${groupTargetValue}-cell.`;
     }
 
-    if (selectedValuesAreGroupable) {
+    if (selectedCellsHaveValidValues) {
         return 'Selection must form a rectangle. Edge wrapping is allowed.';
     }
 
@@ -31,7 +29,7 @@ type KMapGroupingPanelProps = {
     solverForm: KMapSolveForm;
     selectedMinterms: number[];
     canSaveSelectedGroup: boolean;
-    selectedValuesAreGroupable: boolean;
+    selectedCellsHaveValidValues: boolean;
     selectedGroupIsAllDontCare: boolean;
     groupTargetValue: 0 | 1;
     groupLiteralInput: string;
@@ -46,7 +44,7 @@ export default function KMapGroupingPanel({
     solverForm,
     selectedMinterms,
     canSaveSelectedGroup,
-    selectedValuesAreGroupable,
+    selectedCellsHaveValidValues,
     selectedGroupIsAllDontCare,
     groupTargetValue,
     groupLiteralInput,
@@ -97,7 +95,7 @@ export default function KMapGroupingPanel({
                             {getSelectedGroupMessage({
                                 groupTargetValue,
                                 selectedGroupIsAllDontCare,
-                                selectedValuesAreGroupable,
+                                selectedCellsHaveValidValues,
                             })}
                         </p>
                     )}
