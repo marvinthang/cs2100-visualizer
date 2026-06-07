@@ -63,7 +63,7 @@ export default function InspectorPanel({
         id !== null && displayFormatInspectIds.has(id);
 
     return (
-        <section className="rounded-xl border border-slate-200 bg-white p-3 shadow-sm">
+        <section className="rounded-lg border border-slate-200 bg-white p-3 shadow-sm">
             <div className="mb-3 flex items-center justify-between gap-2">
                 <h2 className="text-sm font-semibold text-slate-900">
                     Inspector
@@ -120,7 +120,7 @@ export default function InspectorPanel({
                         {info.subtitle}
                     </p>
 
-                    <div className="mt-3 overflow-hidden rounded-lg border border-slate-200">
+                    <div className="mt-3 overflow-hidden rounded-md border border-slate-200">
                         {info.rows.map((row) => (
                             <div
                                 key={row.label}

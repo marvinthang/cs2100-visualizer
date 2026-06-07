@@ -126,7 +126,7 @@ export default function MemoryTable({
                                                 );
                                                 onMemoryChange(address, value);
                                             }}
-                                            className="w-24 rounded-md border border-slate-200 px-2 py-1 text-left text-slate-900"
+                                            className="w-24 rounded-md border border-slate-300 bg-white px-2 py-1 text-left text-slate-900 shadow-sm outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-100"
                                         />
                                     </td>
                                 </tr>
@@ -139,13 +139,13 @@ export default function MemoryTable({
     }
 
     return (
-        <div className="h-fit rounded-xl border border-slate-200 bg-white p-3 shadow-sm">
+        <div className="h-fit rounded-lg border border-slate-200 bg-white p-3 shadow-sm">
             <div className="mb-3 flex items-start justify-between gap-3">
                 <h2 className="text-sm font-semibold text-slate-900">
                     Data Memory
                 </h2>
                 <div className="flex flex-wrap items-center justify-end gap-2">
-                    <span className="rounded-md bg-slate-100 px-2 py-1 font-mono text-xs text-slate-700">
+                    <span className="rounded-md border border-slate-200 bg-white px-2 py-1 font-mono text-xs font-semibold text-slate-700">
                         {memoryRows.length > 0
                             ? `Addr range: ${memoryRows[0].address} - ${memoryRows[memoryRows.length - 1].address}`
                             : 'Empty'}
@@ -156,7 +156,7 @@ export default function MemoryTable({
                             setDataMemoryDrafts({});
                             onResetMemory();
                         }}
-                        className="rounded-md border border-slate-200 px-2 py-1 text-xs font-semibold text-slate-700 hover:bg-slate-100"
+                        className="rounded-md border border-slate-300 bg-white px-2 py-1 text-xs font-semibold text-slate-700 shadow-sm transition hover:border-slate-400 hover:bg-slate-50"
                     >
                         Reset
                     </button>
@@ -174,7 +174,7 @@ export default function MemoryTable({
                         onChange={(event) =>
                             setStartAddressInput(event.target.value)
                         }
-                        className="mt-1 w-full rounded-md border border-slate-200 px-2 py-1 font-mono text-xs"
+                        className="mt-1 w-full rounded-md border border-slate-300 bg-white px-2 py-1 font-mono text-xs shadow-sm outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-100"
                     />
                 </label>
 
@@ -187,7 +187,7 @@ export default function MemoryTable({
                         onChange={(event) =>
                             setWordCountInput(event.target.value)
                         }
-                        className="mt-1 w-full rounded-md border border-slate-200 px-2 py-1 font-mono text-xs"
+                        className="mt-1 w-full rounded-md border border-slate-300 bg-white px-2 py-1 font-mono text-xs shadow-sm outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-100"
                     />
                 </label>
 
@@ -197,7 +197,7 @@ export default function MemoryTable({
                         setDataMemoryDrafts({});
                         onMemoryRangeChange(startAddress, wordCount);
                     }}
-                    className="self-end rounded-md bg-slate-900 px-3 py-1.5 text-xs font-semibold text-white hover:bg-slate-800"
+                    className="self-end rounded-md bg-slate-900 px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition hover:bg-slate-800"
                 >
                     Apply
                 </button>

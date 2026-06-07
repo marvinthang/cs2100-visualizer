@@ -22,6 +22,25 @@ const modeOptions: Array<{ value: DatapathSimulatorMode; label: string }> = [
     { value: 'assembly', label: 'Assembly' },
 ];
 
+function StatusPill({
+    label,
+    value,
+}: {
+    label: string;
+    value: string | number;
+}) {
+    return (
+        <div className="rounded-md border border-slate-200 bg-white px-3 py-2 shadow-sm">
+            <div className="text-[10px] font-semibold uppercase tracking-wide text-slate-400">
+                {label}
+            </div>
+            <div className="font-mono text-sm font-bold text-slate-900">
+                {value}
+            </div>
+        </div>
+    );
+}
+
 export default function DatapathPage() {
     const simulator = useDatapathSimulator();
     const [isEditingSignals, setIsEditingSignals] = useState(false);
@@ -67,47 +86,57 @@ export default function DatapathPage() {
     const logs = currentContext.logs ?? [];
 
     return (
-        <main className="flex h-full min-h-0 flex-col bg-slate-50 p-3 text-slate-900 md:p-4 xl:overflow-hidden">
-            <div className="mx-auto flex h-full min-h-0 w-full max-w-[1760px] flex-col">
-                <header className="mb-3 flex flex-none flex-col justify-between gap-3 md:flex-row md:items-end">
-                    <div>
-                        <h1 className="text-2xl font-bold">
-                            MIPS Datapath Visualizer
-                        </h1>
-                        <p className="mt-1 text-sm text-slate-600">
-                            Step through the datapath, inspect values, and test
-                            control signals.
-                        </p>
-                    </div>
+        <main className="flex h-full min-h-0 flex-col bg-[#eef2f3] p-3 text-slate-900 sm:p-4 lg:p-6 xl:overflow-hidden">
+            <div className="mx-auto flex h-full min-h-0 w-full max-w-[1760px] flex-col gap-4">
+                <header className="flex-none rounded-lg border border-slate-200 bg-[#fbfcfd] px-4 py-3 shadow-sm">
+                    <div className="flex flex-col justify-between gap-3 lg:flex-row lg:items-center">
+                        <div>
+                            <div className="flex flex-wrap items-center gap-2">
+                                <h1 className="text-xl font-bold tracking-tight text-slate-950">
+                                    MIPS Datapath Visualizer
+                                </h1>
+                                <span className="rounded-md bg-slate-900 px-2 py-1 text-xs font-semibold capitalize text-white">
+                                    {mode}
+                                </span>
+                            </div>
+                            <p className="mt-1 text-sm text-slate-500">
+                                Step through the datapath, inspect values, and
+                                test control signals.
+                            </p>
+                        </div>
 
-                    <div className="flex flex-wrap gap-2 text-xs">
-                        <span className="rounded-full bg-white px-3 py-1 font-medium capitalize text-slate-600 shadow-sm ring-1 ring-slate-200">
-                            {mode}
-                        </span>
-                        <span className="rounded-full bg-blue-50 px-3 py-1 font-mono font-semibold text-blue-700 shadow-sm ring-1 ring-blue-100">
-                            {mode === 'assembly'
-                                ? `program ${programIndex + 1}`
-                                : mnemonic}
-                        </span>
-                        <span className="rounded-full bg-white px-3 py-1 font-mono font-medium text-slate-600 shadow-sm ring-1 ring-slate-200">
-                            {currentStep ?? 'FULL'}
-                        </span>
-                        <span
-                            className={`rounded-full px-3 py-1 font-medium shadow-sm ring-1 ${
-                                warnings.length === 0
-                                    ? 'bg-emerald-50 text-emerald-700 ring-emerald-100'
-                                    : 'bg-red-50 text-red-700 ring-red-100'
-                            }`}
-                        >
-                            {warnings.length} warning
-                            {warnings.length === 1 ? '' : 's'}
-                        </span>
+                        <div className="grid grid-cols-2 gap-2 text-xs sm:grid-cols-4">
+                            <StatusPill
+                                label={
+                                    mode === 'assembly'
+                                        ? 'Program'
+                                        : 'Instruction'
+                                }
+                                value={
+                                    mode === 'assembly'
+                                        ? programIndex + 1
+                                        : mnemonic
+                                }
+                            />
+                            <StatusPill
+                                label="Step"
+                                value={currentStep ?? 'FULL'}
+                            />
+                            <StatusPill
+                                label="Warnings"
+                                value={warnings.length}
+                            />
+                            <StatusPill
+                                label="Signals"
+                                value={isEditingSignals ? 'EDIT' : 'LOCK'}
+                            />
+                        </div>
                     </div>
                 </header>
 
-                <div className="grid min-h-0 flex-1 gap-3 xl:grid-cols-[300px_minmax(720px,1fr)_350px] 2xl:grid-cols-[310px_minmax(820px,1fr)_360px]">
+                <div className="grid min-h-0 flex-1 gap-4 xl:grid-cols-[320px_minmax(720px,1fr)_380px] 2xl:grid-cols-[320px_minmax(820px,1fr)_380px]">
                     <aside className="min-h-0 space-y-3 xl:overflow-y-auto xl:pr-1">
-                        <section className="rounded-xl border border-slate-200 bg-white p-3 shadow-sm">
+                        <section className="rounded-lg border border-slate-200 bg-white p-3 shadow-sm">
                             <div className="mb-3 flex items-center justify-between gap-3">
                                 <h2 className="text-sm font-semibold text-slate-900">
                                     Setup
@@ -117,7 +146,7 @@ export default function DatapathPage() {
                                 </span>
                             </div>
 
-                            <div className="grid grid-cols-3 rounded-lg bg-slate-100 p-1 ring-1 ring-slate-200">
+                            <div className="grid grid-cols-3 rounded-md bg-slate-100 p-1 ring-1 ring-slate-200">
                                 {modeOptions.map((option) => (
                                     <button
                                         key={option.value}
@@ -187,7 +216,7 @@ export default function DatapathPage() {
                             onResetStep={handleResetStep}
                         />
 
-                        <section className="rounded-xl border border-slate-200 bg-white p-3 shadow-sm">
+                        <section className="rounded-lg border border-slate-200 bg-white p-3 shadow-sm">
                             <div className="mb-3 flex items-center justify-between gap-2">
                                 <h2 className="text-sm font-semibold text-slate-900">
                                     Control Signals
@@ -229,8 +258,8 @@ export default function DatapathPage() {
                         </section>
                     </aside>
 
-                    <section className="flex min-h-0 min-w-0 flex-col rounded-xl border border-slate-200 bg-white p-3 shadow-sm">
-                        <div className="mb-3 flex flex-none flex-wrap items-center justify-between gap-3">
+                    <section className="flex min-h-0 min-w-0 flex-col overflow-hidden rounded-lg border border-slate-300 bg-white shadow-sm">
+                        <div className="flex flex-none flex-wrap items-center justify-between gap-3 border-b border-slate-200 bg-[#fbfcfd] px-4 py-3">
                             <div>
                                 <h2 className="text-sm font-semibold text-slate-900">
                                     Datapath Diagram
@@ -248,7 +277,7 @@ export default function DatapathPage() {
                             </div>
                         </div>
 
-                        <div className="flex min-h-0 flex-1 items-center justify-center overflow-hidden rounded-lg border border-slate-200 bg-slate-50 p-1">
+                        <div className="flex min-h-0 flex-1 items-center justify-center overflow-hidden bg-slate-50 p-1">
                             <DatapathDiagram
                                 bits={bits}
                                 defaultActiveSegments={defaultActiveSegments}
@@ -292,7 +321,7 @@ export default function DatapathPage() {
                             machineHighlight={machineHighlight}
                         />
 
-                        <section className="rounded-xl border border-slate-200 bg-white p-3 shadow-sm">
+                        <section className="rounded-lg border border-slate-200 bg-white p-3 shadow-sm">
                             <div className="mb-3 flex items-center justify-between">
                                 <h2 className="text-sm font-semibold text-slate-900">
                                     Execution Log

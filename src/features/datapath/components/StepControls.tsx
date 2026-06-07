@@ -16,12 +16,12 @@ export default function StepControls({
     onResetStep: () => void;
 }) {
     return (
-        <div className="rounded-xl border border-slate-200 bg-white p-3 shadow-sm">
+        <div className="rounded-lg border border-slate-200 bg-white p-3 shadow-sm">
             <div className="mb-3 flex items-center justify-between gap-3">
                 <h2 className="text-sm font-semibold text-slate-900">
                     Step Execution
                 </h2>
-                <span className="rounded-md bg-blue-50 px-2 py-1 font-mono text-xs font-semibold text-blue-700 ring-1 ring-blue-100">
+                <span className="rounded-md border border-slate-200 bg-white px-2 py-1 font-mono text-xs font-semibold text-slate-700">
                     {step ?? 'Not started'}
                 </span>
             </div>

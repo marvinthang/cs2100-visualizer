@@ -43,7 +43,7 @@ export default function ControlSignalTable({
     }
 
     return (
-        <div className="overflow-hidden rounded-lg border border-slate-200">
+        <div className="overflow-hidden rounded-md border border-slate-200">
             <table className="w-full text-sm">
                 <thead className="bg-slate-50">
                     <tr className="border-b border-slate-200 text-xs text-slate-500">

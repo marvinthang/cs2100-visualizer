@@ -145,7 +145,7 @@ export default function RegisterTable({
                                                     event.currentTarget.blur();
                                                 }
                                             }}
-                                            className="w-24 rounded-md border border-slate-200 px-2 py-1 text-left text-slate-900 disabled:bg-slate-100 disabled:text-slate-400"
+                                            className="w-24 rounded-md border border-slate-300 bg-white px-2 py-1 text-left text-slate-900 shadow-sm outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-100 disabled:bg-slate-100 disabled:text-slate-400"
                                         />
                                     </td>
                                 </tr>
@@ -158,7 +158,7 @@ export default function RegisterTable({
     }
 
     return (
-        <div className="h-fit rounded-xl border border-slate-200 bg-white p-3 shadow-sm">
+        <div className="h-fit rounded-lg border border-slate-200 bg-white p-3 shadow-sm">
             <div className="mb-3 flex items-center justify-between">
                 <h2 className="text-sm font-semibold text-slate-900">
                     Registers
@@ -175,7 +175,7 @@ export default function RegisterTable({
                             setRegisterDrafts({});
                             onResetRegisters();
                         }}
-                        className="rounded-md border border-slate-200 px-2 py-1 text-xs font-semibold text-slate-700 hover:bg-slate-100"
+                        className="rounded-md border border-slate-300 bg-white px-2 py-1 text-xs font-semibold text-slate-700 shadow-sm transition hover:border-slate-400 hover:bg-slate-50"
                     >
                         Reset
                     </button>

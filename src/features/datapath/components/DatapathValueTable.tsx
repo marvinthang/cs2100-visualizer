@@ -35,7 +35,7 @@ export default function DatapathValueTable({
     ] as const;
 
     return (
-        <div className="rounded-xl border border-slate-200 bg-white p-3 shadow-sm">
+        <div className="rounded-lg border border-slate-200 bg-white p-3 shadow-sm">
             <h2 className="mb-3 text-sm font-semibold text-slate-900">
                 Datapath Values
             </h2>
