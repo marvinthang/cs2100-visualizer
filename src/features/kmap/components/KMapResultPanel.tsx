@@ -54,8 +54,8 @@ type KMapResultPanelProps = {
     groupView: 'manual' | 'solver';
     solverForm: KMapSolveForm;
     activeGroupId: number | null;
-    activeManualGroup: KMapGroup | undefined;
-    activeManualExpression: string | null;
+    manualGroups: KMapGroup[];
+    manualExpression: string;
     solverAnalysis: KMapSolveAnalysis;
     solverSolution: KMapSolvePI[];
     solverPrimeListView: 'expression' | 'all';
@@ -69,8 +69,8 @@ export default function KMapResultPanel({
     groupView,
     solverForm,
     activeGroupId,
-    activeManualGroup,
-    activeManualExpression,
+    manualGroups,
+    manualExpression,
     solverAnalysis,
     solverSolution,
     solverPrimeListView,
@@ -80,22 +80,29 @@ export default function KMapResultPanel({
     onActiveGroupChange,
 }: KMapResultPanelProps) {
     return (
-        <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-            <div className="mb-3 flex items-center justify-between gap-3">
-                <h2 className="text-sm font-semibold text-slate-900">Result</h2>
-                <span className="rounded-full bg-blue-50 px-2 py-0.5 text-xs font-semibold text-blue-700 ring-1 ring-blue-100">
+        <div className="rounded-lg border border-slate-300 bg-[#fbfcfd] shadow-sm">
+            <div className="flex items-center justify-between gap-3 border-b border-slate-200 px-4 py-3">
+                <div>
+                    <h2 className="text-sm font-semibold text-slate-950">
+                        Result
+                    </h2>
+                    <p className="text-xs text-slate-500">
+                        Manual expression or solver answer.
+                    </p>
+                </div>
+                <span className="rounded-md bg-sky-50 px-2 py-1 text-xs font-semibold text-sky-700 ring-1 ring-sky-100">
                     {solverForm}
                 </span>
             </div>
 
-            <div className="grid grid-cols-2 rounded-lg bg-slate-100 p-1">
+            <div className="mx-4 mt-4 grid grid-cols-2 rounded-md bg-slate-200/70 p-1">
                 <button
                     type="button"
                     onClick={() => {
                         onGroupViewChange('manual');
                         onActiveGroupChange(null);
                     }}
-                    className={`rounded-md px-3 py-1.5 text-sm font-medium transition ${
+                    className={`rounded px-3 py-1.5 text-sm font-semibold transition ${
                         groupView === 'manual'
                             ? 'bg-white text-slate-900 shadow-sm'
                             : 'text-slate-500 hover:text-slate-900'
@@ -109,7 +116,7 @@ export default function KMapResultPanel({
                         onGroupViewChange('solver');
                         onActiveGroupChange(null);
                     }}
-                    className={`rounded-md px-3 py-1.5 text-sm font-medium transition ${
+                    className={`rounded px-3 py-1.5 text-sm font-semibold transition ${
                         groupView === 'solver'
                             ? 'bg-white text-slate-900 shadow-sm'
                             : 'text-slate-500 hover:text-slate-900'
@@ -121,8 +128,8 @@ export default function KMapResultPanel({
 
             {groupView === 'manual' ? (
                 <ManualResult
-                    activeManualGroup={activeManualGroup}
-                    activeManualExpression={activeManualExpression}
+                    manualGroups={manualGroups}
+                    manualExpression={manualExpression}
                 />
             ) : (
                 <SolverResult
@@ -142,29 +149,28 @@ export default function KMapResultPanel({
 }
 
 function ManualResult({
-    activeManualGroup,
-    activeManualExpression,
+    manualGroups,
+    manualExpression,
 }: {
-    activeManualGroup: KMapGroup | undefined;
-    activeManualExpression: string | null;
+    manualGroups: KMapGroup[];
+    manualExpression: string;
 }) {
     return (
-        <div className="mt-3">
-            {activeManualGroup === undefined ? (
-                <p className="rounded-lg bg-slate-50 p-3 text-xs text-slate-500">
-                    Select a manual group to show its expression.
+        <div className="px-4 pb-4 pt-3">
+            <div className="rounded-md bg-slate-950 p-4 font-mono text-sm text-slate-100 shadow-inner">
+                {manualExpression}
+            </div>
+
+            {manualGroups.length === 0 ? (
+                <p className="mt-3 rounded-md border border-slate-300 bg-white p-3 text-xs text-slate-500">
+                    Add manual groups to build an expression.
                 </p>
             ) : (
-                <>
-                    <div className="rounded-lg bg-slate-950 p-4 font-mono text-sm text-slate-100">
-                        {activeManualExpression}
-                    </div>
-                    <p className="mt-2 font-mono text-xs text-slate-600">
-                        {activeManualGroup.minterms
-                            .map((minterm) => `m${minterm}`)
-                            .join(', ')}
-                    </p>
-                </>
+                <p className="mt-2 font-mono text-xs text-slate-600">
+                    {manualGroups.length} manual{' '}
+                    {manualGroups.length === 1 ? 'group' : 'groups'}:{' '}
+                    {manualGroups.map((group) => `G${group.id}`).join(', ')}
+                </p>
             )}
         </div>
     );
@@ -193,18 +199,18 @@ function SolverResult({
 }) {
     return (
         <>
-            <div className="mt-3 rounded-lg bg-slate-950 p-4 font-mono text-sm text-slate-100">
+            <div className="mx-4 mt-3 rounded-md bg-slate-950 p-4 font-mono text-sm text-slate-100 shadow-inner">
                 {formatExpression(solverSolution, variableNames, solverForm)}
             </div>
 
             {solverSolution.length === 0 ? (
-                <p className="mt-3 text-xs text-slate-500">
+                <p className="mx-4 mt-3 text-xs text-slate-500">
                     {solverForm === 'SOP'
                         ? 'No 1-cells to solve yet.'
                         : 'No 0-cells to solve yet.'}
                 </p>
             ) : (
-                <ul className="mt-3 space-y-2">
+                <ul className="mx-4 mt-3 space-y-2">
                     {solverSolution.map((implicant, index) => {
                         const primeIndex =
                             solverAnalysis.primeImplicants.findIndex(
@@ -219,12 +225,12 @@ function SolverResult({
                         return (
                             <li
                                 key={`${implicant.term}-${index}`}
-                                className={`rounded-lg border border-l-4 bg-slate-50 p-3 transition ${getGroupAccentClass(
+                                className={`rounded-md border border-l-4 bg-white p-3 transition ${getGroupAccentClass(
                                     primeIndex === -1 ? index : primeIndex,
                                 )} ${
                                     isActive
-                                        ? 'border-blue-400 ring-2 ring-blue-200'
-                                        : 'border-slate-200'
+                                        ? 'border-sky-400 ring-2 ring-sky-200'
+                                        : 'border-slate-300'
                                 }`}
                             >
                                 <button
@@ -253,7 +259,7 @@ function SolverResult({
                                             )}
                                         </span>
                                     </span>
-                                    <span className="rounded bg-slate-200 px-2 py-0.5 text-xs text-slate-600">
+                                    <span className="rounded bg-slate-200 px-2 py-0.5 text-xs font-semibold text-slate-600">
                                         {implicant.isEPI ? 'EPI' : 'PI'}
                                     </span>
                                 </button>
@@ -320,7 +326,7 @@ function AllPrimeImplicants({
         );
 
     return (
-        <div className="mt-4 border-t border-slate-200 pt-3">
+        <div className="mt-4 border-t border-slate-200 px-4 pb-4 pt-3">
             <div className="mb-2 flex items-center justify-between">
                 <h3 className="text-xs font-semibold text-slate-700">
                     {solverForm === 'SOP' ? 'All PI / EPI' : 'All POS Groups'}
@@ -330,11 +336,11 @@ function AllPrimeImplicants({
                 </span>
             </div>
 
-            <div className="mb-3 grid grid-cols-2 rounded-lg bg-slate-100 p-1">
+            <div className="mb-3 grid grid-cols-2 rounded-md bg-slate-200/70 p-1">
                 <button
                     type="button"
                     onClick={() => onListViewChange('expression')}
-                    className={`rounded-md px-2 py-1 text-xs font-medium transition ${
+                    className={`rounded px-2 py-1.5 text-xs font-semibold transition ${
                         listView === 'expression'
                             ? 'bg-white text-slate-900 shadow-sm'
                             : 'text-slate-500 hover:text-slate-900'
@@ -345,7 +351,7 @@ function AllPrimeImplicants({
                 <button
                     type="button"
                     onClick={() => onListViewChange('all')}
-                    className={`rounded-md px-2 py-1 text-xs font-medium transition ${
+                    className={`rounded px-2 py-1.5 text-xs font-semibold transition ${
                         listView === 'all'
                             ? 'bg-white text-slate-900 shadow-sm'
                             : 'text-slate-500 hover:text-slate-900'
@@ -379,10 +385,10 @@ function AllPrimeImplicants({
                                             isActive ? null : id,
                                         );
                                     }}
-                                    className={`flex w-full items-center justify-between gap-2 rounded-md px-2 py-1.5 text-left transition ${
+                                    className={`flex w-full items-center justify-between gap-2 rounded-md border px-2 py-1.5 text-left transition ${
                                         isActive
-                                            ? 'bg-blue-50 ring-2 ring-blue-200'
-                                            : 'bg-slate-50 hover:bg-slate-100'
+                                            ? 'border-sky-200 bg-sky-50 ring-2 ring-sky-100'
+                                            : 'border-slate-300 bg-white hover:bg-slate-50'
                                     }`}
                                 >
                                     <span className="flex min-w-0 items-center gap-2">
@@ -408,7 +414,7 @@ function AllPrimeImplicants({
                                         <span
                                             className={`rounded px-1.5 py-0.5 text-[10px] font-semibold ${
                                                 implicant.isEPI
-                                                    ? 'bg-blue-100 text-blue-700'
+                                                    ? 'bg-sky-100 text-sky-700'
                                                     : 'bg-slate-200 text-slate-600'
                                             }`}
                                         >

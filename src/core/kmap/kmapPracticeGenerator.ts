@@ -73,7 +73,7 @@ const practiceConfigs: Record<KMapPracticeDifficulty, PracticeConfig> = {
         minNewCellsPerSeedGroup: 2,
         maxSeedOverlapRatio: 0.5,
         allowWrap: true,
-        allowedGroupSizes: [1, 2, 4, 8],
+        allowedGroupSizes: [2, 4, 8],
     },
 };
 
@@ -164,9 +164,10 @@ function selectSeedGroups({
             return null;
         }
 
-        const nextGroup = shuffle(eligibleCandidates, random)[
-            Math.floor(random() * eligibleCandidates.length)
-        ];
+        const nextGroup =
+            eligibleCandidates[
+                Math.floor(random() * eligibleCandidates.length)
+            ];
         selectedGroups.push(nextGroup);
 
         for (const minterm of nextGroup.minterms) {

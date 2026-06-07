@@ -1,5 +1,19 @@
-import type { KMapModel, VariableCount } from '../../core/kmap/kmapModel';
+import type {
+    KMapGroup,
+    KMapModel,
+    VariableCount,
+} from '../../core/kmap/kmapModel';
 import type { KMapSolveForm, KMapSolvePI } from '../../core/kmap/kmapSolver';
+export { parseBooleanExpressionInput } from './booleanExpressionParser';
+export {
+    checkGroupExpression,
+    getGroupExpressionType,
+    parseGroupExpressionInput,
+    parseGroupLiteralInput,
+    type GroupExpressionCheck,
+    type KMapGroupExpressionType,
+    type ParsedGroupExpressionTerm,
+} from './groupExpressionUtils';
 
 export const defaultVariableNames = ['A', 'B', 'C', 'D'];
 
@@ -95,7 +109,7 @@ export function formatSolverTerm(
         return '1';
     }
 
-    return [...term]
+    const literals = [...term]
         .map((char, index) => {
             if (char === '_') {
                 return '';
@@ -105,7 +119,9 @@ export function formatSolverTerm(
                 ? variableNames[index]
                 : `${variableNames[index]}'`;
         })
-        .join('');
+        .filter(Boolean);
+
+    return literals.join('.');
 }
 
 export function formatExpression(
@@ -120,7 +136,7 @@ export function formatExpression(
     if (form === 'POS') {
         return `F = ${solution
             .map((implicant) => formatPosTerm(implicant.term, variableNames))
-            .join(' ')}`;
+            .join('.')}`;
     }
 
     return `F = ${solution
@@ -196,199 +212,28 @@ export function formatGroupExpression(
     }`;
 }
 
-export type KMapGroupExpressionType =
-    | 'constant'
-    | 'single-literal'
-    | 'multi-literal';
-
-export function getGroupExpressionType(term: string): KMapGroupExpressionType {
-    const literalCount = [...term].filter((char) => char !== '_').length;
-
-    if (literalCount === 0) {
-        return 'constant';
-    }
-
-    if (literalCount === 1) {
-        return 'single-literal';
-    }
-
-    return 'multi-literal';
-}
-
-export function parseGroupLiteralInput(
-    input: string,
+export function formatManualGroupsExpression(
     model: KMapModel,
+    groups: KMapGroup[],
     variableNames: string[],
     form: KMapSolveForm = 'SOP',
-): { minterms: number[]; error: string | null } {
-    const text = input.trim();
-
-    if (text === '') {
-        return {
-            minterms: [],
-            error: 'Enter a literal expression.',
-        };
+): string {
+    if (groups.length === 0) {
+        return form === 'SOP' ? 'F = 0' : 'F = 1';
     }
 
-    const normalized = text.replace(/\s+/g, '');
-    const allMinterms = model.cells
-        .map((cell) => cell.minterm)
-        .sort((a, b) => a - b);
+    const terms = groups
+        .map((group) => getGroupTerm(model, group.minterms))
+        .filter((term) => term !== null)
+        .map((term) =>
+            form === 'SOP'
+                ? formatSolverTerm(term, variableNames)
+                : formatPosTerm(term, variableNames),
+        );
 
-    if (normalized === (form === 'SOP' ? '1' : '0')) {
-        return {
-            minterms: allMinterms,
-            error: null,
-        };
+    if (terms.length === 0) {
+        return form === 'SOP' ? 'F = 0' : 'F = 1';
     }
 
-    if (normalized === (form === 'SOP' ? '0' : '1')) {
-        return {
-            minterms: [],
-            error: `${normalized} does not select a ${form} group.`,
-        };
-    }
-
-    if (
-        variableNames.length !== model.variableCount ||
-        variableNames.some((name) => !/^[A-Za-z]$/.test(name))
-    ) {
-        return {
-            minterms: [],
-            error: 'Each variable name must be one letter.',
-        };
-    }
-
-    const term = '_'.repeat(model.variableCount).split('');
-    const usedVariables = new Set<string>();
-
-    if (form === 'POS') {
-        let maxterm = normalized;
-        const hasOpeningParen = maxterm.startsWith('(');
-        const hasClosingParen = maxterm.endsWith(')');
-
-        if (hasOpeningParen !== hasClosingParen) {
-            return {
-                minterms: [],
-                error: 'POS terms must use matching parentheses.',
-            };
-        }
-
-        if (hasOpeningParen && hasClosingParen) {
-            maxterm = maxterm.slice(1, -1);
-        }
-
-        if (maxterm.includes('(') || maxterm.includes(')')) {
-            return {
-                minterms: [],
-                error: "Use one POS term, such as A + B'.",
-            };
-        }
-
-        const literals = maxterm.split('+');
-
-        if (literals.some((literal) => literal === '')) {
-            return {
-                minterms: [],
-                error: 'POS literals must be separated by +.',
-            };
-        }
-
-        for (const literal of literals) {
-            const variableName = literal[0];
-            const isComplemented = literal.endsWith("'");
-
-            if (
-                literal.length > 2 ||
-                (literal.length === 2 && !isComplemented)
-            ) {
-                return {
-                    minterms: [],
-                    error: `Invalid literal: ${literal}.`,
-                };
-            }
-
-            if (!variableNames.includes(variableName)) {
-                return {
-                    minterms: [],
-                    error: `Unknown variable: ${variableName}.`,
-                };
-            }
-
-            if (usedVariables.has(variableName)) {
-                return {
-                    minterms: [],
-                    error: `${variableName} appears more than once.`,
-                };
-            }
-
-            usedVariables.add(variableName);
-            term[variableNames.indexOf(variableName)] = isComplemented
-                ? '1'
-                : '0';
-        }
-    } else {
-        for (let i = 0; i < normalized.length; ++i) {
-            const variableName = normalized[i];
-
-            if (variableName === "'") {
-                return {
-                    minterms: [],
-                    error: 'A complement mark must follow a variable.',
-                };
-            }
-
-            if (!variableNames.includes(variableName)) {
-                return {
-                    minterms: [],
-                    error: `Unknown variable: ${variableName}.`,
-                };
-            }
-
-            if (usedVariables.has(variableName)) {
-                return {
-                    minterms: [],
-                    error: `${variableName} appears more than once.`,
-                };
-            }
-
-            usedVariables.add(variableName);
-
-            const pos = variableNames.indexOf(variableName);
-            if (i + 1 < normalized.length && normalized[i + 1] === "'") {
-                term[pos] = '0';
-                ++i;
-            } else {
-                term[pos] = '1';
-            }
-
-            if (i + 1 < normalized.length && normalized[i + 1] === "'") {
-                return {
-                    minterms: [],
-                    error: `${variableName} has too many complement marks.`,
-                };
-            }
-        }
-    }
-
-    const minterms = model.cells
-        .filter((cell) => {
-            const cellBits =
-                model.rowLabels[cell.row] + model.colLabels[cell.col];
-
-            for (let index = 0; index < cellBits.length; ++index) {
-                if (term[index] !== '_' && term[index] !== cellBits[index]) {
-                    return false;
-                }
-            }
-
-            return true;
-        })
-        .map((cell) => cell.minterm)
-        .sort((a, b) => a - b);
-
-    return {
-        minterms,
-        error: null,
-    };
+    return `F = ${terms.join(form === 'SOP' ? ' + ' : '.')}`;
 }
