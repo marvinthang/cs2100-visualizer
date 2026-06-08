@@ -1,6 +1,6 @@
 # CS2100 Visualizer
 
-Interactive web app for learning CS2100 topics through visual simulation: MIPS datapath execution, MIPS assembly, Karnaugh maps, and planned pipeline instruction flow.
+Interactive web app for learning CS2100 topics through visual simulation: MIPS datapath execution, MIPS assembly, and Karnaugh maps.
 
 ## Demo
 
@@ -20,13 +20,13 @@ However, static diagrams do not show how values move through the processor, how 
 
 Similarly, for Karnaugh maps, students may be able to see the final simplified expression, but still not fully understand why certain groups are valid, why groups wrap around, or how a group becomes a Boolean term.
 
-CS2100 Visualizer aims to make these hidden processes visible. Instead of only reading diagrams, students can interact with instructions, signals, memory, registers, K-map cells, groups, and solver output directly.
+CS2100 Visualizer makes these hidden steps visible. Instead of only reading diagrams, students can interact with instructions, signals, memory, registers, K-map cells, groups, and solver output directly.
 
 ---
 
 # 2. Vision
 
-CS2100 Visualizer is intended to become a unified learning tool for core CS2100 topics.
+CS2100 Visualizer is a study tool for core CS2100 topics.
 
 The current app focuses on three learning modules:
 
@@ -34,9 +34,7 @@ The current app focuses on three learning modules:
 2. **MIPS Assembly Simulator** — helps students write and execute MIPS assembly programs.
 3. **K-map Visualizer** — helps students practise Boolean simplification.
 
-The planned pipeline module will focus on **instruction flow across cycles**, showing stalls, bubbles, hazards, and forwarding in a timeline format. It is not intended to be a full visual pipeline datapath diagram.
-
-The long-term goal is to create a tool where students can learn by stepping, inspecting, editing, comparing, and experimenting.
+The planned pipeline module will focus on **instruction flow across cycles**, showing stalls, bubbles, hazards, and forwarding in a timeline format.
 
 ---
 
@@ -52,7 +50,6 @@ The primary users are **CS2100 students** learning:
 * register and memory behavior
 * assembly execution
 * Karnaugh maps
-* pipeline concepts
 
 ## 3.2 Secondary Users
 
@@ -61,11 +58,11 @@ Secondary users include:
 * tutors and teaching assistants
 * students revising before exams
 * students who prefer visual learning
-* learners who want quick concept checking
+* students doing quick revision
 
 ## 3.3 User Needs
 
-Students need a tool that helps them:
+The app is designed to help students:
 
 * see how data moves through hardware
 * observe intermediate values, not just final outputs
@@ -155,8 +152,9 @@ A planned future module for visualizing cache hits, misses, replacement, memory 
 | MIPS Assembly Simulator      | Implemented           | Supports parsing, label resolution, hex output, and stepping |
 | K-map Visualizer             | Implemented           | Supports editing, grouping, solver comparison, and practice  |
 | Automated Tests              | Implemented           | Uses Vitest for MIPS and K-map core logic                    |
-| Pipeline Instruction Flow    | Planned / In progress | Focus on timeline, stalls, bubbles, and hazards              |
-| Cache Visualizer             | Future work           | Not part of current milestone                                |
+| Pipeline Instruction Flow    | In progress | Focus on timeline, stalls, bubbles, and hazards              |
+| Cache Visualizer             | Planned for Milestone 3            | Focus on hits, misses, blocks, tags, index, offset, and replacement                                |
+| Pipeline Datapath Visualization | Not planned | May be added as a stretch goal if time permits               |
 
 ---
 
@@ -164,11 +162,11 @@ A planned future module for visualizing cache hits, misses, replacement, memory 
 
 ## 7.1 MIPS Datapath Visualizer
 
-### Proposed
+### Goal
 
-The datapath visualizer should help students understand how MIPS instructions are executed in a single-cycle datapath.
+The datapath visualizer helps students understand how MIPS instructions are executed in a single-cycle datapath.
 
-It should show:
+It focuses on:
 
 * instruction fields
 * control signals
@@ -226,11 +224,11 @@ Current implemented UI features:
 
 ## 7.2 MIPS Assembly Simulator
 
-### Proposed
+### Goal
 
-The assembly simulator should let students write MIPS code, assemble it into machine code, and step through execution.
+The assembly simulator lets students write MIPS code, assemble it into machine code, and step through execution.
 
-It should help students connect:
+It connects:
 
 * assembly source
 * decoded instruction fields
@@ -269,11 +267,11 @@ Current implemented features:
 
 ## 7.3 K-map Visualizer
 
-### Proposed
+### Goal
 
-The K-map visualizer should help students practise Boolean simplification interactively.
+The K-map visualizer helps students practise Boolean simplification interactively.
 
-It should support:
+It focuses on:
 
 * 2-variable, 3-variable, and 4-variable K-maps
 * minterms and don't-cares
@@ -298,7 +296,6 @@ Current K-map features:
 * solver grouping view
 * expression checker
 * practice-map generation
-* tests for K-map logic
 
 ### Screenshot / Demo
 
@@ -306,79 +303,25 @@ Current K-map features:
 
 ![Annotated K-map visualizer](docs/assets/annotated-kmap-visualizer.png)
 
-The annotated K-map screenshot should label:
-
-* variable selector
-* SOP/POS mode
-* minterm input
-* K-map grid
-* manual groups
-* solver groups
-* expression checker
-* practice generator
-
-### Future Work
-
-Future improvements include:
-
-* step-by-step solver explanation
-* improved overlapping group visualization
-* more guided practice modes
-* more common CS2100-style examples
-* user testing on common K-map mistakes
-
 ---
 
 ## 7.4 Pipeline Instruction Flow Visualizer
 
-### Proposed
+This module is planned for Milestone 2. It will focus on a cycle-by-cycle instruction timeline rather than a full pipeline datapath renderer.
 
-The pipeline visualizer will focus on **instruction flow over cycles**, not a full visual pipeline datapath.
+Planned focus:
 
-It should show:
-
-* cycle-by-cycle instruction timeline
-* IF/ID/EX/MEM/WB stage placement
-* stalls
-* bubbles
+* IF/ID/EX/MEM/WB timeline
+* stalls and bubbles
 * data hazards
 * control hazards
-* forwarding where feasible
-
-Example display goal:
-
-```txt
-Cycle:      1    2    3    4    5    6
-lw          IF   ID   EX   MEM  WB
-add              IF   ID   stall EX   MEM
-```
-
-### Current Progress
-
-This module is not fully implemented yet.
-
-For Milestone 2, the focus is to define and begin the timeline-based model:
-
-* instruction list
-* cycle table
-* stall/bubble representation
-* hazard explanation
-
-### Future Work
-
-Future work includes:
-
-* pipeline timeline table
-* hazard detection
-* stall/bubble visualization
-* forwarding explanation
-* example programs
+* forwarding concept
 
 ---
 
 # 8. Technical Proof of Concept
 
-The technical proof of concept demonstrates that the essential parts of the project are integrated.
+The GIFs and annotated screenshots in Section 7 provide visual evidence for these working modules.
 
 For the datapath visualizer, the PoC shows:
 
@@ -406,15 +349,11 @@ For the K-map visualizer, the PoC shows:
 4. comparing against solver groups
 5. checking simplified expressions
 
-This proves that the project is more than a static UI. It contains working simulation logic, interactive visualization, automated testing, and correctness-sensitive data transformations.
-
 ---
 
 # 9. System Design
 
-This section explains how the main modules are organized and how data flows through the system.
-
-CS2100 Visualizer is a client-side React application. The app does not currently use a backend server or database. Each learning module has its own page-level UI and state management, while correctness-sensitive logic is kept in `core/` folders so it can be tested independently.
+CS2100 Visualizer is a client-side React application. The app does not currently use a backend server or database. Each learning module has its own page-level UI and state management, while simulation and solving logic is kept in `core/` folders so it can be tested independently.
 
 ## 9.1 Overall Architecture
 
@@ -435,39 +374,11 @@ User interaction
 
 ![Overall architecture](docs/diagrams/overall-architecture.png)
 
-The overall architecture diagram should show:
-
-```txt
-CS2100 Visualizer
-├── React App Shell
-│   └── App.tsx + tab navigation
-│
-├── Datapath Visualizer
-│   ├── DatapathPage
-│   ├── useDatapathSimulator
-│   ├── core/mips/single-cycle
-│   └── SVG + tables + logs + inspector
-│
-├── Assembly Simulator
-│   ├── AssemblyPage
-│   ├── useAssemblySimulator
-│   ├── core/mips/assembly
-│   ├── core/mips/execution
-│   └── editor + machine code + registers + memory
-│
-└── K-map Visualizer
-    ├── KMapPage
-    ├── core/kmap
-    └── grid + grouping + solver feedback
-```
-
-This separation keeps the UI layer independent from the simulation and solving logic.
-
 ---
 
 ## 9.2 Datapath Visualizer Design
 
-The datapath visualizer is designed around staged single-cycle execution.
+The datapath visualizer uses staged single-cycle execution.
 
 Users can interact with the datapath in three modes:
 
@@ -489,118 +400,35 @@ Unlike the datapath page, the assembly page does not show IF/ID/EX/MEM/WB stages
 
 ## 9.4 K-map Visualizer Design
 
-The K-map visualizer is designed around two learning paths:
+The K-map visualizer has two learning paths:
 
 * **manual solving**, where users create their own groups and expressions
 * **solver comparison**, where the app generates correct groups and results
 
-The goal is not only to give the final answer, but also to help students understand how grouping and simplification work.
+This design supports answer checking while still showing how groups lead to the simplified expression.
 
 ![K-map design](docs/diagrams/kmap-design.png)
-
-The K-map design diagram should show this structure:
-
-```txt
-User Input
-cells / minterms / don't-cares / expression
-        │
-        ▼
-K-map Model
-variables, cells, 0 / 1 / X values
-        │
-        ├── Manual Grouping
-        │   selected cells
-        │   validate group
-        │   convert group to term
-        │
-        └── Auto Solver
-            generate prime implicants
-            find essential prime implicants
-            choose final cover
-                    │
-                    ▼
-Expression Checker
-compare user answer with solver result
-                    │
-                    ▼
-UI Feedback
-group highlights, simplified expression, errors
-```
-
-This design shows that the K-map module contains real solving logic, not just a visual grid. It supports manual grouping, automatic solver output, expression checking, and practice generation.
 
 ---
 
 ## 9.5 Pipeline Instruction Flow Design
 
-The pipeline module is planned as a timeline-based visualizer. It is intended to show **instruction flow across cycles**, not a full graphical pipeline datapath.
-
-The focus is on:
-
-* instruction timeline
-* IF / ID / EX / MEM / WB placement
-* stalls
-* bubbles
-* data hazards
-* control hazards
-* forwarding where feasible
+The planned pipeline module will model instruction flow as a timeline table. Given a short instruction sequence, the visualizer will place each instruction across IF, ID, EX, MEM, and WB stages, then show stalls, bubbles, hazards, and forwarding where applicable.
 
 ![Pipeline flow design](docs/diagrams/pipeline-flow-design.png)
-
-The pipeline design diagram should show:
-
-```txt
-Instruction Program
-lw, add, sw, beq...
-        │
-        ▼
-Dependency Analysis
-read/write registers
-        │
-        ▼
-Hazard Detection
-data hazards / control hazards
-        │
-        ▼
-Pipeline Scheduler
-assign stage to cycle
-        │
-        ▼
-Stall / Bubble Logic
-insert idle cycles
-        │
-        ▼
-Forwarding Display
-show bypass where possible
-        │
-        ▼
-Timeline View
-cycle-by-cycle pipeline table
-```
-
-Example intended output:
-
-```txt
-Cycle:  1    2    3     4    5    6
-lw      IF   ID   EX    MEM  WB
-add          IF   ID    ST   EX   MEM
-```
-
-This clarifies that the pipeline feature is about timing and instruction flow, not drawing another full datapath diagram.
 
 ---
 
 ## 9.6 Design Boundaries
 
-The project follows these design boundaries:
+The project uses these design boundaries:
 
-* The app is currently fully client-side.
-* There is no backend server or database.
+* The app runs fully in the browser, with no backend server or database.
 * Each learning module has a separate page and workflow.
 * Core logic is separated from UI rendering.
 * Reusable MIPS logic is shared where appropriate between the datapath and assembly modules.
 * K-map solving logic is separated from the K-map UI.
-* Browser state is enough for the current scope because the app does not require accounts, saved progress, or shared classroom data.
+* Current workflows fit in browser state because the app does not require accounts, saved progress, or shared classroom data.
 
 A backend or database may be considered only if future versions add persistent user progress, saved exercises, accounts, or classroom sharing.
 
@@ -664,7 +492,7 @@ The datapath page focuses on staged hardware behavior. The assembly page focuses
 
 SVG was chosen over Canvas because datapath components and wires can be named, styled, highlighted, and clicked individually.
 
-This is useful for a fixed CS2100-style datapath because each wire and component has a stable meaning.
+For a fixed CS2100-style datapath, this makes each wire and component easier to target, highlight, and inspect.
 
 ## 11.3 Signal-based Datapath Simulation
 
@@ -679,12 +507,6 @@ Logical datapath paths are separated from SVG drawing segments.
 For example, the simulator can refer to a high-level path such as `PC_TO_IM`, while the SVG renderer can expand that into multiple actual SVG line segments.
 
 This keeps simulation logic separate from visual drawing details.
-
-## 11.5 No Database for Current Scope
-
-No database is used because the app does not currently need accounts, persistent progress, shared saved work, or server-side data.
-
-The main workload is local simulation and visualization. A database may be considered later if the app adds saved user progress, classrooms, shared exercises, or persistent practice history.
 
 ---
 
@@ -777,17 +599,15 @@ Completed:
 * assembly simulator
 * step execution
 * editable control signals
-* inspector
-* logs/warnings
-* README, poster, video, project log
+* component inspector
+* logs and warnings
 
 ## 14.2 Milestone 2 — K-map Visualizer and Pipeline Instruction Flow
 
 Main goals:
 
-* K-map MVP
+* K-map visualizer
 * K-map tests
-* README expansion
 * pipeline instruction flow design / prototype
 
 Pipeline focus:
@@ -802,16 +622,16 @@ Not focused on:
 
 * full pipeline datapath rendering
 
-## 14.3 Milestone 3 — Validation, Polish, Cache, and Final Demo
+## 14.3 Milestone 3 — Cache Visualizer, Validation, and Final Polish
 
 Planned:
 
-* user testing
-* UI polish
-* pipeline completion
-* possible cache visualizer
+* cache visualizer
+* cache hits, misses, blocks, tags, index, offset, and replacement behavior
+* user testing with CS2100 students or tutors
+* UI polish across Datapath, Assembly, and K-map modules
 * final documentation
-* final poster/video/demo
+* pipeline datapath visualization as a stretch feature if time permits
 
 ---
 
