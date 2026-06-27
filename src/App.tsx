@@ -1,18 +1,38 @@
 import { useState } from 'react';
+import {
+    createInitialMachineState,
+    type MachineState,
+} from './core/mips/single-cycle/execution/machineState';
 import DatapathPage from './features/datapath/DatapathPage';
 import AssemblyPage from './features/assembly/AssemblyPage';
 import KMapPage from './features/kmap/KMapPage';
+import PipelinePage, {
+    DEFAULT_PIPELINE_PROGRAM,
+} from './features/pipeline/PipelinePage';
 
-type Tab = 'datapath' | 'assembly' | 'kmap';
+type Tab = 'datapath' | 'assembly' | 'kmap' | 'pipeline';
 
 const tabs: { id: Tab; label: string }[] = [
     { id: 'datapath', label: 'Datapath' },
     { id: 'assembly', label: 'Assembly' },
     { id: 'kmap', label: 'Karnaugh Maps' },
+    { id: 'pipeline', label: 'Pipeline' },
 ];
 
 export default function App() {
     const [tab, setTab] = useState<Tab>('datapath');
+    const [pipelineProgram, setPipelineProgram] = useState(
+        DEFAULT_PIPELINE_PROGRAM,
+    );
+    const [pipelineInitial, setPipelineInitial] = useState<MachineState>(() =>
+        createInitialMachineState(),
+    );
+
+    function sendToPipeline(source: string, machine: MachineState) {
+        setPipelineProgram(source);
+        setPipelineInitial({ ...machine, pc: 0 });
+        setTab('pipeline');
+    }
 
     return (
         <div className="flex h-screen flex-col overflow-hidden bg-[#eef2f3]">
@@ -38,7 +58,7 @@ export default function App() {
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-3 rounded-md bg-slate-100 p-1 ring-1 ring-slate-200">
+                    <div className="grid grid-cols-4 rounded-md bg-slate-100 p-1 ring-1 ring-slate-200">
                         {tabs.map(({ id, label }) => (
                             <button
                                 key={id}
@@ -61,9 +81,16 @@ export default function App() {
                 {tab === 'datapath' ? (
                     <DatapathPage />
                 ) : tab === 'assembly' ? (
-                    <AssemblyPage />
-                ) : (
+                    <AssemblyPage onSendToPipeline={sendToPipeline} />
+                ) : tab === 'kmap' ? (
                     <KMapPage />
+                ) : (
+                    <PipelinePage
+                        program={pipelineProgram}
+                        onProgramChange={setPipelineProgram}
+                        initialMachine={pipelineInitial}
+                        onInitialMachineChange={setPipelineInitial}
+                    />
                 )}
             </div>
         </div>

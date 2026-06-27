@@ -5,10 +5,12 @@ export default function Modal({
     title,
     onClose,
     children,
+    maxWidthClass = 'max-w-lg',
 }: {
     title: string;
     onClose: () => void;
     children: ReactNode;
+    maxWidthClass?: string;
 }) {
     useEffect(() => {
         function handleKey(event: KeyboardEvent) {
@@ -26,7 +28,7 @@ export default function Modal({
             onClick={onClose}
         >
             <div
-                className="max-h-[85vh] w-full max-w-lg overflow-auto rounded-2xl border border-slate-200 bg-white p-6 shadow-xl"
+                className={`max-h-[85vh] w-full ${maxWidthClass} overflow-auto rounded-2xl border border-slate-200 bg-white p-6 shadow-xl`}
                 onClick={(event) => event.stopPropagation()}
             >
                 <div className="mb-4 flex items-center justify-between">
