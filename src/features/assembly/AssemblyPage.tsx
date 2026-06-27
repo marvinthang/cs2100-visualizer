@@ -39,6 +39,12 @@ export default function AssemblyPage() {
         handleResetMemory,
     } = useAssemblySimulator();
 
+    const assemblyState = !programLoaded
+        ? 'Idle'
+        : programFinished
+          ? 'Finished'
+          : 'Ready';
+
     return (
         <main className="min-h-full bg-[#eef2f3] p-3 text-slate-900 sm:p-4 lg:p-6">
             <div className="mx-auto flex max-w-[1480px] flex-col gap-4">
@@ -50,7 +56,7 @@ export default function AssemblyPage() {
                                     MIPS Assembly Simulator
                                 </h1>
                                 <span className="rounded-md bg-slate-900 px-2 py-1 text-xs font-semibold text-white">
-                                    {programFinished ? 'Finished' : 'Live'}
+                                    {assemblyState}
                                 </span>
                             </div>
                             <p className="mt-1 text-sm text-slate-500">
@@ -70,7 +76,7 @@ export default function AssemblyPage() {
                             />
                             <StatusPill
                                 label="State"
-                                value={programFinished ? 'DONE' : 'READY'}
+                                value={assemblyState.toUpperCase()}
                             />
                             <StatusPill label="Mode" value="MIPS" />
                         </div>

@@ -99,11 +99,6 @@ export default function DatapathPage() {
     } = simulator;
 
     const logs = currentContext.logs ?? [];
-    const activeInstructionLabel =
-        mode === 'assembly' ? 'Program step' : 'Instruction';
-    const activeInstructionValue =
-        mode === 'assembly' ? `#${programIndex + 1}` : mnemonic;
-
     return (
         <main className="flex h-full min-h-0 flex-col bg-[#eef2f3] p-3 text-slate-900 sm:p-4 lg:p-5 xl:overflow-hidden">
             <div className="mx-auto flex h-full min-h-0 w-full max-w-[1760px] flex-col gap-4">
@@ -129,7 +124,8 @@ export default function DatapathPage() {
                             </p>
                         </div>
 
-                        <div className="grid grid-cols-2 gap-2 text-xs sm:grid-cols-4">
+                        <div className="grid grid-cols-2 gap-2 text-xs sm:grid-cols-3 xl:grid-cols-5">
+                            <StatusPill label="PC" value={machine.pc} />
                             <StatusPill
                                 label={
                                     mode === 'assembly'
@@ -154,33 +150,6 @@ export default function DatapathPage() {
                                 label="Signals"
                                 value={isEditingSignals ? 'EDIT' : 'LOCK'}
                             />
-                        </div>
-                    </div>
-
-                    <div className="grid gap-px bg-slate-200 text-xs sm:grid-cols-3">
-                        <div className="bg-white px-4 py-2">
-                            <span className="font-semibold text-slate-500">
-                                Program counter
-                            </span>
-                            <span className="ml-2 font-mono font-bold text-slate-950">
-                                {machine.pc}
-                            </span>
-                        </div>
-                        <div className="bg-white px-4 py-2">
-                            <span className="font-semibold text-slate-500">
-                                {activeInstructionLabel}
-                            </span>
-                            <span className="ml-2 font-mono font-bold text-slate-950">
-                                {activeInstructionValue}
-                            </span>
-                        </div>
-                        <div className="bg-white px-4 py-2">
-                            <span className="font-semibold text-slate-500">
-                                Warnings
-                            </span>
-                            <span className="ml-2 font-mono font-bold text-slate-950">
-                                {warnings.length}
-                            </span>
                         </div>
                     </div>
                 </header>
