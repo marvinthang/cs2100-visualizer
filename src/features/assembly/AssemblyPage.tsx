@@ -1,3 +1,4 @@
+import type { MachineState } from '../../core/mips/single-cycle/execution/machineState';
 import MemoryTable from '../datapath/components/MemoryTable';
 import RegisterTable from '../datapath/components/RegisterTable';
 import MipsEditor from './MipsEditor';
@@ -22,15 +23,21 @@ function StatusPill({
     );
 }
 
-export default function AssemblyPage() {
+export default function AssemblyPage({
+    onSendToPipeline,
+}: {
+    onSendToPipeline?: (source: string, machine: MachineState) => void;
+}) {
     const {
         machine,
         machineHighlight,
         programLoaded,
         programIndex,
         programFinished,
+        canStepBack,
         handleLoadProgram,
         handleStepInstruction,
+        handleStepBack,
         handleResetProgram,
         handleRegisterChange,
         handleResetRegisters,
@@ -87,6 +94,12 @@ export default function AssemblyPage() {
                     <aside className="space-y-4">
                         <MipsEditor
                             onLoad={handleLoadProgram}
+                            onSendToPipeline={
+                                onSendToPipeline
+                                    ? (source) =>
+                                          onSendToPipeline(source, machine)
+                                    : undefined
+                            }
                             programLoaded={programLoaded}
                             programIndex={programIndex}
                             programFinished={programFinished}
@@ -105,6 +118,15 @@ export default function AssemblyPage() {
                             </div>
 
                             <div className="flex items-center gap-2">
+                                <button
+                                    type="button"
+                                    onClick={handleStepBack}
+                                    disabled={!canStepBack}
+                                    className="rounded-md border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-700 shadow-sm transition hover:border-slate-400 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
+                                >
+                                    Back
+                                </button>
+
                                 <button
                                     type="button"
                                     onClick={handleStepInstruction}

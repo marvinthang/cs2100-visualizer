@@ -129,9 +129,14 @@ export function useAssemblySimulator() {
     );
     const [machineHighlight, setMachineHighlight] =
         useState<MachineStateHighlightState>(emptyHighlight);
+    // snapshot of (machine, index) before each step, so we can step back
+    const [history, setHistory] = useState<
+        { machine: MachineState; programIndex: number }[]
+    >([]);
 
     const programLoaded = program.length > 0;
     const programFinished = programLoaded && programIndex >= program.length;
+    const canStepBack = history.length > 0;
 
     // Assemble the editor source and load it. Returns the assemble result so the
     // editor can show errors; only loads when there are none.
@@ -147,6 +152,7 @@ export function useAssemblySimulator() {
         setLoadedMachine(initialMachine);
         setMachine(initialMachine);
         setMachineHighlight(emptyHighlight);
+        setHistory([]);
 
         return result;
     }
@@ -159,11 +165,24 @@ export function useAssemblySimulator() {
         }
 
         const after = executeInstruction(machine, program[programIndex].fields);
+        setHistory((h) => [...h, { machine, programIndex }]);
         setMachineHighlight(
             getInstructionHighlights(machine, program[programIndex].fields),
         );
         setMachine(after);
         setProgramIndex(after.pc / 4);
+    }
+
+    // Undo the last step: restore the machine and index from before it ran.
+    function handleStepBack() {
+        if (history.length === 0) {
+            return;
+        }
+        const previous = history[history.length - 1];
+        setMachine(previous.machine);
+        setProgramIndex(previous.programIndex);
+        setMachineHighlight(emptyHighlight);
+        setHistory(history.slice(0, -1));
     }
 
     function handleResetProgram() {
@@ -173,6 +192,7 @@ export function useAssemblySimulator() {
         setMachine(loadedMachine);
         setProgramIndex(0);
         setMachineHighlight(emptyHighlight);
+        setHistory([]);
     }
 
     function handleRegisterChange(register: RegisterNumber, value: number) {
@@ -235,8 +255,10 @@ export function useAssemblySimulator() {
         programIndex,
         programLoaded,
         programFinished,
+        canStepBack,
         handleLoadProgram,
         handleStepInstruction,
+        handleStepBack,
         handleResetProgram,
         handleRegisterChange,
         handleResetRegisters,
