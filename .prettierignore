@@ -1,0 +1,7 @@
+node_modules
+dist
+coverage
+apps
+.turbo
+bun.lock
+*.local
