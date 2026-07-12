@@ -23,9 +23,9 @@ describe('buildPipelineSchedule', () => {
     });
 
     it('needs N + 4 cycles to drain the pipeline', () => {
-        expect(buildPipelineSchedule(['a', 'b', 'c', 'd', 'e']).totalCycles).toBe(
-            9,
-        );
+        expect(
+            buildPipelineSchedule(['a', 'b', 'c', 'd', 'e']).totalCycles,
+        ).toBe(9);
     });
 
     it('has zero cycles for an empty program', () => {

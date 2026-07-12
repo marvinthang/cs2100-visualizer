@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import {
     assembleMipsProgram,
     type AssembleMipsResult,
@@ -34,7 +34,7 @@ export default function MipsEditor({
     const gutterRef = useRef<HTMLDivElement>(null);
     const lineNumbers = source.split('\n').map((_, i) => i + 1);
 
-    const program = useMemo(() => assembleMipsProgram(source), [source]);
+    const program = assembleMipsProgram(source);
     const hasErrors = program.errors.length > 0;
 
     return (

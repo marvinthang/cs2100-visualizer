@@ -20,11 +20,9 @@ const EMPTY_HIGHLIGHT: MachineStateHighlightState = {
     registers: {},
     memory: {},
 };
-import {
-    type PipelineStage,
-    stageAtCycle,
-} from '../../core/pipeline/schedule';
+import { type PipelineStage, stageAtCycle } from '../../core/pipeline/schedule';
 import { buildExecutionTrace } from '../../core/pipeline/trace';
+import { DEFAULT_PIPELINE_PROGRAM } from './defaultProgram';
 
 const STAGE_STYLES: Record<PipelineStage, string> = {
     IF: 'bg-sky-100 text-sky-700',
@@ -138,23 +136,6 @@ function MemoryList({
         </div>
     );
 }
-
-// a default program where every toggle changes the cycle count:
-// the lw + add chain shows forwarding, the taken beq shows early branch,
-// the not-taken beq shows prediction
-export const DEFAULT_PIPELINE_PROGRAM = [
-    'addi $1, $zero, 1',
-    'lw   $2, 0($0)',
-    'add  $3, $2, $1',
-    'add  $4, $3, $1',
-    'add  $5, $4, $1',
-    'add  $6, $5, $1',
-    'beq  $0, $0, T0',
-    'add  $7, $1, $1',
-    'T0: add $8, $1, $1',
-    'beq  $1, $0, N1',
-    'N1: add $9, $1, $1',
-].join('\n');
 
 // example programs from the lecture / tutorial
 const PRESETS: { name: string; program: string }[] = [
@@ -486,7 +467,9 @@ function PipelineGrid({
                     <thead>
                         <tr>
                             <th className="sticky left-0 top-0 z-30 bg-white px-2 py-1 text-left font-semibold text-slate-400">
-                                <span className="mr-2 text-slate-300">Line</span>
+                                <span className="mr-2 text-slate-300">
+                                    Line
+                                </span>
                                 Instruction
                             </th>
                             {cycles.map((cycle) => (
@@ -586,7 +569,9 @@ function PipelineGrid({
                             strokeWidth={1.5}
                             markerEnd="url(#fwd-arrow)"
                             className={
-                                a.load ? 'stroke-amber-500' : 'stroke-violet-500'
+                                a.load
+                                    ? 'stroke-amber-500'
+                                    : 'stroke-violet-500'
                             }
                         />
                     ))}
@@ -746,7 +731,9 @@ export default function PipelinePage({
         for (const addr of Object.keys(selStep.machine.dataMemory).map(
             Number,
         )) {
-            const before = prevMachine ? (prevMachine.dataMemory[addr] ?? 0) : 0;
+            const before = prevMachine
+                ? (prevMachine.dataMemory[addr] ?? 0)
+                : 0;
             if (selStep.machine.dataMemory[addr] !== before) {
                 changedMem.add(addr);
             }
@@ -1043,8 +1030,9 @@ export default function PipelinePage({
                         </div>
                         {colsClipped ? (
                             <p className="mb-2 text-[11px] text-amber-600">
-                                Showing the first {maxCols} of {allCycles.length}{' '}
-                                cycles — raise Cols to see more.
+                                Showing the first {maxCols} of{' '}
+                                {allCycles.length} cycles — raise Cols to see
+                                more.
                             </p>
                         ) : null}
                         {instructionCount === 0 ? (
