@@ -6,9 +6,8 @@ import {
 import DatapathPage from './features/datapath/DatapathPage';
 import AssemblyPage from './features/assembly/AssemblyPage';
 import KMapPage from './features/kmap/KMapPage';
-import PipelinePage, {
-    DEFAULT_PIPELINE_PROGRAM,
-} from './features/pipeline/PipelinePage';
+import PipelinePage from './features/pipeline/PipelinePage';
+import { DEFAULT_PIPELINE_PROGRAM } from './features/pipeline/defaultProgram';
 
 type Tab = 'datapath' | 'assembly' | 'kmap' | 'pipeline';
 

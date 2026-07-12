@@ -100,7 +100,11 @@ describe('exam 20s2 — array loop, first iteration', () => {
 
     it('(b) no forwarding, MEM branch = +24 (44)', () => {
         expect(
-            cycles({ forwarding: false, earlyBranch: false, prediction: false }),
+            cycles({
+                forwarding: false,
+                earlyBranch: false,
+                prediction: false,
+            }),
         ).toBe(44);
     });
     it('(c) no forwarding, ID branch = +20 (40)', () => {
@@ -150,10 +154,7 @@ describe('exam 17s2 — branch-path loop, forwarding + early branch', () => {
             `addi $t6, $zero, ${mem0}`,
             'sw $t6, 0($zero)',
         ];
-        const trace = buildExecutionTrace(
-            [...setup, ...body].join('\n'),
-            200,
-        );
+        const trace = buildExecutionTrace([...setup, ...body].join('\n'), 200);
         const schedule = buildHazardSchedule(trace.steps, opts);
         const first = schedule.instructions[setup.length].startCycle;
         let lastIdx = schedule.instructions.length - 1;
@@ -204,7 +205,11 @@ describe('exam 18s2 — array-add loop', () => {
 
     it('(b) no forwarding, MEM branch = 38 cycles', () => {
         expect(
-            cycles({ forwarding: false, earlyBranch: false, prediction: false }),
+            cycles({
+                forwarding: false,
+                earlyBranch: false,
+                prediction: false,
+            }),
         ).toBe(38);
     });
     it('(c) forwarding, early branch = 27 cycles', () => {
@@ -255,7 +260,11 @@ describe('exam 19s2 — image-merge loop', () => {
 
     it('(b) no forwarding, MEM branch = 53 (+26)', () => {
         expect(
-            cycles({ forwarding: false, earlyBranch: false, prediction: false }),
+            cycles({
+                forwarding: false,
+                earlyBranch: false,
+                prediction: false,
+            }),
         ).toBe(53);
     });
     it('(c) no forwarding, ID branch = 49 (+22)', () => {
@@ -436,7 +445,10 @@ describe('exam 24s1 — straight-line load-use chain', () => {
         'add $t5, $a0, $zero',
     ];
     const run = (options: HazardOptions) =>
-        buildHazardSchedule(buildExecutionTrace(body.join('\n')).steps, options);
+        buildHazardSchedule(
+            buildExecutionTrace(body.join('\n')).steps,
+            options,
+        );
 
     it('(a) without forwarding = 4 stall cycles', () => {
         expect(

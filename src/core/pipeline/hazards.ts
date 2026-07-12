@@ -234,7 +234,8 @@ export function buildHazardSchedule(
                 if (startCycle < producer.startCycle + 3) {
                     forwardEdges.push({
                         fromRow: producer.row,
-                        fromCycle: producer.startCycle + (producer.isLoad ? 3 : 2),
+                        fromCycle:
+                            producer.startCycle + (producer.isLoad ? 3 : 2),
                         toRow: row,
                         toCycle: consumeCell,
                         fromLoad: producer.isLoad,

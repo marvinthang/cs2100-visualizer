@@ -596,12 +596,12 @@ The K-map Visualizer is independent from the MIPS modules, but it follows the sa
 
 ## 9.8 Data Flow Summary
 
-| Area      | Input                              | Core Processing                           | Output Shown to User                                      |
-| --------- | ---------------------------------- | ----------------------------------------- | --------------------------------------------------------- |
-| Datapath  | selected instruction, signal edits | staged datapath execution and highlights  | active wires, control signals, values, registers, memory  |
-| Assembly  | MIPS source code                   | parsing, label resolution, encoding       | machine code, PC changes, register and memory updates     |
-| K-map     | minterms, don't-cares, expression  | model updates, group validation, solving  | K-map grid, groups, simplified expression, feedback       |
-| Pipeline  | MIPS source and pipeline options   | dynamic trace generation, hazard schedule | stage-time table, stalls, flushes, forwarding, CPI values |
+| Area     | Input                              | Core Processing                           | Output Shown to User                                      |
+| -------- | ---------------------------------- | ----------------------------------------- | --------------------------------------------------------- |
+| Datapath | selected instruction, signal edits | staged datapath execution and highlights  | active wires, control signals, values, registers, memory  |
+| Assembly | MIPS source code                   | parsing, label resolution, encoding       | machine code, PC changes, register and memory updates     |
+| K-map    | minterms, don't-cares, expression  | model updates, group validation, solving  | K-map grid, groups, simplified expression, feedback       |
+| Pipeline | MIPS source and pipeline options   | dynamic trace generation, hazard schedule | stage-time table, stalls, flushes, forwarding, CPI values |
 
 This flow keeps the app understandable for users and maintainable for developers. Each module has a clear input, a testable core transformation, and a visual output layer.
 
@@ -939,12 +939,12 @@ The most useful parts were:
 
 The main issues were UI clarity rather than correctness. Some users did not immediately understand the difference between Explore and Simulate mode in the Datapath Visualizer. Some pipeline options, such as early branch and jump-in-ID, also needed clearer explanations. In the K-map module, manual group clearing worked, but it was not always visually obvious.
 
-| Area      | What We Observed                                                                                                                                                                                                                                  | Improvement                                                                                                                                    |
-| --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| Datapath  | The visualizer was useful, but one user stayed in Explore mode and expected register/memory state to update. Another triggered an unaligned memory warning with `lw` before adjusting the base register value.                                  | Make Explore vs Simulate more obvious. Use aligned default memory examples or show a short address-alignment hint.                             |
-| Pipeline  | Users liked stall bubbles, forwarding arrows, CPI counters, and the “Why it stalls” explanation. The less obvious parts were row/column limits and configuration toggles such as early branch and jump-in-ID.                                   | Let row/column settings apply on Enter or blur. Add clearer explanations near pipeline toggles and spell out stage names in stall explanations. |
-| Assembly  | Stepping through code was intuitive, especially the ability to go backward with the **Back** button. Users found this helpful for debugging small programs and tracing register changes.                                                          | Add a compact execution history or “last changed register” summary.                                                                            |
-| K-map     | Solver comparison helped users check their manual reasoning, but one user did not immediately notice how to clear or delete manually created groups.                                                                                            | Make the existing manual-group clearing/deletion controls more visually prominent.                                                             |
+| Area     | What We Observed                                                                                                                                                                                               | Improvement                                                                                                                                     |
+| -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| Datapath | The visualizer was useful, but one user stayed in Explore mode and expected register/memory state to update. Another triggered an unaligned memory warning with `lw` before adjusting the base register value. | Make Explore vs Simulate more obvious. Use aligned default memory examples or show a short address-alignment hint.                              |
+| Pipeline | Users liked stall bubbles, forwarding arrows, CPI counters, and the “Why it stalls” explanation. The less obvious parts were row/column limits and configuration toggles such as early branch and jump-in-ID.  | Let row/column settings apply on Enter or blur. Add clearer explanations near pipeline toggles and spell out stage names in stall explanations. |
+| Assembly | Stepping through code was intuitive, especially the ability to go backward with the **Back** button. Users found this helpful for debugging small programs and tracing register changes.                       | Add a compact execution history or “last changed register” summary.                                                                             |
+| K-map    | Solver comparison helped users check their manual reasoning, but one user did not immediately notice how to clear or delete manually created groups.                                                           | Make the existing manual-group clearing/deletion controls more visually prominent.                                                              |
 
 These findings will guide the next round of polish together with the planned Cache Visualizer work.
 
