@@ -133,6 +133,8 @@ export function useAssemblySimulator() {
     const [history, setHistory] = useState<
         { machine: MachineState; programIndex: number }[]
     >([]);
+    // source line numbers (1-based) the user marked as breakpoints
+    const [breakpoints, setBreakpoints] = useState<Set<number>>(new Set());
 
     const programLoaded = program.length > 0;
     const programFinished = programLoaded && programIndex >= program.length;
@@ -171,6 +173,56 @@ export function useAssemblySimulator() {
         );
         setMachine(after);
         setProgramIndex(after.pc / 4);
+    }
+
+    // Toggle a breakpoint on a source line.
+    function toggleBreakpoint(line: number) {
+        setBreakpoints((current) => {
+            const next = new Set(current);
+            if (next.has(line)) {
+                next.delete(line);
+            } else {
+                next.add(line);
+            }
+            return next;
+        });
+    }
+
+    // Keep executing instructions until the next one sits on a breakpoint line.
+    // If there is no breakpoint ahead, this runs to the end of the program.
+    // A step cap guards against infinite loops.
+    function handleRunToBreakpoint() {
+        if (!programLoaded || programIndex >= program.length) {
+            return;
+        }
+        const MAX_STEPS = 5000;
+        const snapshots: { machine: MachineState; programIndex: number }[] = [];
+        let current = machine;
+        let index = programIndex;
+        let lastHighlight = emptyHighlight;
+        for (
+            let steps = 0;
+            steps < MAX_STEPS && index < program.length;
+            steps++
+        ) {
+            snapshots.push({ machine: current, programIndex: index });
+            lastHighlight = getInstructionHighlights(
+                current,
+                program[index].fields,
+            );
+            current = executeInstruction(current, program[index].fields);
+            index = current.pc / 4;
+            if (
+                index < program.length &&
+                breakpoints.has(program[index].line)
+            ) {
+                break;
+            }
+        }
+        setHistory((h) => [...h, ...snapshots]);
+        setMachine(current);
+        setProgramIndex(index);
+        setMachineHighlight(lastHighlight);
     }
 
     // Undo the last step: restore the machine and index from before it ran.
@@ -256,8 +308,11 @@ export function useAssemblySimulator() {
         programLoaded,
         programFinished,
         canStepBack,
+        breakpoints,
+        toggleBreakpoint,
         handleLoadProgram,
         handleStepInstruction,
+        handleRunToBreakpoint,
         handleStepBack,
         handleResetProgram,
         handleRegisterChange,
