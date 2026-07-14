@@ -1,4 +1,4 @@
-import { useState, type CSSProperties } from 'react';
+import { useRef, useState, type CSSProperties } from 'react';
 import type {
     KMapCell,
     KMapGroup,
@@ -255,6 +255,9 @@ export default function KMapGrid({
     groups,
     activeGroupId,
     onCellClick,
+    dragEnabled = false,
+    onSelectRegion,
+    onDragEnd,
 }: {
     model: KMapModel;
     variableNames: string[];
@@ -262,8 +265,37 @@ export default function KMapGrid({
     groups: KMapGroup[];
     activeGroupId: number | null;
     onCellClick: (minterm: number) => void;
+    // group-mode drag selection: drag a rectangle of cells into one selection
+    dragEnabled?: boolean;
+    onSelectRegion?: (minterms: number[]) => void;
+    onDragEnd?: () => void;
 }) {
     const rows = getKMap2DArray(model);
+    // drag state kept in refs so mouse-move does not thrash re-renders
+    const dragStart = useRef<{ row: number; col: number } | null>(null);
+    const dragged = useRef(false);
+    const justDragged = useRef(false);
+    // selection at the moment a drag starts, so the dragged rectangle is added
+    // to it (never wipes the cells that were already selected)
+    const baseSelection = useRef<number[]>([]);
+
+    // every minterm inside the rectangle spanned by two cells (no wrap-around)
+    function rectangleMinterms(
+        a: { row: number; col: number },
+        b: { row: number; col: number },
+    ): number[] {
+        const rowMin = Math.min(a.row, b.row);
+        const rowMax = Math.max(a.row, b.row);
+        const colMin = Math.min(a.col, b.col);
+        const colMax = Math.max(a.col, b.col);
+        const minterms: number[] = [];
+        for (let row = rowMin; row <= rowMax; row++) {
+            for (let col = colMin; col <= colMax; col++) {
+                minterms.push(rows[row][col].minterm);
+            }
+        }
+        return minterms;
+    }
     const rowCount = model.rowLabels.length;
     const colCount = model.colLabels.length;
     const rowBitCount = model.rowLabels[0].length;
@@ -382,10 +414,72 @@ export default function KMapGrid({
                             <button
                                 key={cell.minterm}
                                 type="button"
-                                onClick={() => onCellClick(cell.minterm)}
-                                onMouseEnter={() =>
-                                    setHoveredMinterm(cell.minterm)
-                                }
+                                onClick={() => {
+                                    // a drag just finished on this cell: swallow
+                                    // the click so it does not toggle the cell
+                                    if (justDragged.current) {
+                                        justDragged.current = false;
+                                        return;
+                                    }
+                                    onCellClick(cell.minterm);
+                                }}
+                                onMouseDown={(event) => {
+                                    if (!dragEnabled) {
+                                        return;
+                                    }
+                                    event.preventDefault();
+                                    dragStart.current = {
+                                        row: cell.row,
+                                        col: cell.col,
+                                    };
+                                    dragged.current = false;
+                                    // start of a fresh interaction: a prior
+                                    // multi-cell drag fires no click to clear
+                                    // this, so reset it here or the next real
+                                    // click would be swallowed
+                                    justDragged.current = false;
+                                    // remember what was already selected so the
+                                    // dragged rectangle adds to it
+                                    baseSelection.current = selectedMinterms;
+                                    // no hover emphasis while dragging so the
+                                    // existing groups stay fully visible
+                                    setHoveredMinterm(null);
+                                }}
+                                onMouseEnter={() => {
+                                    if (
+                                        dragEnabled &&
+                                        dragStart.current &&
+                                        onSelectRegion
+                                    ) {
+                                        dragged.current = true;
+                                        const rectangle = rectangleMinterms(
+                                            dragStart.current,
+                                            { row: cell.row, col: cell.col },
+                                        );
+                                        onSelectRegion([
+                                            ...new Set([
+                                                ...baseSelection.current,
+                                                ...rectangle,
+                                            ]),
+                                        ]);
+                                        return;
+                                    }
+                                    setHoveredMinterm(cell.minterm);
+                                }}
+                                onMouseUp={() => {
+                                    if (!dragEnabled || !dragStart.current) {
+                                        return;
+                                    }
+                                    if (dragged.current) {
+                                        justDragged.current = true;
+                                        // drop the parked hover so existing
+                                        // groups are not dimmed after the drag
+                                        setHoveredMinterm(null);
+                                        onDragEnd?.();
+                                    }
+                                    dragStart.current = null;
+                                    dragged.current = false;
+                                }}
                                 onMouseLeave={() => setHoveredMinterm(null)}
                                 onFocus={() => setHoveredMinterm(cell.minterm)}
                                 onBlur={() => setHoveredMinterm(null)}

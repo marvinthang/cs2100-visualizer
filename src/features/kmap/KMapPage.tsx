@@ -159,6 +159,19 @@ export default function KMapPage() {
         });
     }
 
+    // Drag-select in group mode: replace the selection with the dragged
+    // rectangle, then auto-add it on release if it forms a valid group.
+    function handleSelectRegion(minterms: number[]) {
+        setActiveGroupId(null);
+        setSelectedGroupMinterms(minterms);
+    }
+
+    function handleGroupDragEnd() {
+        if (canSaveSelectedGroup) {
+            handleAddGroup();
+        }
+    }
+
     function handleApplyValueInputs() {
         const mintermResult = parseMintermsInput(mintermInput, maxMinterm);
         const dontCareResult = parseMintermsInput(dontCareInput, maxMinterm);
@@ -493,7 +506,8 @@ export default function KMapPage() {
         setSelectedGroupMinterms([]);
         setGroups([]);
         setNextGroupId(1);
-        setGroupView('manual');
+        // keep the current view (solver/manual) when switching SOP <-> POS;
+        // only the manual groups are cleared since they no longer apply
         setSolverPrimeListView('all');
         setBooleanExpressionError(null);
         setGroupLiteralError(null);
@@ -601,7 +615,7 @@ export default function KMapPage() {
                                     <p className="mt-1 text-xs text-slate-500">
                                         {mode === 'edit'
                                             ? 'Click cells to cycle 0, 1, and X.'
-                                            : `Select ${groupTargetValue}/X cells to form a valid group.`}
+                                            : `Click or drag a rectangle over ${groupTargetValue}/X cells to form a valid group.`}
                                     </p>
                                 </div>
 
@@ -625,6 +639,9 @@ export default function KMapPage() {
                                 groups={visibleGroups}
                                 activeGroupId={activeGroupId}
                                 onCellClick={handleCellClick}
+                                dragEnabled={mode === 'group'}
+                                onSelectRegion={handleSelectRegion}
+                                onDragEnd={handleGroupDragEnd}
                             />
                         </div>
 

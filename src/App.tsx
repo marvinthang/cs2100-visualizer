@@ -37,42 +37,56 @@ export default function App() {
         <div className="flex h-screen flex-col overflow-hidden bg-[#eef2f3]">
             <nav className="flex flex-none border-b border-slate-200 bg-[#fbfcfd] px-3 py-2 shadow-sm sm:px-4 lg:px-6">
                 <div className="mx-auto flex w-full max-w-[1760px] flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                    <div className="flex items-center gap-3">
-                        <div className="flex h-9 w-9 items-center justify-center rounded-md border border-slate-200 bg-white shadow-sm">
-                            <img
-                                src="/logo.png"
-                                alt=""
-                                className="h-6 w-6"
-                                aria-hidden="true"
-                            />
+                    <div className="flex flex-wrap items-center gap-3 sm:gap-5">
+                        <div className="flex items-center gap-3">
+                            <div className="flex h-9 w-9 items-center justify-center rounded-md border border-slate-200 bg-white shadow-sm">
+                                <img
+                                    src="/logo.png"
+                                    alt=""
+                                    className="h-6 w-6"
+                                    aria-hidden="true"
+                                />
+                            </div>
+
+                            <div>
+                                <div className="text-sm font-bold tracking-tight text-slate-950">
+                                    CS2100 Visualizer
+                                </div>
+                                <div className="text-[11px] font-medium uppercase tracking-wide text-slate-400">
+                                    MIPS and logic practice
+                                </div>
+                            </div>
                         </div>
 
-                        <div>
-                            <div className="text-sm font-bold tracking-tight text-slate-950">
-                                CS2100 Visualizer
-                            </div>
-                            <div className="text-[11px] font-medium uppercase tracking-wide text-slate-400">
-                                MIPS and logic practice
-                            </div>
+                        <div className="grid grid-cols-4 rounded-md bg-slate-100 p-1 ring-1 ring-slate-200">
+                            {tabs.map(({ id, label }) => (
+                                <button
+                                    key={id}
+                                    type="button"
+                                    onClick={() => setTab(id)}
+                                    className={`rounded-md px-3 py-1.5 text-xs font-semibold transition sm:px-4 ${
+                                        tab === id
+                                            ? 'bg-slate-900 text-white shadow-sm'
+                                            : 'text-slate-600 hover:bg-white/70 hover:text-slate-950'
+                                    }`}
+                                >
+                                    {label}
+                                </button>
+                            ))}
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-4 rounded-md bg-slate-100 p-1 ring-1 ring-slate-200">
-                        {tabs.map(({ id, label }) => (
-                            <button
-                                key={id}
-                                type="button"
-                                onClick={() => setTab(id)}
-                                className={`rounded-md px-3 py-1.5 text-xs font-semibold transition sm:px-4 ${
-                                    tab === id
-                                        ? 'bg-slate-900 text-white shadow-sm'
-                                        : 'text-slate-600 hover:bg-white/70 hover:text-slate-950'
-                                }`}
-                            >
-                                {label}
-                            </button>
-                        ))}
-                    </div>
+                    <button
+                        type="button"
+                        aria-label="How to use"
+                        title="How to use"
+                        className="flex items-center gap-2 rounded-full border border-slate-300 bg-white py-1 pl-4 pr-1 text-xs font-semibold text-slate-600 shadow-sm transition hover:border-slate-400 hover:bg-slate-50 hover:text-slate-900"
+                    >
+                        How to use
+                        <span className="flex h-7 w-7 items-center justify-center rounded-full border border-slate-300 text-sm font-bold">
+                            ?
+                        </span>
+                    </button>
                 </div>
             </nav>
 
