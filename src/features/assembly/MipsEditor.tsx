@@ -21,6 +21,13 @@ type MipsEditorProps = {
     programLoaded: boolean;
     programIndex: number;
     programFinished: boolean;
+    breakpoints: Set<number>;
+    onToggleBreakpoint: (line: number) => void;
+    onStep: () => void;
+    onRunToBreakpoint: () => void;
+    onBack: () => void;
+    onReset: () => void;
+    canStepBack: boolean;
 };
 
 export default function MipsEditor({
@@ -29,6 +36,13 @@ export default function MipsEditor({
     programLoaded,
     programIndex,
     programFinished,
+    breakpoints,
+    onToggleBreakpoint,
+    onStep,
+    onRunToBreakpoint,
+    onBack,
+    onReset,
+    canStepBack,
 }: MipsEditorProps) {
     const [source, setSource] = useState(EXAMPLE_SOURCE);
     const gutterRef = useRef<HTMLDivElement>(null);
@@ -52,10 +66,25 @@ export default function MipsEditor({
                 <div className="flex h-64 rounded-md border border-slate-300 bg-white font-mono text-xs leading-5 shadow-sm focus-within:border-slate-500 focus-within:ring-2 focus-within:ring-slate-100">
                     <div
                         ref={gutterRef}
-                        className="select-none overflow-hidden border-r border-slate-200 py-2 pl-3 pr-2 text-right text-slate-400"
+                        className="group/gutter select-none overflow-hidden border-r border-slate-200 py-2 pl-2 pr-2 text-right text-slate-400"
                     >
                         {lineNumbers.map((n) => (
-                            <div key={n}>{n}</div>
+                            <button
+                                key={n}
+                                type="button"
+                                onClick={() => onToggleBreakpoint(n)}
+                                title="Toggle breakpoint"
+                                className="flex h-5 w-full items-center justify-end gap-1.5 leading-5 hover:text-slate-600"
+                            >
+                                <span
+                                    className={`h-2 w-2 shrink-0 rounded-full ${
+                                        breakpoints.has(n)
+                                            ? 'bg-red-500'
+                                            : 'bg-transparent hover:bg-red-200'
+                                    }`}
+                                />
+                                {n}
+                            </button>
                         ))}
                     </div>
                     <textarea
@@ -94,6 +123,54 @@ export default function MipsEditor({
                         Send to Pipeline →
                     </button>
                 )}
+
+                {/* step execution: run one instruction, run to the next breakpoint,
+                    step back, or reset. Set breakpoints by clicking a line number. */}
+                <div className="mt-3 space-y-2">
+                    <div className="flex gap-2">
+                        <button
+                            type="button"
+                            onClick={onStep}
+                            disabled={!programLoaded || programFinished}
+                            className="flex-1 rounded-md bg-slate-900 px-3 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-40"
+                        >
+                            Next Instruction
+                        </button>
+                        <button
+                            type="button"
+                            onClick={onRunToBreakpoint}
+                            disabled={!programLoaded || programFinished}
+                            className="flex-1 rounded-md bg-slate-900 px-3 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-40"
+                        >
+                            To Next Breakpoint
+                        </button>
+                    </div>
+                    <div className="flex gap-2">
+                        <button
+                            type="button"
+                            onClick={onBack}
+                            disabled={!canStepBack}
+                            className="flex-1 rounded-md border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-700 shadow-sm transition hover:border-slate-400 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
+                        >
+                            Back
+                        </button>
+                        <button
+                            type="button"
+                            onClick={onReset}
+                            disabled={!programLoaded}
+                            className="flex-1 rounded-md border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-700 shadow-sm transition hover:border-slate-400 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
+                        >
+                            Reset
+                        </button>
+                    </div>
+                    <div className="rounded-md border border-slate-200 bg-[#fbfcfd] px-3 py-2 text-center text-xs font-semibold text-slate-600">
+                        {!programLoaded
+                            ? 'Not loaded'
+                            : programFinished
+                              ? 'Program finished'
+                              : `Running instruction #${programIndex + 1}`}
+                    </div>
+                </div>
 
                 {program.instructions.length > 0 && (
                     <ul className="mt-3 max-h-64 space-y-1 overflow-auto rounded-md border border-slate-200 bg-[#fbfcfd] p-2 font-mono text-xs">

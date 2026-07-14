@@ -35,8 +35,11 @@ export default function AssemblyPage({
         programIndex,
         programFinished,
         canStepBack,
+        breakpoints,
+        toggleBreakpoint,
         handleLoadProgram,
         handleStepInstruction,
+        handleRunToBreakpoint,
         handleStepBack,
         handleResetProgram,
         handleRegisterChange,
@@ -103,55 +106,14 @@ export default function AssemblyPage({
                             programLoaded={programLoaded}
                             programIndex={programIndex}
                             programFinished={programFinished}
+                            breakpoints={breakpoints}
+                            onToggleBreakpoint={toggleBreakpoint}
+                            onStep={handleStepInstruction}
+                            onRunToBreakpoint={handleRunToBreakpoint}
+                            onBack={handleStepBack}
+                            onReset={handleResetProgram}
+                            canStepBack={canStepBack}
                         />
-
-                        <section className="rounded-lg border border-slate-200 bg-white p-3 shadow-sm">
-                            <div className="mb-3 flex items-center justify-between gap-3">
-                                <h2 className="text-sm font-semibold text-slate-900">
-                                    Step Execution
-                                </h2>
-                                <span className="rounded-md border border-slate-200 bg-white px-2 py-1 font-mono text-xs font-semibold text-slate-700">
-                                    {programFinished
-                                        ? 'Finished'
-                                        : `#${programIndex + 1}`}
-                                </span>
-                            </div>
-
-                            <div className="flex items-center gap-2">
-                                <button
-                                    type="button"
-                                    onClick={handleStepBack}
-                                    disabled={!canStepBack}
-                                    className="rounded-md border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-700 shadow-sm transition hover:border-slate-400 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
-                                >
-                                    Back
-                                </button>
-
-                                <button
-                                    type="button"
-                                    onClick={handleStepInstruction}
-                                    disabled={!programLoaded || programFinished}
-                                    className="flex-1 rounded-md bg-slate-900 px-3 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-40"
-                                >
-                                    Next Instruction
-                                </button>
-
-                                <button
-                                    type="button"
-                                    onClick={handleResetProgram}
-                                    disabled={!programLoaded}
-                                    className="rounded-md border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-700 shadow-sm transition hover:border-slate-400 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
-                                >
-                                    Reset
-                                </button>
-                            </div>
-
-                            {programFinished && (
-                                <p className="mt-3 text-xs text-slate-500">
-                                    Program finished.
-                                </p>
-                            )}
-                        </section>
                     </aside>
 
                     <div className="grid items-start gap-4 md:grid-cols-2">
