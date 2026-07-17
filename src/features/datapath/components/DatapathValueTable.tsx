@@ -35,14 +35,14 @@ export default function DatapathValueTable({
     ] as const;
 
     return (
-        <div className="rounded-lg border border-slate-200 bg-white p-3 shadow-sm">
-            <h2 className="mb-3 text-sm font-semibold text-slate-900">
+        <div className="rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-3 shadow-sm">
+            <h2 className="mb-3 text-sm font-semibold text-slate-900 dark:text-slate-100">
                 Datapath Values
             </h2>
             <div className="max-h-[170px] overflow-auto">
                 <table className="w-full text-sm">
                     <thead>
-                        <tr className="border-b border-slate-200 text-left text-xs text-slate-500">
+                        <tr className="border-b border-slate-200 dark:border-slate-800 text-left text-xs text-slate-500 dark:text-slate-400">
                             <th className="py-2 pr-3">Reg</th>
                             <th className="py-2 text-right">Value</th>
                         </tr>
@@ -57,7 +57,7 @@ export default function DatapathValueTable({
                             return (
                                 <tr
                                     key={name}
-                                    className={`border-b border-slate-100 font-mono text-xs ${bgClass}`}
+                                    className={`border-b border-slate-100 dark:border-slate-800 font-mono text-xs ${bgClass}`}
                                 >
                                     <td className={`py-1.5 pr-3 ${textClass}`}>
                                         {label}

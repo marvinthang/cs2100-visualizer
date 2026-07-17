@@ -41,11 +41,19 @@ export default function DatapathDiagram({
         currentActiveSegments.includes(id);
 
     const wireStroke = (id: DatapathSegment) =>
-        isCurrent(id) ? (isDefault(id) ? '#FF0000' : '#facc15') : 'black';
+        isCurrent(id)
+            ? isDefault(id)
+                ? '#FF0000'
+                : '#facc15'
+            : 'var(--dp-ink)';
     const wireStrokeWidth = (id: DatapathSegment) =>
         isCurrent(id) ? 2.3 : 1.5;
     const wireFill = (id: DatapathSegment) =>
-        isCurrent(id) ? (isDefault(id) ? '#FF0000' : '#facc15') : 'black';
+        isCurrent(id)
+            ? isDefault(id)
+                ? '#FF0000'
+                : '#facc15'
+            : 'var(--dp-ink)';
     const wireArrow = (id: DatapathSegment) =>
         isCurrent(id)
             ? isDefault(id)
@@ -53,7 +61,9 @@ export default function DatapathDiagram({
                 : 'url(#arrow-yellow)'
             : 'url(#arrow-black)';
     const signalFill = (signal: ControlSignalId) =>
-        signals[signal] === defaultSignals[signal] ? '#2C1AF4' : '#ea580c';
+        signals[signal] === defaultSignals[signal]
+            ? 'var(--dp-blue)'
+            : '#ea580c';
     const muxFill = (signal: ControlSignalId) =>
         getHighlightSvgFill(datapathHighlight.controls[signal] ?? 'normal');
     const valueFill = (id: DatapathValueId) =>

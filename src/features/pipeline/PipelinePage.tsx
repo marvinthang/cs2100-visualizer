@@ -96,7 +96,7 @@ function RegisterList({
                     className={`flex justify-between ${
                         changed.has(num)
                             ? 'font-semibold text-rose-600'
-                            : 'text-slate-600'
+                            : 'text-slate-600 dark:text-slate-400'
                     }`}
                 >
                     <span>{name}</span>
@@ -126,7 +126,7 @@ function MemoryList({
                     className={`flex justify-between ${
                         changed.has(addr)
                             ? 'font-semibold text-rose-600'
-                            : 'text-slate-600'
+                            : 'text-slate-600 dark:text-slate-400'
                     }`}
                 >
                     <span>[{addr}]</span>
@@ -239,7 +239,7 @@ function LimitBox({
                 onKeyDown={(e) => {
                     if (e.key === 'Enter') onApply();
                 }}
-                className="w-24 rounded border border-slate-200 bg-slate-50 px-2 py-1 text-center text-sm font-semibold text-slate-700 outline-none focus:border-slate-400"
+                className="w-24 rounded border border-slate-200 bg-slate-50 px-2 py-1 text-center text-sm font-semibold text-slate-700 outline-none focus:border-slate-400 dark:border-slate-800 dark:bg-slate-800 dark:text-slate-200"
             />
         </label>
     );
@@ -257,7 +257,7 @@ function Segmented({
     offLabel?: string;
 }) {
     return (
-        <div className="grid grid-cols-2 rounded-md bg-slate-100 p-0.5 ring-1 ring-slate-200">
+        <div className="grid grid-cols-2 rounded-md bg-slate-100 p-0.5 ring-1 ring-slate-200 dark:bg-slate-800 dark:ring-slate-700">
             {[
                 { active: value, label: onLabel, next: true },
                 { active: !value, label: offLabel, next: false },
@@ -268,8 +268,8 @@ function Segmented({
                     onClick={() => onChange(next)}
                     className={`min-w-12 rounded px-2 py-1 text-center text-xs font-semibold transition ${
                         active
-                            ? 'bg-slate-900 text-white shadow-sm'
-                            : 'text-slate-600 hover:bg-white/70 hover:text-slate-950'
+                            ? 'bg-slate-900 text-white shadow-sm dark:bg-slate-600 dark:text-white'
+                            : 'text-slate-600 hover:bg-white/70 hover:text-slate-950 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-white'
                     }`}
                 >
                     {label}
@@ -298,12 +298,12 @@ function InfoDot({
                 onMouseEnter={() => onHover(true)}
                 onMouseLeave={() => onHover(false)}
                 aria-label="What does this do?"
-                className="flex h-4 w-4 items-center justify-center rounded-full border border-slate-300 text-[10px] font-bold text-slate-500 hover:border-slate-400 hover:text-slate-700"
+                className="flex h-4 w-4 items-center justify-center rounded-full border border-slate-300 text-[10px] font-bold text-slate-500 hover:border-slate-400 hover:text-slate-700 dark:border-slate-700 dark:text-slate-400 dark:hover:text-slate-200"
             >
                 i
             </button>
             {open ? (
-                <span className="absolute left-5 top-0 z-50 w-56 whitespace-normal rounded-md border border-slate-200 bg-white p-2 text-[11px] leading-snug text-slate-600 shadow-md">
+                <span className="absolute left-5 top-0 z-50 w-56 whitespace-normal rounded-md border border-slate-200 bg-white p-2 text-[11px] leading-snug text-slate-600 shadow-md dark:border-slate-800 dark:bg-slate-900 dark:text-slate-400">
                     {text}
                 </span>
             ) : null}
@@ -323,14 +323,14 @@ function InstructionDetail({
 }) {
     return (
         <div className="flex flex-col gap-4">
-            <section className="rounded-md border border-slate-200 bg-white p-3 shadow-sm">
-                <h2 className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-400">
+            <section className="rounded-md border border-slate-200 bg-white p-3 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+                <h2 className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-400">
                     Instruction Details
                 </h2>
                 {selStep ? (
                     <div>
-                        <p className="mb-2 font-mono text-sm font-semibold text-slate-900">
-                            <span className="text-slate-400">
+                        <p className="mb-2 font-mono text-sm font-semibold text-slate-900 dark:text-slate-100">
+                            <span className="text-slate-400 dark:text-slate-400">
                                 Line {selStep.line}:
                             </span>{' '}
                             {selStep.text}
@@ -347,19 +347,19 @@ function InstructionDetail({
                                         >
                                             {stage}
                                         </span>
-                                        <span className="text-[11px] leading-snug text-slate-600">
+                                        <span className="text-[11px] leading-snug text-slate-600 dark:text-slate-400">
                                             {text}
                                         </span>
                                     </div>
                                 ),
                             )}
                         </div>
-                        <p className="mt-2 text-[11px] text-slate-400">
+                        <p className="mt-2 text-[11px] text-slate-400 dark:text-slate-400">
                             Click any row in the diagram to inspect it.
                         </p>
                     </div>
                 ) : (
-                    <p className="text-sm text-slate-400">
+                    <p className="text-sm text-slate-400 dark:text-slate-400">
                         Type a program to inspect its instructions.
                     </p>
                 )}
@@ -389,9 +389,9 @@ function InstructionDetail({
                                 return (
                                     <div
                                         key={i}
-                                        className="flex items-center justify-between rounded border border-rose-200 bg-white px-2 py-1 text-[11px]"
+                                        className="flex items-center justify-between rounded border border-rose-200 bg-white px-2 py-1 text-[11px] dark:bg-slate-800"
                                     >
-                                        <span className="font-semibold text-slate-700">
+                                        <span className="font-semibold text-slate-700 dark:text-slate-200">
                                             {info.label}
                                         </span>
                                         <span className="font-mono font-semibold text-rose-600">
@@ -463,11 +463,11 @@ function PipelineGrid({
     return (
         <div className={`overflow-auto ${heightClass}`}>
             <div ref={gridRef} className="relative inline-block">
-                <table className="border-separate border-spacing-1 text-xs">
+                <table className="border-separate border-spacing-2 text-xs">
                     <thead>
                         <tr>
-                            <th className="sticky left-0 top-0 z-30 bg-white px-2 py-1 text-left font-semibold text-slate-400">
-                                <span className="mr-2 text-slate-300">
+                            <th className="sticky left-0 top-0 z-30 bg-white px-2 py-1 text-left font-semibold text-slate-400 dark:bg-slate-900 dark:text-slate-400">
+                                <span className="mr-2 text-slate-300 dark:text-slate-400">
                                     Line
                                 </span>
                                 Instruction
@@ -475,7 +475,7 @@ function PipelineGrid({
                             {cycles.map((cycle) => (
                                 <th
                                     key={cycle}
-                                    className="sticky top-0 z-20 w-9 bg-white px-1 py-1 text-center font-semibold text-slate-400"
+                                    className="sticky top-0 z-20 w-10 min-w-[2.5rem] bg-white px-1 py-1 text-center font-semibold text-slate-400 dark:bg-slate-900 dark:text-slate-400"
                                 >
                                     {cycle}
                                 </th>
@@ -489,18 +489,18 @@ function PipelineGrid({
                                 onClick={() => onSelectRow(row)}
                                 className={`cursor-pointer ${
                                     row === selRow
-                                        ? 'bg-slate-100'
-                                        : 'hover:bg-slate-50'
+                                        ? 'bg-slate-100 dark:bg-slate-800'
+                                        : 'hover:bg-slate-50 dark:hover:bg-slate-700'
                                 }`}
                             >
                                 <td
-                                    className={`sticky left-0 z-10 whitespace-nowrap px-2 py-1 font-mono text-slate-700 ${
+                                    className={`sticky left-0 z-10 whitespace-nowrap px-2 py-1 font-mono text-slate-700 dark:text-slate-200 ${
                                         row === selRow
-                                            ? 'bg-slate-100'
-                                            : 'bg-white'
+                                            ? 'bg-slate-100 dark:bg-slate-800'
+                                            : 'bg-white dark:bg-slate-900'
                                     }`}
                                 >
-                                    <span className="mr-3 inline-block w-6 text-right text-slate-400">
+                                    <span className="mr-3 inline-block w-6 text-right text-slate-400 dark:text-slate-400">
                                         {instruction.line}
                                     </span>
                                     {instruction.text}
@@ -524,12 +524,12 @@ function PipelineGrid({
                                                     ? `${row}-${cycle}`
                                                     : undefined
                                             }
-                                            className={`h-7 w-9 rounded text-center font-semibold ${
+                                            className={`h-10 min-h-[2.5rem] w-10 min-w-[2.5rem] rounded text-center font-semibold ${
                                                 stage
                                                     ? STAGE_STYLES[stage]
                                                     : isBubble
                                                       ? 'bg-rose-100 text-rose-400'
-                                                      : 'bg-slate-50'
+                                                      : 'bg-slate-50 dark:bg-slate-800'
                                             }`}
                                         >
                                             {stage ?? (isBubble ? '••' : '')}
@@ -551,27 +551,27 @@ function PipelineGrid({
                             viewBox="0 0 10 10"
                             refX="8"
                             refY="5"
-                            markerWidth="6"
-                            markerHeight="6"
+                            markerWidth="8"
+                            markerHeight="8"
                             orient="auto-start-reverse"
                         >
                             <path
                                 d="M 0 0 L 10 5 L 0 10 z"
-                                className="fill-violet-500"
+                                className="fill-violet-500 dark:fill-pink-400"
                             />
                         </marker>
                     </defs>
                     {arrows.map((a, i) => (
                         <path
                             key={i}
-                            d={`M ${a.x1} ${a.y1} C ${a.x1} ${a.y1 + 14}, ${a.x2} ${a.y2 - 14}, ${a.x2} ${a.y2}`}
+                            d={`M ${a.x1} ${a.y1} C ${a.x1} ${a.y1 + 34}, ${a.x2} ${a.y2 - 34}, ${a.x2} ${a.y2}`}
                             fill="none"
-                            strokeWidth={1.5}
+                            strokeWidth={2}
                             markerEnd="url(#fwd-arrow)"
                             className={
                                 a.load
-                                    ? 'stroke-amber-500'
-                                    : 'stroke-violet-500'
+                                    ? 'stroke-amber-500 dark:stroke-pink-400'
+                                    : 'stroke-violet-500 dark:stroke-pink-400'
                             }
                         />
                     ))}
@@ -770,8 +770,8 @@ export default function PipelinePage({
                 disabled={!limitsDirty}
                 className={`rounded border px-2.5 py-1 text-sm font-semibold transition ${
                     limitsDirty
-                        ? 'border-slate-300 bg-slate-900 text-white hover:bg-slate-800'
-                        : 'border-slate-200 bg-slate-50 text-slate-400'
+                        ? 'border-slate-300 bg-slate-900 text-white hover:bg-slate-800 dark:border-slate-700'
+                        : 'border-slate-200 bg-slate-50 text-slate-400 dark:border-slate-800 dark:bg-slate-800 dark:text-slate-400'
                 }`}
             >
                 Apply
@@ -794,7 +794,7 @@ export default function PipelinePage({
 
     const renderOption = ({ id, label, info }: Option) => (
         <div key={id} className="flex items-center justify-between gap-3">
-            <span className="flex flex-1 items-center gap-1.5 whitespace-nowrap text-sm text-slate-700">
+            <span className="flex flex-1 items-center gap-1.5 whitespace-nowrap text-sm text-slate-700 dark:text-slate-200">
                 {label}
                 <InfoDot
                     text={info}
@@ -816,18 +816,18 @@ export default function PipelinePage({
 
     return (
         <div className="mx-auto flex w-full max-w-[1760px] flex-col gap-4 p-3 sm:p-4 lg:p-6">
-            <header className="rounded-lg border border-slate-200 bg-[#fbfcfd] px-4 py-3 shadow-sm">
+            <header className="rounded-lg border border-slate-200 bg-[#fbfcfd] px-4 py-3 shadow-sm dark:border-slate-800 dark:bg-slate-900/60">
                 <div className="flex flex-col justify-between gap-3 lg:flex-row lg:items-center">
                     <div>
                         <div className="flex flex-wrap items-center gap-2">
-                            <h1 className="text-xl font-bold tracking-tight text-slate-950">
+                            <h1 className="text-xl font-bold tracking-tight text-slate-950 dark:text-slate-100">
                                 MIPS Pipeline Visualizer
                             </h1>
                             <span className="rounded-md bg-slate-900 px-2 py-1 text-xs font-semibold text-white">
                                 Hazards
                             </span>
                         </div>
-                        <p className="mt-1 text-sm text-slate-500">
+                        <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
                             Step a MIPS program through the 5-stage pipeline and
                             watch hazards form.
                         </p>
@@ -837,12 +837,12 @@ export default function PipelinePage({
                         {counters.map(({ label, value }) => (
                             <div
                                 key={label}
-                                className="min-w-[4.5rem] rounded-md border border-slate-200 bg-white px-4 py-2 text-center shadow-sm"
+                                className="min-w-[4.5rem] rounded-md border border-slate-200 bg-white px-4 py-2 text-center shadow-sm dark:border-slate-800 dark:bg-slate-800"
                             >
-                                <div className="font-mono text-2xl font-bold text-slate-900">
+                                <div className="font-mono text-2xl font-bold text-slate-900 dark:text-slate-100">
                                     {value}
                                 </div>
-                                <div className="text-[11px] font-semibold uppercase tracking-wide text-slate-400">
+                                <div className="text-[11px] font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-400">
                                     {label}
                                 </div>
                             </div>
@@ -851,11 +851,11 @@ export default function PipelinePage({
                 </div>
             </header>
 
-            <section className="rounded-md border border-slate-200 bg-white p-3 shadow-sm">
+            <section className="rounded-md border border-slate-200 bg-white p-3 shadow-sm dark:border-slate-800 dark:bg-slate-900">
                 <button
                     type="button"
                     onClick={() => setShowInitial((v) => !v)}
-                    className="flex w-full items-center justify-between text-xs font-semibold uppercase tracking-wide text-slate-400 hover:text-slate-700"
+                    className="flex w-full items-center justify-between text-xs font-semibold uppercase tracking-wide text-slate-400 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200"
                 >
                     <span>Initial Register / Memory Values</span>
                     <span>{showInitial ? 'hide' : 'edit'}</span>
@@ -879,7 +879,7 @@ export default function PipelinePage({
                         />
                     </div>
                 ) : (
-                    <p className="mt-2 text-[11px] text-slate-400">
+                    <p className="mt-2 text-[11px] text-slate-400 dark:text-slate-400">
                         Set starting values for registers and memory before the
                         program runs (needed when branches depend on inputs).
                     </p>
@@ -889,19 +889,19 @@ export default function PipelinePage({
             <div className="grid gap-4 lg:grid-cols-[320px_minmax(0,1fr)] xl:grid-cols-[300px_minmax(0,1fr)_320px]">
                 {/* Left: program input + toggles */}
                 <div className="flex flex-col gap-4">
-                    <section className="rounded-md border border-slate-200 bg-white p-3 shadow-sm">
+                    <section className="rounded-md border border-slate-200 bg-white p-3 shadow-sm dark:border-slate-800 dark:bg-slate-900">
                         <div className="mb-2 flex items-center justify-between">
-                            <h2 className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+                            <h2 className="text-xs font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-400">
                                 Program
                             </h2>
                             <ExpandButton
                                 onClick={() => setExpanded('program')}
                             />
                         </div>
-                        <div className="flex h-48 rounded border border-slate-200 bg-slate-50 font-mono text-xs leading-5">
+                        <div className="flex h-48 rounded border border-slate-200 bg-slate-50 font-mono text-xs leading-5 dark:border-slate-800 dark:bg-slate-800">
                             <div
                                 ref={gutterRef}
-                                className="select-none overflow-hidden border-r border-slate-200 py-2 pl-2 pr-1.5 text-right text-slate-400"
+                                className="select-none overflow-hidden border-r border-slate-200 py-2 pl-2 pr-1.5 text-right text-slate-400 dark:border-slate-800 dark:text-slate-400"
                             >
                                 {lineNumbers.map((n) => (
                                     <div key={n}>{n}</div>
@@ -909,7 +909,7 @@ export default function PipelinePage({
                             </div>
                             <textarea
                                 wrap="off"
-                                className="flex-1 resize-none overflow-x-auto whitespace-pre bg-transparent py-2 pl-2 pr-2 leading-5 text-slate-700 outline-none"
+                                className="flex-1 resize-none overflow-x-auto whitespace-pre bg-transparent py-2 pl-2 pr-2 leading-5 text-slate-700 outline-none dark:text-slate-200"
                                 placeholder={
                                     'sub $2, $1, $3\nand $12, $2, $5\nor  $13, $6, $2'
                                 }
@@ -949,14 +949,14 @@ export default function PipelinePage({
                             className={`mt-3 w-full rounded-md px-3 py-2 text-xs font-semibold shadow-sm transition ${
                                 dirty
                                     ? 'bg-slate-900 text-white hover:bg-slate-800'
-                                    : 'border border-slate-200 bg-slate-50 text-slate-500 hover:bg-white'
+                                    : 'border border-slate-200 bg-slate-50 text-slate-500 hover:bg-white dark:border-slate-800 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700'
                             }`}
                         >
                             {dirty ? 'Run ▶' : 'Run again'}
                         </button>
 
                         <div className="mt-3 mb-1.5 flex items-center gap-1.5">
-                            <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-400">
+                            <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-400">
                                 Presets
                             </span>
                             <InfoDot
@@ -974,7 +974,7 @@ export default function PipelinePage({
                                     key={name}
                                     type="button"
                                     onClick={() => onProgramChange(preset)}
-                                    className="rounded border border-slate-200 bg-slate-50 px-2 py-1 text-[11px] font-semibold text-slate-600 transition hover:border-slate-300 hover:bg-white hover:text-slate-900"
+                                    className="rounded border border-slate-200 bg-slate-50 px-2 py-1 text-[11px] font-semibold text-slate-600 transition hover:border-slate-300 hover:bg-white hover:text-slate-900 dark:border-slate-800 dark:bg-slate-800 dark:text-slate-400 dark:hover:border-slate-700 dark:hover:bg-slate-700 dark:hover:text-white"
                                 >
                                     {name}
                                 </button>
@@ -982,15 +982,15 @@ export default function PipelinePage({
                         </div>
                     </section>
 
-                    <section className="rounded-md border border-slate-200 bg-white p-3 shadow-sm">
-                        <h2 className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-400">
+                    <section className="rounded-md border border-slate-200 bg-white p-3 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+                        <h2 className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-400">
                             Options
                         </h2>
                         <div className="flex flex-col gap-2">
                             {OPTIONS.map(renderOption)}
                             {options.prediction ? (
                                 <div className="flex items-center justify-between gap-3 pl-3">
-                                    <span className="text-sm text-slate-500">
+                                    <span className="text-sm text-slate-500 dark:text-slate-400">
                                         Guess
                                     </span>
                                     <Segmented
@@ -1004,8 +1004,8 @@ export default function PipelinePage({
                         </div>
                     </section>
 
-                    <section className="rounded-md border border-slate-200 bg-white p-3 shadow-sm">
-                        <h2 className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-400">
+                    <section className="rounded-md border border-slate-200 bg-white p-3 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+                        <h2 className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-400">
                             Optional
                         </h2>
                         <div className="flex flex-col gap-2">
@@ -1016,12 +1016,12 @@ export default function PipelinePage({
 
                 {/* Right: stage-time diagram + counters */}
                 <div className="flex flex-col gap-4">
-                    <section className="rounded-md border border-slate-200 bg-white p-3 shadow-sm">
+                    <section className="rounded-md border border-slate-200 bg-white p-3 shadow-sm dark:border-slate-800 dark:bg-slate-900">
                         <div className="mb-2 flex items-center justify-between gap-3">
-                            <h2 className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+                            <h2 className="text-xs font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-400">
                                 Stage-Time Diagram
                             </h2>
-                            <div className="flex items-center gap-3 text-[11px] text-slate-500">
+                            <div className="flex items-center gap-3 text-[11px] text-slate-500 dark:text-slate-400">
                                 {limitControls}
                                 <ExpandButton
                                     onClick={() => setExpanded('diagram')}
@@ -1036,7 +1036,7 @@ export default function PipelinePage({
                             </p>
                         ) : null}
                         {instructionCount === 0 ? (
-                            <div className="flex h-32 items-center justify-center rounded border border-dashed border-slate-200 text-sm text-slate-400">
+                            <div className="flex h-32 items-center justify-center rounded border border-dashed border-slate-200 text-sm text-slate-400 dark:border-slate-800 dark:text-slate-400">
                                 Type a MIPS program to see the pipeline.
                             </div>
                         ) : (
@@ -1061,8 +1061,8 @@ export default function PipelinePage({
 
                     {selStep ? (
                         <>
-                            <section className="rounded-md border border-slate-200 bg-white p-3 shadow-sm">
-                                <h2 className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-400">
+                            <section className="rounded-md border border-slate-200 bg-white p-3 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+                                <h2 className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-400">
                                     Registers (after #{selRow + 1})
                                 </h2>
                                 <RegisterList
@@ -1071,8 +1071,8 @@ export default function PipelinePage({
                                 />
                             </section>
 
-                            <section className="rounded-md border border-slate-200 bg-white p-3 shadow-sm">
-                                <h2 className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-400">
+                            <section className="rounded-md border border-slate-200 bg-white p-3 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+                                <h2 className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-400">
                                     Data Memory (after #{selRow + 1})
                                 </h2>
                                 <MemoryList
@@ -1096,7 +1096,7 @@ export default function PipelinePage({
                         spellCheck={false}
                         value={program}
                         onChange={(e) => onProgramChange(e.target.value)}
-                        className="h-[60vh] w-full resize-none overflow-auto whitespace-pre rounded border border-slate-200 bg-slate-50 p-3 font-mono text-sm leading-5 text-slate-700 outline-none"
+                        className="h-[60vh] w-full resize-none overflow-auto whitespace-pre rounded border border-slate-200 bg-slate-50 p-3 font-mono text-sm leading-5 text-slate-700 outline-none dark:border-slate-800 dark:bg-slate-800 dark:text-slate-200"
                     />
                 </Modal>
             ) : null}
@@ -1116,7 +1116,7 @@ export default function PipelinePage({
                             />
                         </div>
                         <div className="flex min-w-0 flex-1 flex-col gap-2">
-                            <div className="flex items-center justify-end gap-3 text-[11px] text-slate-500">
+                            <div className="flex items-center justify-end gap-3 text-[11px] text-slate-500 dark:text-slate-400">
                                 {limitControls}
                             </div>
                             <div className="min-h-0 flex-1">

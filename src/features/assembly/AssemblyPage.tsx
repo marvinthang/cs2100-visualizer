@@ -12,11 +12,11 @@ function StatusPill({
     value: string | number;
 }) {
     return (
-        <div className="rounded-md border border-slate-200 bg-white px-3 py-2 shadow-sm">
-            <div className="text-[10px] font-semibold uppercase tracking-wide text-slate-400">
+        <div className="rounded-md border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-3 py-2 shadow-sm">
+            <div className="text-[10px] font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-400">
                 {label}
             </div>
-            <div className="font-mono text-sm font-bold text-slate-900">
+            <div className="font-mono text-sm font-bold text-slate-900 dark:text-slate-100">
                 {value}
             </div>
         </div>
@@ -56,20 +56,20 @@ export default function AssemblyPage({
           : 'Ready';
 
     return (
-        <main className="min-h-full bg-[#eef2f3] p-3 text-slate-900 sm:p-4 lg:p-6">
+        <main className="min-h-full bg-[#eef2f3] dark:bg-slate-950 p-3 text-slate-900 dark:text-slate-100 sm:p-4 lg:p-6">
             <div className="mx-auto flex max-w-[1480px] flex-col gap-4">
-                <header className="rounded-lg border border-slate-200 bg-[#fbfcfd] px-4 py-3 shadow-sm">
+                <header className="rounded-lg border border-slate-200 dark:border-slate-800 bg-[#fbfcfd] dark:bg-slate-900/60 px-4 py-3 shadow-sm">
                     <div className="flex flex-col justify-between gap-3 lg:flex-row lg:items-center">
                         <div>
                             <div className="flex flex-wrap items-center gap-2">
-                                <h1 className="text-xl font-bold tracking-tight text-slate-950">
+                                <h1 className="text-xl font-bold tracking-tight text-slate-950 dark:text-slate-100">
                                     MIPS Assembly Simulator
                                 </h1>
-                                <span className="rounded-md bg-slate-900 px-2 py-1 text-xs font-semibold text-white">
+                                <span className="rounded-md bg-slate-900 dark:bg-slate-600 px-2 py-1 text-xs font-semibold text-white dark:text-white">
                                     {assemblyState}
                                 </span>
                             </div>
-                            <p className="mt-1 text-sm text-slate-500">
+                            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
                                 Write a program and execute it one instruction
                                 at a time, watching registers and memory update.
                             </p>

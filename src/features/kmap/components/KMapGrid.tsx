@@ -34,26 +34,26 @@ type AxisBrace = {
 
 function getCellValueClass(value: KMapCellValue): string {
     if (value === 1) {
-        return 'bg-emerald-50 text-emerald-800 hover:bg-emerald-100';
+        return 'bg-emerald-50 text-emerald-800 hover:bg-emerald-100 dark:bg-emerald-800 dark:text-emerald-100 dark:hover:bg-emerald-700';
     }
 
     if (value === 'X') {
-        return 'bg-amber-50 text-amber-800 hover:bg-amber-100';
+        return 'bg-amber-50 text-amber-800 hover:bg-amber-100 dark:bg-amber-800 dark:text-amber-100 dark:hover:bg-amber-700';
     }
 
-    return 'bg-white text-slate-500 hover:bg-slate-50';
+    return 'bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700';
 }
 
 function getValueBadgeClass(value: KMapCellValue): string {
     if (value === 1) {
-        return 'text-emerald-800';
+        return 'text-emerald-800 dark:text-emerald-300';
     }
 
     if (value === 'X') {
-        return 'text-amber-800';
+        return 'text-amber-800 dark:text-amber-300';
     }
 
-    return 'text-slate-500';
+    return 'text-slate-500 dark:text-slate-400';
 }
 
 function getGroupOutlineStyle({
@@ -185,7 +185,7 @@ function HorizontalAxisBrace({
 
     return (
         <div
-            className="pointer-events-none relative h-8 font-sans text-slate-900"
+            className="pointer-events-none relative h-8 font-sans text-slate-900 dark:text-slate-100"
             style={{
                 gridColumn: `${3 + brace.startIndex} / span ${
                     brace.endIndex - brace.startIndex + 1
@@ -205,7 +205,7 @@ function HorizontalAxisBrace({
                     isTop
                         ? 'bottom-0 rounded-t-xl border-l-2 border-r-2 border-t-2'
                         : 'top-0 rounded-b-xl border-b-2 border-l-2 border-r-2'
-                } border-slate-900`}
+                } border-slate-900 dark:border-slate-100`}
             />
         </div>
     );
@@ -222,7 +222,7 @@ function VerticalAxisBrace({
 
     return (
         <div
-            className="pointer-events-none relative h-full w-10 font-sans text-slate-900"
+            className="pointer-events-none relative h-full w-10 font-sans text-slate-900 dark:text-slate-100"
             style={{
                 gridColumn: isLeft ? 1 : 3 + colCount,
                 gridRow: `${3 + brace.startIndex} / span ${
@@ -242,7 +242,7 @@ function VerticalAxisBrace({
                     isLeft
                         ? 'right-0 rounded-l-xl border-b-2 border-l-2 border-t-2'
                         : 'left-0 rounded-r-xl border-b-2 border-r-2 border-t-2'
-                } border-slate-900`}
+                } border-slate-900 dark:border-slate-100`}
             />
         </div>
     );
@@ -316,7 +316,7 @@ export default function KMapGrid({
     const hasGroupEmphasis = hoveredMinterm !== null || activeGroupId !== null;
 
     return (
-        <div className="overflow-auto bg-[#f7f9fa] px-3 py-5">
+        <div className="overflow-auto bg-[#f7f9fa] dark:bg-slate-900 px-3 py-5">
             <div
                 className="mx-auto grid w-fit gap-0 font-mono text-sm"
                 style={{
@@ -352,10 +352,10 @@ export default function KMapGrid({
                 {model.colLabels.map((label, colIndex) => (
                     <div
                         key={label}
-                        className="flex h-full w-full flex-col items-center justify-center border border-l-0 border-slate-300 bg-slate-100 text-xs font-semibold text-slate-700"
+                        className="flex h-full w-full flex-col items-center justify-center border border-l-0 border-slate-300 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 text-xs font-semibold text-slate-700 dark:text-slate-200"
                         style={{ gridColumn: 3 + colIndex, gridRow: 2 }}
                     >
-                        <span className="text-[10px] text-slate-400">
+                        <span className="text-[10px] text-slate-400 dark:text-slate-400">
                             {colVariableLabel}
                         </span>
                         <span>{label}</span>
@@ -365,10 +365,10 @@ export default function KMapGrid({
                 {model.rowLabels.map((label, rowIndex) => (
                     <div
                         key={label}
-                        className="flex h-full w-full flex-col items-center justify-center border border-t-0 border-slate-300 bg-slate-100 text-xs font-semibold text-slate-700"
+                        className="flex h-full w-full flex-col items-center justify-center border border-t-0 border-slate-300 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 text-xs font-semibold text-slate-700 dark:text-slate-200"
                         style={{ gridColumn: 2, gridRow: 3 + rowIndex }}
                     >
-                        <span className="text-[10px] text-slate-400">
+                        <span className="text-[10px] text-slate-400 dark:text-slate-400">
                             {rowVariableLabel}
                         </span>
                         <span>{label}</span>
@@ -483,7 +483,7 @@ export default function KMapGrid({
                                 onMouseLeave={() => setHoveredMinterm(null)}
                                 onFocus={() => setHoveredMinterm(cell.minterm)}
                                 onBlur={() => setHoveredMinterm(null)}
-                                className={`relative isolate flex h-full w-full flex-col items-center justify-center border border-l-0 border-t-0 border-slate-300 transition ${cellLayerClass} ${
+                                className={`relative isolate flex h-full w-full flex-col items-center justify-center border border-l-0 border-t-0 border-slate-300 dark:border-slate-700 transition ${cellLayerClass} ${
                                     valueClass
                                 } ${
                                     isSelected
@@ -530,7 +530,7 @@ export default function KMapGrid({
                                     );
                                 })}
                                 {cellGroups.length > 0 && (
-                                    <span className="absolute bottom-1 right-1 z-30 flex items-center gap-1 rounded bg-white/90 px-1 py-0.5 ring-1 ring-slate-200/80">
+                                    <span className="absolute bottom-1 right-1 z-30 flex items-center gap-1 rounded bg-white/90 dark:bg-slate-800/90 px-1 py-0.5 ring-1 ring-slate-200/80 dark:ring-slate-700/80">
                                         {visibleCellGroups.map((cellGroup) => (
                                             <span
                                                 key={cellGroup.id}
@@ -554,7 +554,7 @@ export default function KMapGrid({
                                 >
                                     {cell.value}
                                 </span>
-                                <span className="relative z-0 mt-1 text-[10px] text-slate-400">
+                                <span className="relative z-0 mt-1 text-[10px] text-slate-400 dark:text-slate-400">
                                     m{cell.minterm}
                                 </span>
                             </button>

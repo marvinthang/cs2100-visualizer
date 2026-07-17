@@ -106,7 +106,7 @@ export default function StaticDatapathSvg({
             preserveAspectRatio="xMidYMid meet"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
-            className="h-full max-h-full w-full max-w-full bg-white"
+            className="h-full max-h-full w-full max-w-full bg-[var(--dp-canvas)]"
         >
             <defs>
                 <marker
@@ -129,7 +129,7 @@ export default function StaticDatapathSvg({
                     orient="auto"
                     markerUnits="userSpaceOnUse"
                 >
-                    <path d="M0,0 L0,10 L10,5 z" fill="black" />
+                    <path d="M0,0 L0,10 L10,5 z" fill="var(--dp-ink)" />
                 </marker>
 
                 <marker
@@ -145,7 +145,7 @@ export default function StaticDatapathSvg({
                 </marker>
             </defs>
 
-            <rect width={900} height={600} fill="white" />
+            <rect width={900} height={600} fill="var(--dp-canvas)" />
             <path
                 d="M51.5 107.5H20.5V355H50.5"
                 stroke={wireStroke('IM_TO_IR')}
@@ -154,8 +154,14 @@ export default function StaticDatapathSvg({
             />
             <path
                 d={add4ShapePath}
-                fill={selectedInspectId === 'ADD4' ? '#eff6ff' : 'white'}
-                stroke={selectedInspectId === 'ADD4' ? '#2563eb' : 'black'}
+                fill={
+                    selectedInspectId === 'ADD4'
+                        ? 'var(--dp-box-sel)'
+                        : 'var(--dp-box)'
+                }
+                stroke={
+                    selectedInspectId === 'ADD4' ? '#2563eb' : 'var(--dp-ink)'
+                }
                 strokeWidth={1.5}
             />
             <path
@@ -187,10 +193,14 @@ export default function StaticDatapathSvg({
             <path
                 d={branchAdderShapePath}
                 fill={
-                    selectedInspectId === 'BRANCH_ADDER' ? '#eff6ff' : 'white'
+                    selectedInspectId === 'BRANCH_ADDER'
+                        ? 'var(--dp-box-sel)'
+                        : 'var(--dp-box)'
                 }
                 stroke={
-                    selectedInspectId === 'BRANCH_ADDER' ? '#2563eb' : 'black'
+                    selectedInspectId === 'BRANCH_ADDER'
+                        ? '#2563eb'
+                        : 'var(--dp-ink)'
                 }
                 strokeWidth={1.5}
             />
@@ -221,8 +231,14 @@ export default function StaticDatapathSvg({
                 y={43.65}
                 width={44.7}
                 height={74.7}
-                fill={selectedInspectId === 'PC' ? '#eff6ff' : '#D9D9D9'}
-                stroke={selectedInspectId === 'PC' ? '#2563eb' : 'black'}
+                fill={
+                    selectedInspectId === 'PC'
+                        ? 'var(--dp-box-sel)'
+                        : 'var(--dp-box-gray)'
+                }
+                stroke={
+                    selectedInspectId === 'PC' ? '#2563eb' : 'var(--dp-ink)'
+                }
                 strokeWidth={1.3}
             />
             <text
@@ -256,13 +272,13 @@ export default function StaticDatapathSvg({
                 height={125.7}
                 fill={
                     selectedInspectId === 'INSTRUCTION_MEMORY'
-                        ? '#eff6ff'
-                        : '#E7E4B9'
+                        ? 'var(--dp-box-sel)'
+                        : 'var(--dp-box-tan)'
                 }
                 stroke={
                     selectedInspectId === 'INSTRUCTION_MEMORY'
                         ? '#2563eb'
-                        : 'black'
+                        : 'var(--dp-ink)'
                 }
                 strokeWidth={1.3}
             />
@@ -297,7 +313,7 @@ export default function StaticDatapathSvg({
                 </tspan>
             </text>
             <text
-                fill="#FF0000"
+                fill="var(--dp-title)"
                 style={{
                     whiteSpace: 'pre',
                 }}
@@ -331,11 +347,13 @@ export default function StaticDatapathSvg({
                 height={164.7}
                 fill={
                     selectedInspectId === 'REGISTER_FILE'
-                        ? '#eff6ff'
-                        : '#FFFFCB'
+                        ? 'var(--dp-box-sel)'
+                        : 'var(--dp-box-yellow)'
                 }
                 stroke={
-                    selectedInspectId === 'REGISTER_FILE' ? '#2563eb' : 'black'
+                    selectedInspectId === 'REGISTER_FILE'
+                        ? '#2563eb'
+                        : 'var(--dp-ink)'
                 }
                 strokeWidth={1.3}
             />
@@ -405,10 +423,14 @@ export default function StaticDatapathSvg({
                 width={115.7}
                 height={149.7}
                 fill={
-                    selectedInspectId === 'DATA_MEMORY' ? '#eff6ff' : '#E1FEC4'
+                    selectedInspectId === 'DATA_MEMORY'
+                        ? 'var(--dp-box-sel)'
+                        : 'var(--dp-box-green)'
                 }
                 stroke={
-                    selectedInspectId === 'DATA_MEMORY' ? '#2563eb' : 'black'
+                    selectedInspectId === 'DATA_MEMORY'
+                        ? '#2563eb'
+                        : 'var(--dp-ink)'
                 }
                 strokeWidth={1.3}
             />
@@ -447,8 +469,14 @@ export default function StaticDatapathSvg({
             </text>
             <path
                 d="M545 333V280L620 313.5V403.5L545 439V375L560.5 355L545 333Z"
-                fill={selectedInspectId === 'ALU' ? '#eff6ff' : 'white'}
-                stroke={selectedInspectId === 'ALU' ? '#2563eb' : 'black'}
+                fill={
+                    selectedInspectId === 'ALU'
+                        ? 'var(--dp-box-sel)'
+                        : 'var(--dp-box)'
+                }
+                stroke={
+                    selectedInspectId === 'ALU' ? '#2563eb' : 'var(--dp-ink)'
+                }
                 strokeWidth={1.3}
             />
             <text
@@ -485,7 +513,7 @@ export default function StaticDatapathSvg({
                 </tspan>
             </text>
             <text
-                fill="#FF383C"
+                fill="var(--dp-title2)"
                 style={{
                     whiteSpace: 'pre',
                 }}
@@ -514,7 +542,7 @@ export default function StaticDatapathSvg({
             />
 
             <text
-                fill="#FF0000"
+                fill="var(--dp-title)"
                 style={{
                     whiteSpace: 'pre',
                 }}
@@ -541,7 +569,7 @@ export default function StaticDatapathSvg({
                 onInspect={onInspect}
             />
             <text
-                fill="#FF0000"
+                fill="var(--dp-title)"
                 style={{
                     whiteSpace: 'pre',
                 }}
@@ -589,8 +617,8 @@ export default function StaticDatapathSvg({
                 d="M95.5 178H125.5V252.5V317V380.5V444.5V508V582.5H95L95.0921 508L95.1706 444.5L95.2497 380.5L95.3282 317L95.4079 252.5L95.5 178Z"
                 fill={
                     selectedInspectId === 'INSTRUCTION_REGISTER'
-                        ? '#eff6ff'
-                        : 'white'
+                        ? 'var(--dp-box-sel)'
+                        : 'var(--dp-box)'
                 }
             />
             <path
@@ -598,13 +626,13 @@ export default function StaticDatapathSvg({
                 stroke={
                     selectedInspectId === 'INSTRUCTION_REGISTER'
                         ? '#2563eb'
-                        : 'black'
+                        : 'var(--dp-ink)'
                 }
                 strokeWidth={2.3}
             />
             <text
                 transform="matrix(0 1 -1 0 91 454)"
-                fill="#093EB0"
+                fill="var(--dp-blue2)"
                 style={{
                     whiteSpace: 'pre',
                 }}
@@ -623,7 +651,7 @@ export default function StaticDatapathSvg({
             </text>
             <text
                 transform="matrix(0 1 -1 0 91 388)"
-                fill="#FF383C"
+                fill="var(--dp-title2)"
                 style={{
                     whiteSpace: 'pre',
                 }}
@@ -684,10 +712,14 @@ export default function StaticDatapathSvg({
             <path
                 d={leftShift2ShapePath}
                 fill={
-                    selectedInspectId === 'LEFT_SHIFT_2' ? '#eff6ff' : '#F1F1F1'
+                    selectedInspectId === 'LEFT_SHIFT_2'
+                        ? 'var(--dp-box-sel)'
+                        : 'var(--dp-box)'
                 }
                 stroke={
-                    selectedInspectId === 'LEFT_SHIFT_2' ? '#2563eb' : 'black'
+                    selectedInspectId === 'LEFT_SHIFT_2'
+                        ? '#2563eb'
+                        : 'var(--dp-ink)'
                 }
                 strokeWidth={1.5}
             />
@@ -717,10 +749,14 @@ export default function StaticDatapathSvg({
             <path
                 d={signExtendShapePath}
                 fill={
-                    selectedInspectId === 'SIGN_EXTEND' ? '#eff6ff' : '#F1F1F1'
+                    selectedInspectId === 'SIGN_EXTEND'
+                        ? 'var(--dp-box-sel)'
+                        : 'var(--dp-box)'
                 }
                 stroke={
-                    selectedInspectId === 'SIGN_EXTEND' ? '#2563eb' : 'black'
+                    selectedInspectId === 'SIGN_EXTEND'
+                        ? '#2563eb'
+                        : 'var(--dp-ink)'
                 }
                 strokeWidth={1.5}
             />
@@ -753,8 +789,16 @@ export default function StaticDatapathSvg({
                 width={27}
                 height={90}
                 rx={4}
-                fill={selectedInspectId === 'PCSRC_MUX' ? '#eff6ff' : '#F1F1F1'}
-                stroke={selectedInspectId === 'PCSRC_MUX' ? '#2563eb' : 'black'}
+                fill={
+                    selectedInspectId === 'PCSRC_MUX'
+                        ? 'var(--dp-box-sel)'
+                        : 'var(--dp-box)'
+                }
+                stroke={
+                    selectedInspectId === 'PCSRC_MUX'
+                        ? '#2563eb'
+                        : 'var(--dp-ink)'
+                }
                 strokeWidth={2}
             />
             <text
@@ -786,7 +830,11 @@ export default function StaticDatapathSvg({
                 height={90}
                 onInspect={onInspect}
             />
-            <path d="M709 157L709 183" stroke="#2C1AF4" strokeWidth={1.5} />
+            <path
+                d="M709 157L709 183"
+                stroke="var(--dp-blue)"
+                strokeWidth={1.5}
+            />
             <rect
                 x={822}
                 y={450}
@@ -794,10 +842,14 @@ export default function StaticDatapathSvg({
                 height={90}
                 rx={4}
                 fill={
-                    selectedInspectId === 'MEMTOREG_MUX' ? '#eff6ff' : '#F1F1F1'
+                    selectedInspectId === 'MEMTOREG_MUX'
+                        ? 'var(--dp-box-sel)'
+                        : 'var(--dp-box)'
                 }
                 stroke={
-                    selectedInspectId === 'MEMTOREG_MUX' ? '#2563eb' : 'black'
+                    selectedInspectId === 'MEMTOREG_MUX'
+                        ? '#2563eb'
+                        : 'var(--dp-ink)'
                 }
                 strokeWidth={2}
             />
@@ -830,7 +882,11 @@ export default function StaticDatapathSvg({
                 height={90}
                 onInspect={onInspect}
             />
-            <path d="M836 432.5L836 450" stroke="#2C1AF4" strokeWidth={1.5} />
+            <path
+                d="M836 432.5L836 450"
+                stroke="var(--dp-blue)"
+                strokeWidth={1.5}
+            />
             <rect
                 x={485}
                 y={381}
@@ -838,10 +894,14 @@ export default function StaticDatapathSvg({
                 height={90}
                 rx={4}
                 fill={
-                    selectedInspectId === 'ALUSRC_MUX' ? '#eff6ff' : '#F1F1F1'
+                    selectedInspectId === 'ALUSRC_MUX'
+                        ? 'var(--dp-box-sel)'
+                        : 'var(--dp-box)'
                 }
                 stroke={
-                    selectedInspectId === 'ALUSRC_MUX' ? '#2563eb' : 'black'
+                    selectedInspectId === 'ALUSRC_MUX'
+                        ? '#2563eb'
+                        : 'var(--dp-ink)'
                 }
                 strokeWidth={2}
             />
@@ -874,7 +934,11 @@ export default function StaticDatapathSvg({
                 height={90}
                 onInspect={onInspect}
             />
-            <path d="M499 366L499 380" stroke="#2C1AF4" strokeWidth={1.5} />
+            <path
+                d="M499 366L499 380"
+                stroke="var(--dp-blue)"
+                strokeWidth={1.5}
+            />
             <rect
                 x={218}
                 y={365}
@@ -882,10 +946,14 @@ export default function StaticDatapathSvg({
                 height={90}
                 rx={4}
                 fill={
-                    selectedInspectId === 'REGDST_MUX' ? '#eff6ff' : '#F1F1F1'
+                    selectedInspectId === 'REGDST_MUX'
+                        ? 'var(--dp-box-sel)'
+                        : 'var(--dp-box)'
                 }
                 stroke={
-                    selectedInspectId === 'REGDST_MUX' ? '#2563eb' : 'black'
+                    selectedInspectId === 'REGDST_MUX'
+                        ? '#2563eb'
+                        : 'var(--dp-ink)'
                 }
                 strokeWidth={2}
             />
@@ -918,7 +986,11 @@ export default function StaticDatapathSvg({
                 height={90}
                 onInspect={onInspect}
             />
-            <path d="M232 456L232 471" stroke="#2C1AF4" strokeWidth={1.5} />
+            <path
+                d="M232 456L232 471"
+                stroke="var(--dp-blue)"
+                strokeWidth={1.5}
+            />
             <path
                 d="M269 104H294.5"
                 stroke={wireStroke('CONST4_TO_ADD4')}
@@ -1035,9 +1107,13 @@ export default function StaticDatapathSvg({
                 strokeWidth={wireStrokeWidth('DM_RD_TO_MEMTOREG_MUX1')}
                 markerEnd={wireArrow('DM_RD_TO_MEMTOREG_MUX1')}
             />
-            <path d="M357 433.5V452.5" stroke="#2C1AF4" strokeWidth={1.5} />
-            <path d="M721 508V537" stroke="#2C1AF4" strokeWidth={1.5} />
-            <path d="M721 357V335" stroke="#2C1AF4" strokeWidth={1.5} />
+            <path
+                d="M357 433.5V452.5"
+                stroke="var(--dp-blue)"
+                strokeWidth={1.5}
+            />
+            <path d="M721 508V537" stroke="var(--dp-blue)" strokeWidth={1.5} />
+            <path d="M721 357V335" stroke="var(--dp-blue)" strokeWidth={1.5} />
             <path
                 d="M409 527H447V456"
                 stroke={wireStroke('SIGN_EXTEND_TO_SE_JUNCTION')}
@@ -1048,10 +1124,14 @@ export default function StaticDatapathSvg({
                 stroke={wireStroke('SE_JUNCTION_TO_ALUSRC_MUX1')}
                 strokeWidth={wireStrokeWidth('SE_JUNCTION_TO_ALUSRC_MUX1')}
             />
-            <path d="M590.5 269V300.5" stroke="#2C1AF4" strokeWidth={1.5} />
+            <path
+                d="M590.5 269V300.5"
+                stroke="var(--dp-blue)"
+                strokeWidth={1.5}
+            />
             <path
                 d="M578.5 284.5L601 291.5"
-                stroke="#2C1AF4"
+                stroke="var(--dp-blue)"
                 strokeWidth={1.2}
             />
             <path
@@ -1061,7 +1141,7 @@ export default function StaticDatapathSvg({
             />
             <text
                 transform="matrix(0 1 -1 0 91 187)"
-                fill="#833A83"
+                fill="var(--dp-purple)"
                 style={{
                     whiteSpace: 'pre',
                 }}
@@ -1080,7 +1160,7 @@ export default function StaticDatapathSvg({
             </text>
             <text
                 transform="matrix(0 1 -1 0 119 183)"
-                fill="#833A83"
+                fill="var(--dp-purple)"
                 style={{
                     whiteSpace: 'pre',
                 }}
@@ -1097,7 +1177,7 @@ export default function StaticDatapathSvg({
             </text>
             <text
                 transform="matrix(0 1 -1 0 119 451)"
-                fill="#093EB0"
+                fill="var(--dp-blue2)"
                 style={{
                     whiteSpace: 'pre',
                 }}
@@ -1114,7 +1194,7 @@ export default function StaticDatapathSvg({
             </text>
             <text
                 transform="matrix(0 1 -1 0 91 527)"
-                fill="#093EB0"
+                fill="var(--dp-blue2)"
                 style={{
                     whiteSpace: 'pre',
                 }}
@@ -1133,7 +1213,7 @@ export default function StaticDatapathSvg({
             </text>
             <text
                 transform="matrix(0 1 -1 0 119 514)"
-                fill="#093EB0"
+                fill="var(--dp-blue2)"
                 style={{
                     whiteSpace: 'pre',
                 }}
@@ -1150,7 +1230,7 @@ export default function StaticDatapathSvg({
             </text>
             <text
                 transform="matrix(0 1 -1 0 119 381)"
-                fill="#FF383C"
+                fill="var(--dp-title2)"
                 style={{
                     whiteSpace: 'pre',
                 }}
@@ -1291,7 +1371,7 @@ export default function StaticDatapathSvg({
                 </tspan>
             </text>
             <text
-                fill="#2C1AF4"
+                fill="var(--dp-blue)"
                 style={{
                     whiteSpace: 'pre',
                 }}
@@ -1336,7 +1416,7 @@ export default function StaticDatapathSvg({
                 </tspan>
             </text>
             <text
-                fill="#2C1AF4"
+                fill="var(--dp-blue)"
                 style={{
                     whiteSpace: 'pre',
                 }}
@@ -1366,11 +1446,23 @@ export default function StaticDatapathSvg({
                     {'4'}
                 </tspan>
             </text>
-            <path d="M280 284.5L271 300" stroke="black" strokeWidth={1.2} />
-            <path d="M280.5 322L271 337.5" stroke="black" strokeWidth={1.2} />
-            <path d="M280 365L271 380.5" stroke="black" strokeWidth={1.2} />
+            <path
+                d="M280 284.5L271 300"
+                stroke="var(--dp-ink)"
+                strokeWidth={1.2}
+            />
+            <path
+                d="M280.5 322L271 337.5"
+                stroke="var(--dp-ink)"
+                strokeWidth={1.2}
+            />
+            <path
+                d="M280 365L271 380.5"
+                stroke="var(--dp-ink)"
+                strokeWidth={1.2}
+            />
             <text
-                fill="black"
+                fill="var(--dp-ink)"
                 style={{
                     whiteSpace: 'pre',
                 }}
@@ -1385,7 +1477,7 @@ export default function StaticDatapathSvg({
                 </tspan>
             </text>
             <text
-                fill="black"
+                fill="var(--dp-ink)"
                 style={{
                     whiteSpace: 'pre',
                 }}
@@ -1400,7 +1492,7 @@ export default function StaticDatapathSvg({
                 </tspan>
             </text>
             <text
-                fill="black"
+                fill="var(--dp-ink)"
                 style={{
                     whiteSpace: 'pre',
                 }}
@@ -1415,7 +1507,7 @@ export default function StaticDatapathSvg({
                 </tspan>
             </text>
             <text
-                fill="#2C1AF4"
+                fill="var(--dp-blue)"
                 style={{
                     whiteSpace: 'pre',
                 }}

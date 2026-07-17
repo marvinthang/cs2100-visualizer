@@ -15,11 +15,11 @@ function PanelMetric({
     value: string | number;
 }) {
     return (
-        <div className="rounded-md border border-slate-200 bg-white px-3 py-2 shadow-sm">
-            <div className="text-[10px] font-semibold uppercase tracking-wide text-slate-400">
+        <div className="rounded-md border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 px-3 py-2 shadow-sm">
+            <div className="text-[10px] font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-400">
                 {label}
             </div>
-            <div className="mt-0.5 font-mono text-sm font-bold text-slate-900">
+            <div className="mt-0.5 font-mono text-sm font-bold text-slate-900 dark:text-slate-100">
                 {value}
             </div>
         </div>
@@ -69,11 +69,11 @@ export default function MemoryTable({
     function renderTable(scrollClass: string) {
         return (
             <div
-                className={`${scrollClass} overflow-auto rounded-md border border-slate-200`}
+                className={`${scrollClass} overflow-auto rounded-md border border-slate-200 dark:border-slate-800`}
             >
                 <table className="w-full text-sm">
-                    <thead className="sticky top-0 bg-[#fbfcfd]">
-                        <tr className="border-b border-slate-200 text-left text-xs text-slate-500">
+                    <thead className="sticky top-0 bg-[#fbfcfd] dark:bg-slate-900/60">
+                        <tr className="border-b border-slate-200 dark:border-slate-800 text-left text-xs text-slate-500 dark:text-slate-400">
                             <th className="px-3 py-2 font-semibold">Addr</th>
                             <th className="px-3 py-2 font-semibold">Hex</th>
                             <th className="px-3 py-2 text-right font-semibold">
@@ -95,7 +95,7 @@ export default function MemoryTable({
                             return (
                                 <tr
                                     key={address}
-                                    className={`border-b border-slate-100 font-mono text-xs last:border-b-0 ${bgClass}`}
+                                    className={`border-b border-slate-100 dark:border-slate-800 font-mono text-xs last:border-b-0 ${bgClass}`}
                                 >
                                     <td className={`px-3 py-1.5 ${textClass}`}>
                                         {address}
@@ -155,7 +155,7 @@ export default function MemoryTable({
                                                 );
                                                 onMemoryChange(address, value);
                                             }}
-                                            className="w-24 rounded-md border border-slate-300 bg-white px-2 py-1 text-left text-slate-900 shadow-sm outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-100"
+                                            className="w-24 rounded-md border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-2 py-1 text-left text-slate-900 dark:text-slate-100 shadow-sm outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-100"
                                         />
                                     </td>
                                 </tr>
@@ -168,13 +168,13 @@ export default function MemoryTable({
     }
 
     return (
-        <div className="h-fit overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
-            <div className="flex items-center justify-between gap-3 border-b border-slate-200 bg-[#fbfcfd] px-4 py-3">
+        <div className="h-fit overflow-hidden rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
+            <div className="flex items-center justify-between gap-3 border-b border-slate-200 dark:border-slate-800 bg-[#fbfcfd] dark:bg-slate-900/60 px-4 py-3">
                 <div>
-                    <h2 className="text-sm font-semibold text-slate-900">
+                    <h2 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
                         Data Memory
                     </h2>
-                    <p className="mt-0.5 text-xs text-slate-500">
+                    <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
                         Word-addressable data segment
                     </p>
                 </div>
@@ -185,7 +185,7 @@ export default function MemoryTable({
                             setDataMemoryDrafts({});
                             onResetMemory();
                         }}
-                        className="rounded-md border border-slate-300 bg-white px-2 py-1 text-xs font-semibold text-slate-700 shadow-sm transition hover:border-slate-400 hover:bg-slate-50"
+                        className="rounded-md border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-2 py-1 text-xs font-semibold text-slate-700 dark:text-slate-200 shadow-sm transition hover:border-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700"
                     >
                         Reset
                     </button>
@@ -199,9 +199,9 @@ export default function MemoryTable({
                     <PanelMetric label="Words" value={memoryRows.length} />
                 </div>
 
-                <div className="rounded-md border border-slate-200 bg-[#fbfcfd] p-2">
+                <div className="rounded-md border border-slate-200 dark:border-slate-800 bg-[#fbfcfd] dark:bg-slate-900/60 p-2">
                     <div className="grid grid-cols-[1fr_1fr_auto] gap-2">
-                        <label className="text-xs font-medium text-slate-600">
+                        <label className="text-xs font-medium text-slate-600 dark:text-slate-400">
                             Start addr
                             <input
                                 type="number"
@@ -211,11 +211,11 @@ export default function MemoryTable({
                                 onChange={(event) =>
                                     setStartAddressInput(event.target.value)
                                 }
-                                className="mt-1 w-full rounded-md border border-slate-300 bg-white px-2 py-1 font-mono text-xs shadow-sm outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-100"
+                                className="mt-1 w-full rounded-md border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-2 py-1 font-mono text-xs shadow-sm outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-100"
                             />
                         </label>
 
-                        <label className="text-xs font-medium text-slate-600">
+                        <label className="text-xs font-medium text-slate-600 dark:text-slate-400">
                             Words
                             <input
                                 type="number"
@@ -224,7 +224,7 @@ export default function MemoryTable({
                                 onChange={(event) =>
                                     setWordCountInput(event.target.value)
                                 }
-                                className="mt-1 w-full rounded-md border border-slate-300 bg-white px-2 py-1 font-mono text-xs shadow-sm outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-100"
+                                className="mt-1 w-full rounded-md border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-2 py-1 font-mono text-xs shadow-sm outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-100"
                             />
                         </label>
 
@@ -234,7 +234,7 @@ export default function MemoryTable({
                                 setDataMemoryDrafts({});
                                 onMemoryRangeChange(startAddress, wordCount);
                             }}
-                            className="self-end rounded-md bg-slate-900 px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition hover:bg-slate-800"
+                            className="self-end rounded-md bg-slate-900 dark:bg-slate-600 px-3 py-1.5 text-xs font-semibold text-white dark:text-white shadow-sm transition hover:bg-slate-800 dark:hover:bg-slate-500"
                         >
                             Apply
                         </button>

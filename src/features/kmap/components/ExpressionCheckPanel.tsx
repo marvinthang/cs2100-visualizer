@@ -28,17 +28,17 @@ export default function ExpressionCheckPanel({
     onAddGroupExpression,
 }: ExpressionCheckPanelProps) {
     return (
-        <section className="rounded-lg border border-slate-300 bg-[#fbfcfd] shadow-sm">
-            <div className="flex items-center justify-between gap-3 border-b border-slate-200 px-4 py-3">
+        <section className="rounded-lg border border-slate-300 bg-[#fbfcfd] shadow-sm dark:border-slate-700 dark:bg-slate-900/60">
+            <div className="flex items-center justify-between gap-3 border-b border-slate-200 px-4 py-3 dark:border-slate-800">
                 <div>
-                    <h2 className="text-sm font-semibold text-slate-950">
+                    <h2 className="text-sm font-semibold text-slate-950 dark:text-slate-100">
                         Expression Check
                     </h2>
-                    <p className="text-xs text-slate-500">
+                    <p className="text-xs text-slate-500 dark:text-slate-400">
                         Test a full {solverForm} grouping answer.
                     </p>
                 </div>
-                <span className="rounded-md border border-slate-300 bg-white px-2 py-1 text-xs font-semibold text-slate-700">
+                <span className="rounded-md border border-slate-300 bg-white px-2 py-1 text-xs font-semibold text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200">
                     {solverForm}
                 </span>
             </div>

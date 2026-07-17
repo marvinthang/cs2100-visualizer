@@ -35,13 +35,13 @@ export default function ManualFeedbackPanel({
               : 'Incomplete';
 
     return (
-        <div className="rounded-lg border border-slate-300 bg-[#fbfcfd] shadow-sm">
-            <div className="flex items-center justify-between gap-3 border-b border-slate-200 px-4 py-3">
+        <div className="rounded-lg border border-slate-300 dark:border-slate-700 bg-[#fbfcfd] dark:bg-slate-900/60 shadow-sm">
+            <div className="flex items-center justify-between gap-3 border-b border-slate-200 dark:border-slate-800 px-4 py-3">
                 <div>
-                    <h2 className="text-sm font-semibold text-slate-950">
+                    <h2 className="text-sm font-semibold text-slate-950 dark:text-slate-100">
                         Manual Feedback
                     </h2>
-                    <p className="text-xs text-slate-500">
+                    <p className="text-xs text-slate-500 dark:text-slate-400">
                         Coverage and minimality checks.
                     </p>
                 </div>
@@ -57,7 +57,7 @@ export default function ManualFeedbackPanel({
                 </span>
             </div>
 
-            <div className="divide-y divide-slate-200 text-xs">
+            <div className="divide-y divide-slate-200 dark:divide-slate-800 text-xs">
                 <FeedbackRow
                     label="Coverage"
                     ok={analysis.isComplete}
@@ -108,7 +108,9 @@ function FeedbackRow({
     return (
         <div className="px-4 py-3">
             <div className="flex items-center justify-between gap-2">
-                <span className="font-semibold text-slate-700">{label}</span>
+                <span className="font-semibold text-slate-700 dark:text-slate-200">
+                    {label}
+                </span>
                 <span
                     className={`rounded px-2 py-0.5 font-semibold ${
                         ok
@@ -119,7 +121,9 @@ function FeedbackRow({
                     {ok ? 'OK' : 'Check'}
                 </span>
             </div>
-            <p className="mt-1 font-mono text-[11px] text-slate-600">{text}</p>
+            <p className="mt-1 font-mono text-[11px] text-slate-600 dark:text-slate-400">
+                {text}
+            </p>
         </div>
     );
 }

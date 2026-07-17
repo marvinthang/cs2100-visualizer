@@ -40,7 +40,7 @@ export function getDatapathHighlightState(
 
 export function getHighlightSvgFill(
     role: HighlightRole,
-    normalColor = 'black',
+    normalColor = 'var(--dp-ink)',
 ): string {
     if (role === 'input') {
         return '#2563eb';
@@ -63,18 +63,18 @@ export function getHighlightSvgFill(
 
 export function getHighlightTextClass(
     role: HighlightRole,
-    normalText = 'text-slate-900',
+    normalText = 'text-slate-900 dark:text-slate-100',
 ): string {
     if (role === 'input') {
-        return 'text-blue-600';
+        return 'text-blue-600 dark:text-blue-400';
     }
 
     if (role === 'output') {
-        return 'text-green-600';
+        return 'text-green-600 dark:text-green-400';
     }
 
     if (role === 'control' || role === 'modified') {
-        return 'text-yellow-600';
+        return 'text-yellow-600 dark:text-yellow-400';
     }
 
     return normalText;
