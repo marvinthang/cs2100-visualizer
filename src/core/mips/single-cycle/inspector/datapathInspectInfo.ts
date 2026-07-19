@@ -312,7 +312,6 @@ function getRegisterFileInspectInfo(
 }
 
 function getALUInspectInfo(frame: InspectInfoFrame): DatapathInspectInfo {
-    console.log('Getting ALU inspect info with context:', frame.context);
     return {
         id: frame.id,
         title: 'Arithmetic Logic Unit (ALU)',

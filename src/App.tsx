@@ -7,17 +7,24 @@ import DatapathPage from './features/datapath/DatapathPage';
 import AssemblyPage from './features/assembly/AssemblyPage';
 import KMapPage from './features/kmap/KMapPage';
 import PipelinePage from './features/pipeline/PipelinePage';
+import CachePage from './features/cache/CachePage';
+import {
+    DEFAULT_CACHE_ARRAYS,
+    DEFAULT_CACHE_PROGRAM,
+} from './features/cache/defaultConfig';
 import { DEFAULT_PIPELINE_PROGRAM } from './features/pipeline/defaultProgram';
 import Modal from './features/datapath/components/Modal';
 import { usePersistentState } from './hooks/usePersistentState';
+import type { MipsArrayDefinitionDraft } from './types/mips';
 
-type Tab = 'datapath' | 'assembly' | 'kmap' | 'pipeline';
+type Tab = 'datapath' | 'assembly' | 'kmap' | 'pipeline' | 'cache';
 
 const tabs: { id: Tab; label: string }[] = [
     { id: 'datapath', label: 'Datapath' },
     { id: 'assembly', label: 'Assembly' },
     { id: 'kmap', label: 'Karnaugh Maps' },
     { id: 'pipeline', label: 'Pipeline' },
+    { id: 'cache', label: 'Cache' },
 ];
 
 // Demo "How to use" content. Only the Datapath tab is filled in for now.
@@ -70,6 +77,17 @@ const howToUse: Record<Tab, { intro: string; steps: string[] }> = {
             'Bonus: set initial register/memory values before running, or load one of the presets to explore.',
         ],
     },
+    cache: {
+        intro: 'See how a memory access trace hits or misses in the cache, and how geometry changes the hit rate.',
+        steps: [
+            'Set the cache geometry — size, block size, and associativity.',
+            'Choose a trace source: a manual address list, a MIPS program, or an array access pattern.',
+            'Run it to see each access classified as a hit or a miss.',
+            'Inspect the cache lines and the per-access breakdown to see which block each address maps to.',
+            'Watch the summary — hit rate, misses, and eviction counts — update as you change the geometry.',
+            'Bonus: send a program from the Assembly tab straight into the cache simulator.',
+        ],
+    },
 };
 
 function SunIcon() {
@@ -114,6 +132,9 @@ export default function App() {
         'light',
     );
     const [showHelp, setShowHelp] = useState(false);
+    const [assemblyArrays, setAssemblyArrays] = useState<
+        MipsArrayDefinitionDraft[]
+    >([]);
     const [pipelineProgram, setPipelineProgram] = usePersistentState(
         'cs2100:pipeline:program',
         DEFAULT_PIPELINE_PROGRAM,
@@ -121,11 +142,40 @@ export default function App() {
     const [pipelineInitial, setPipelineInitial] = useState<MachineState>(() =>
         createInitialMachineState(),
     );
+    const [pipelineArrays, setPipelineArrays] = useState<
+        MipsArrayDefinitionDraft[]
+    >([]);
 
-    function sendToPipeline(source: string, machine: MachineState) {
+    const [cacheProgram, setCacheProgram] = useState(DEFAULT_CACHE_PROGRAM);
+    const [cacheInitial, setCacheInitial] = useState<MachineState>(() =>
+        createInitialMachineState(),
+    );
+    const [cacheArrays, setCacheArrays] =
+        useState<MipsArrayDefinitionDraft[]>(DEFAULT_CACHE_ARRAYS);
+
+    function sendToPipeline(
+        source: string,
+        machine: MachineState,
+        arrays: MipsArrayDefinitionDraft[],
+    ) {
         setPipelineProgram(source);
         setPipelineInitial({ ...machine, pc: 0 });
+        setPipelineArrays(arrays);
         setTab('pipeline');
+    }
+
+    function sendToCache(
+        source: string,
+        machine: MachineState,
+        arrays: MipsArrayDefinitionDraft[],
+    ) {
+        setCacheProgram(source);
+        setCacheInitial({
+            ...machine,
+            pc: 0,
+        });
+        setCacheArrays(arrays);
+        setTab('cache');
     }
 
     return (
@@ -155,7 +205,7 @@ export default function App() {
                             </div>
                         </div>
 
-                        <div className="grid grid-cols-4 rounded-md bg-slate-100 p-1 ring-1 ring-slate-200 dark:bg-slate-800 dark:ring-slate-700">
+                        <div className="grid grid-cols-5 rounded-md bg-slate-100 p-1 ring-1 ring-slate-200 dark:bg-slate-800 dark:ring-slate-700">
                             {tabs.map(({ id, label }) => (
                                 <button
                                     key={id}
@@ -212,15 +262,31 @@ export default function App() {
                 {tab === 'datapath' ? (
                     <DatapathPage />
                 ) : tab === 'assembly' ? (
-                    <AssemblyPage onSendToPipeline={sendToPipeline} />
+                    <AssemblyPage
+                        arrayDefinitions={assemblyArrays}
+                        onArrayDefinitionsChange={setAssemblyArrays}
+                        onSendToPipeline={sendToPipeline}
+                        onSendToCache={sendToCache}
+                    />
                 ) : tab === 'kmap' ? (
                     <KMapPage />
-                ) : (
+                ) : tab === 'pipeline' ? (
                     <PipelinePage
                         program={pipelineProgram}
                         onProgramChange={setPipelineProgram}
                         initialMachine={pipelineInitial}
                         onInitialMachineChange={setPipelineInitial}
+                        arrayDefinitions={pipelineArrays}
+                        onArrayDefinitionsChange={setPipelineArrays}
+                    />
+                ) : (
+                    <CachePage
+                        program={cacheProgram}
+                        onProgramChange={setCacheProgram}
+                        initialMachine={cacheInitial}
+                        onInitialMachineChange={setCacheInitial}
+                        arrayDefinitions={cacheArrays}
+                        onArrayDefinitionsChange={setCacheArrays}
                     />
                 )}
             </div>

@@ -7,6 +7,11 @@ import {
     getHighlightTextClass,
 } from '../../../core/mips/single-cycle/highlight/datapathHighlightState';
 import Modal, { ExpandButton } from './Modal';
+import {
+    formatRegisterValue,
+    parseRegisterValue,
+    type RegisterValueFormat,
+} from '../../../core/mips/registerValueFormat';
 
 const registerRows = [
     [0, '$zero'],
@@ -81,10 +86,14 @@ export default function RegisterTable({
     tableMaxHeightClass?: string;
     onPcChange?: (pc: number) => void;
 }) {
+    const [valueFormat, setValueFormat] = useState<RegisterValueFormat>('dec');
     const [registerDrafts, setRegisterDrafts] = useState<
         Partial<Record<RegisterNumber, string>>
     >({});
     const [pcDraft, setPcDraft] = useState<string | null>(null);
+    const [registerFormats, setRegisterFormats] = useState<
+        Partial<Record<RegisterNumber, RegisterValueFormat>>
+    >({});
     const [isExpanded, setIsExpanded] = useState(false);
 
     const pcRole = machineHighlight.pc ?? 'normal';
@@ -99,11 +108,12 @@ export default function RegisterTable({
             <div
                 className={`${scrollClass} overflow-auto rounded-md border border-slate-200 dark:border-slate-800`}
             >
-                <table className="w-full text-sm">
+                <table className="w-full min-w-max text-sm">
                     <thead className="sticky top-0 bg-[#fbfcfd] dark:bg-slate-900/60">
                         <tr className="border-b border-slate-200 dark:border-slate-800 text-left text-xs text-slate-500 dark:text-slate-400">
                             <th className="px-3 py-2 font-semibold">No.</th>
                             <th className="px-3 py-2 font-semibold">Name</th>
+                            <th className="px-3 py-2 font-semibold">Format</th>
                             <th className="px-3 py-2 text-right font-semibold">
                                 Value
                             </th>
@@ -113,10 +123,13 @@ export default function RegisterTable({
                         {registerRows.map(([id, name]) => {
                             const role =
                                 machineHighlight.registers[id] ?? 'normal';
+                            const rowFormat =
+                                registerFormats[id] ?? valueFormat;
                             const textClass = getHighlightTextClass(role);
                             const bgClass = getHighlightBackgroundClass(role);
-                            const registerValue = String(
+                            const registerValue = formatRegisterValue(
                                 machine.registers[id] ?? 0,
+                                rowFormat,
                             );
                             const draftValue =
                                 registerDrafts[id] ?? registerValue;
@@ -133,11 +146,88 @@ export default function RegisterTable({
                                     <td className={`px-3 py-1.5 ${textClass}`}>
                                         {name}
                                     </td>
+                                    <td className="px-3 py-1.5">
+                                        <div
+                                            role="group"
+                                            aria-label={`${name} value format`}
+                                            className="inline-flex overflow-hidden rounded border border-slate-300 bg-white"
+                                        >
+                                            {(
+                                                [
+                                                    {
+                                                        format: 'dec',
+                                                        name: '10',
+                                                    },
+                                                    {
+                                                        format: 'hex',
+                                                        name: '16',
+                                                    },
+                                                    {
+                                                        format: 'bin',
+                                                        name: '2',
+                                                    },
+                                                ] as const
+                                            ).map(({ format, name }) => (
+                                                <button
+                                                    key={format}
+                                                    type="button"
+                                                    title={
+                                                        format === 'dec'
+                                                            ? 'Decimal'
+                                                            : format === 'hex'
+                                                              ? 'Hexadecimal'
+                                                              : 'Binary'
+                                                    }
+                                                    aria-pressed={
+                                                        rowFormat === format
+                                                    }
+                                                    onClick={() => {
+                                                        setRegisterDrafts(
+                                                            (drafts) => {
+                                                                const next = {
+                                                                    ...drafts,
+                                                                };
+                                                                delete next[id];
+                                                                return next;
+                                                            },
+                                                        );
+                                                        setRegisterFormats(
+                                                            (formats) => {
+                                                                const next = {
+                                                                    ...formats,
+                                                                };
+                                                                if (
+                                                                    format ===
+                                                                    valueFormat
+                                                                ) {
+                                                                    delete next[
+                                                                        id
+                                                                    ];
+                                                                } else {
+                                                                    next[id] =
+                                                                        format;
+                                                                }
+                                                                return next;
+                                                            },
+                                                        );
+                                                    }}
+                                                    className={`border-r border-slate-300 px-1.5 py-1 text-[9px] font-bold transition last:border-r-0 focus-visible:z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 ${
+                                                        rowFormat === format
+                                                            ? 'bg-slate-700 text-white'
+                                                            : 'bg-white text-slate-400 hover:bg-slate-50 hover:text-slate-800'
+                                                    }`}
+                                                >
+                                                    {name}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </td>
                                     <td
                                         className={`px-3 py-1.5 text-right ${textClass}`}
                                     >
                                         <input
-                                            type="number"
+                                            type="text"
+                                            spellCheck={false}
                                             value={draftValue}
                                             disabled={id === 0}
                                             onChange={(event) =>
@@ -147,14 +237,17 @@ export default function RegisterTable({
                                                 }))
                                             }
                                             onBlur={() => {
-                                                const raw =
-                                                    registerDrafts[id] ??
-                                                    registerValue;
-                                                const value = Number(raw);
-                                                if (
-                                                    raw.trim() === '' ||
-                                                    Number.isNaN(value)
-                                                ) {
+                                                const value =
+                                                    registerDrafts[id] !==
+                                                    undefined
+                                                        ? parseRegisterValue(
+                                                              registerDrafts[
+                                                                  id
+                                                              ],
+                                                              rowFormat,
+                                                          )
+                                                        : machine.registers[id];
+                                                if (value === null) {
                                                     setRegisterDrafts(
                                                         (drafts) => {
                                                             const next = {
@@ -178,7 +271,13 @@ export default function RegisterTable({
                                                     event.currentTarget.blur();
                                                 }
                                             }}
-                                            className="w-24 rounded-md border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-2 py-1 text-left text-slate-900 dark:text-slate-100 shadow-sm outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-100 disabled:bg-slate-100 dark:disabled:bg-slate-800 disabled:text-slate-400"
+                                            className={`rounded-md border border-slate-300 bg-white px-2 py-1 text-left text-slate-900 shadow-sm outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-100 disabled:bg-slate-100 disabled:text-slate-400 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:disabled:bg-slate-800 ${
+                                                rowFormat === 'bin'
+                                                    ? 'w-64'
+                                                    : rowFormat === 'hex'
+                                                      ? 'w-28'
+                                                      : 'w-24'
+                                            }`}
                                         />
                                     </td>
                                 </tr>
@@ -202,6 +301,37 @@ export default function RegisterTable({
                     </p>
                 </div>
                 <div className="flex items-center gap-2">
+                    <div
+                        role="group"
+                        aria-label="Register value format"
+                        className="inline-flex overflow-hidden rounded-md border border-slate-300 bg-white shadow-sm"
+                    >
+                        {(
+                            [
+                                { format: 'dec', name: 'DEC' },
+                                { format: 'hex', name: 'HEX' },
+                                { format: 'bin', name: 'BIN' },
+                            ] as const
+                        ).map(({ format, name }) => (
+                            <button
+                                key={format}
+                                type="button"
+                                aria-pressed={valueFormat === format}
+                                onClick={() => {
+                                    setRegisterDrafts({});
+                                    setRegisterFormats({});
+                                    setValueFormat(format);
+                                }}
+                                className={`border-r border-slate-300 px-2 py-1 font-mono text-[10px] font-bold transition last:border-r-0 focus-visible:z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 ${
+                                    valueFormat === format
+                                        ? 'bg-slate-900 text-white'
+                                        : 'bg-white text-slate-500 hover:bg-slate-50 hover:text-slate-900'
+                                }`}
+                            >
+                                {name}
+                            </button>
+                        ))}
+                    </div>
                     <button
                         type="button"
                         onClick={() => {

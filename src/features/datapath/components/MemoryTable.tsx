@@ -5,6 +5,11 @@ import {
     getHighlightBackgroundClass,
     getHighlightTextClass,
 } from '../../../core/mips/single-cycle/highlight/datapathHighlightState';
+import {
+    formatRegisterValue,
+    parseRegisterValue,
+    type RegisterValueFormat,
+} from '../../../core/mips/registerValueFormat';
 import Modal, { ExpandButton } from './Modal';
 
 function PanelMetric({
@@ -41,10 +46,14 @@ export default function MemoryTable({
     machineHighlight: MachineStateHighlightState;
     tableMaxHeightClass?: string;
 }) {
+    const [valueFormat, setValueFormat] = useState<RegisterValueFormat>('dec');
     const [startAddressInput, setStartAddressInput] = useState('0');
     const [wordCountInput, setWordCountInput] = useState('16');
     const [dataMemoryDrafts, setDataMemoryDrafts] = useState<
         Partial<Record<number, string>>
+    >({});
+    const [memoryFormats, setMemoryFormats] = useState<
+        Partial<Record<number, RegisterValueFormat>>
     >({});
     const [isExpanded, setIsExpanded] = useState(false);
 
@@ -71,11 +80,12 @@ export default function MemoryTable({
             <div
                 className={`${scrollClass} overflow-auto rounded-md border border-slate-200 dark:border-slate-800`}
             >
-                <table className="w-full text-sm">
+                <table className="w-full min-w-max text-sm">
                     <thead className="sticky top-0 bg-[#fbfcfd] dark:bg-slate-900/60">
                         <tr className="border-b border-slate-200 dark:border-slate-800 text-left text-xs text-slate-500 dark:text-slate-400">
                             <th className="px-3 py-2 font-semibold">Addr</th>
                             <th className="px-3 py-2 font-semibold">Hex</th>
+                            <th className="px-3 py-2 font-semibold">Format</th>
                             <th className="px-3 py-2 text-right font-semibold">
                                 Value
                             </th>
@@ -87,8 +97,11 @@ export default function MemoryTable({
                                 machineHighlight.memory[address] ?? 'normal';
                             const textClass = getHighlightTextClass(role);
                             const bgClass = getHighlightBackgroundClass(role);
-                            const memoryValue = String(
+                            const rowFormat =
+                                memoryFormats[address] ?? valueFormat;
+                            const memoryValue = formatRegisterValue(
                                 machine.dataMemory[address] ?? 0,
+                                rowFormat,
                             );
                             const draftValue =
                                 dataMemoryDrafts[address] ?? memoryValue;
@@ -107,11 +120,91 @@ export default function MemoryTable({
                                             .toUpperCase()
                                             .padStart(8, '0')}
                                     </td>
+                                    <td className="px-3 py-1.5">
+                                        <div
+                                            role="group"
+                                            aria-label={`Address ${address} value format`}
+                                            className="inline-flex overflow-hidden rounded border border-slate-300 bg-white"
+                                        >
+                                            {(
+                                                [
+                                                    {
+                                                        format: 'dec',
+                                                        name: '10',
+                                                    },
+                                                    {
+                                                        format: 'hex',
+                                                        name: '16',
+                                                    },
+                                                    {
+                                                        format: 'bin',
+                                                        name: '2',
+                                                    },
+                                                ] as const
+                                            ).map(({ format, name }) => (
+                                                <button
+                                                    key={format}
+                                                    type="button"
+                                                    title={
+                                                        format === 'dec'
+                                                            ? 'Decimal'
+                                                            : format === 'hex'
+                                                              ? 'Hexadecimal'
+                                                              : 'Binary'
+                                                    }
+                                                    aria-pressed={
+                                                        rowFormat === format
+                                                    }
+                                                    onClick={() => {
+                                                        setDataMemoryDrafts(
+                                                            (drafts) => {
+                                                                const next = {
+                                                                    ...drafts,
+                                                                };
+                                                                delete next[
+                                                                    address
+                                                                ];
+                                                                return next;
+                                                            },
+                                                        );
+                                                        setMemoryFormats(
+                                                            (formats) => {
+                                                                const next = {
+                                                                    ...formats,
+                                                                };
+                                                                if (
+                                                                    format ===
+                                                                    valueFormat
+                                                                ) {
+                                                                    delete next[
+                                                                        address
+                                                                    ];
+                                                                } else {
+                                                                    next[
+                                                                        address
+                                                                    ] = format;
+                                                                }
+                                                                return next;
+                                                            },
+                                                        );
+                                                    }}
+                                                    className={`border-r border-slate-300 px-1.5 py-1 text-[9px] font-bold transition last:border-r-0 focus-visible:z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 ${
+                                                        rowFormat === format
+                                                            ? 'bg-slate-700 text-white'
+                                                            : 'bg-white text-slate-400 hover:bg-slate-50 hover:text-slate-800'
+                                                    }`}
+                                                >
+                                                    {name}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </td>
                                     <td
                                         className={`px-3 py-1.5 text-right ${textClass}`}
                                     >
                                         <input
-                                            type="number"
+                                            type="text"
+                                            spellCheck={false}
                                             value={draftValue}
                                             onChange={(event) =>
                                                 setDataMemoryDrafts(
@@ -123,14 +216,20 @@ export default function MemoryTable({
                                                 )
                                             }
                                             onBlur={() => {
-                                                const raw =
-                                                    dataMemoryDrafts[address] ??
-                                                    memoryValue;
-                                                const value = Number(raw);
-                                                if (
-                                                    raw.trim() === '' ||
-                                                    Number.isNaN(value)
-                                                ) {
+                                                const value =
+                                                    dataMemoryDrafts[
+                                                        address
+                                                    ] !== undefined
+                                                        ? parseRegisterValue(
+                                                              dataMemoryDrafts[
+                                                                  address
+                                                              ],
+                                                              rowFormat,
+                                                          )
+                                                        : machine.dataMemory[
+                                                              address
+                                                          ];
+                                                if (value === null) {
                                                     setDataMemoryDrafts(
                                                         (drafts) => {
                                                             const next = {
@@ -155,7 +254,18 @@ export default function MemoryTable({
                                                 );
                                                 onMemoryChange(address, value);
                                             }}
-                                            className="w-24 rounded-md border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-2 py-1 text-left text-slate-900 dark:text-slate-100 shadow-sm outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-100"
+                                            onKeyDown={(event) => {
+                                                if (event.key === 'Enter') {
+                                                    event.currentTarget.blur();
+                                                }
+                                            }}
+                                            className={`rounded-md border border-slate-300 bg-white px-2 py-1 text-left text-slate-900 shadow-sm outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-100 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 ${
+                                                rowFormat === 'bin'
+                                                    ? 'w-64'
+                                                    : rowFormat === 'hex'
+                                                      ? 'w-28'
+                                                      : 'w-24'
+                                            }`}
                                         />
                                     </td>
                                 </tr>
@@ -179,6 +289,37 @@ export default function MemoryTable({
                     </p>
                 </div>
                 <div className="flex items-center gap-2">
+                    <div
+                        role="group"
+                        aria-label="Memory value format"
+                        className="inline-flex overflow-hidden rounded-md border border-slate-300 bg-white shadow-sm"
+                    >
+                        {(
+                            [
+                                { format: 'dec', name: 'DEC' },
+                                { format: 'hex', name: 'HEX' },
+                                { format: 'bin', name: 'BIN' },
+                            ] as const
+                        ).map(({ format, name }) => (
+                            <button
+                                key={format}
+                                type="button"
+                                aria-pressed={valueFormat === format}
+                                onClick={() => {
+                                    setDataMemoryDrafts({});
+                                    setMemoryFormats({});
+                                    setValueFormat(format);
+                                }}
+                                className={`border-r border-slate-300 px-2 py-1 font-mono text-[10px] font-bold transition last:border-r-0 focus-visible:z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 ${
+                                    valueFormat === format
+                                        ? 'bg-slate-900 text-white'
+                                        : 'bg-white text-slate-500 hover:bg-slate-50 hover:text-slate-900'
+                                }`}
+                            >
+                                {name}
+                            </button>
+                        ))}
+                    </div>
                     <button
                         type="button"
                         onClick={() => {

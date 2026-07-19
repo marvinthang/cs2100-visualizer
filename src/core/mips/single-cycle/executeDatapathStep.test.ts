@@ -208,6 +208,78 @@ describe('executeDatapathStep', () => {
         expect(result.warnings).toEqual([]);
     });
 
+    it('MEM interprets a negative ALU result as an unsigned lw address', () => {
+        const instruction: DatapathInstructionFields = {
+            ...datapathInstructionExamples.lw,
+            immediate: -4,
+        };
+        const machine = createMachine({ 9: 0 }, { [0xfffffffc]: 42 });
+        const { context } = runStepSequence(machine, instruction);
+
+        expect(context.aluResult).toBe(-4);
+
+        const result = executeDatapathStep(
+            machine,
+            context,
+            instruction,
+            createSignals('lw'),
+            'MEM',
+            true,
+        );
+
+        expect(result.executionContext.memAddress).toBe(0xfffffffc);
+        expect(result.executionContext.memReadData).toBe(42);
+        expect(result.warnings).toEqual([]);
+    });
+
+    it('MEM interprets a negative ALU result as an unsigned sw address', () => {
+        const instruction: DatapathInstructionFields = {
+            ...datapathInstructionExamples.sw,
+            immediate: -4,
+        };
+        const machine = createMachine({ 8: 42, 9: 0 });
+        const { context } = runStepSequence(machine, instruction);
+
+        expect(context.aluResult).toBe(-4);
+
+        const result = executeDatapathStep(
+            machine,
+            context,
+            instruction,
+            createSignals('sw'),
+            'MEM',
+            true,
+        );
+
+        expect(result.executionContext.memAddress).toBe(0xfffffffc);
+        expect(result.machineState.dataMemory[0xfffffffc]).toBe(42);
+        expect(result.machineState.dataMemory[-4]).toBeUndefined();
+        expect(result.warnings).toEqual([]);
+    });
+
+    it('MEM preserves a signed word while using an unsigned address', () => {
+        const instruction: DatapathInstructionFields = {
+            ...datapathInstructionExamples.sw,
+            immediate: -4,
+        };
+        const machine = createMachine({ 8: -1, 9: 0 });
+        const { context } = runStepSequence(machine, instruction);
+
+        const result = executeDatapathStep(
+            machine,
+            context,
+            instruction,
+            createSignals('sw'),
+            'MEM',
+            true,
+        );
+
+        expect(result.executionContext.memAddress).toBe(0xfffffffc);
+        expect(result.executionContext.memWriteData).toBe(-1);
+        expect(result.machineState.dataMemory[0xfffffffc]).toBe(-1);
+        expect(result.warnings).toEqual([]);
+    });
+
     it('WB writes register only when RegWrite = 1', () => {
         const machine = createMachine();
         const context: ExecutionContext = {
