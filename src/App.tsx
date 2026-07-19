@@ -7,30 +7,69 @@ import DatapathPage from './features/datapath/DatapathPage';
 import AssemblyPage from './features/assembly/AssemblyPage';
 import KMapPage from './features/kmap/KMapPage';
 import PipelinePage from './features/pipeline/PipelinePage';
+import CachePage from './features/cache/CachePage';
+import {
+    DEFAULT_CACHE_ARRAYS,
+    DEFAULT_CACHE_PROGRAM,
+} from './features/cache/defaultConfig';
 import { DEFAULT_PIPELINE_PROGRAM } from './features/pipeline/defaultProgram';
+import type { MipsArrayDefinitionDraft } from './types/mips';
 
-type Tab = 'datapath' | 'assembly' | 'kmap' | 'pipeline';
+type Tab = 'datapath' | 'assembly' | 'kmap' | 'pipeline' | 'cache';
 
 const tabs: { id: Tab; label: string }[] = [
     { id: 'datapath', label: 'Datapath' },
     { id: 'assembly', label: 'Assembly' },
     { id: 'kmap', label: 'Karnaugh Maps' },
     { id: 'pipeline', label: 'Pipeline' },
+    { id: 'cache', label: 'Cache' },
 ];
 
 export default function App() {
     const [tab, setTab] = useState<Tab>('datapath');
+    const [assemblyArrays, setAssemblyArrays] = useState<
+        MipsArrayDefinitionDraft[]
+    >([]);
     const [pipelineProgram, setPipelineProgram] = useState(
         DEFAULT_PIPELINE_PROGRAM,
     );
     const [pipelineInitial, setPipelineInitial] = useState<MachineState>(() =>
         createInitialMachineState(),
     );
+    const [pipelineArrays, setPipelineArrays] = useState<
+        MipsArrayDefinitionDraft[]
+    >([]);
 
-    function sendToPipeline(source: string, machine: MachineState) {
+    const [cacheProgram, setCacheProgram] = useState(DEFAULT_CACHE_PROGRAM);
+    const [cacheInitial, setCacheInitial] = useState<MachineState>(() =>
+        createInitialMachineState(),
+    );
+    const [cacheArrays, setCacheArrays] =
+        useState<MipsArrayDefinitionDraft[]>(DEFAULT_CACHE_ARRAYS);
+
+    function sendToPipeline(
+        source: string,
+        machine: MachineState,
+        arrays: MipsArrayDefinitionDraft[],
+    ) {
         setPipelineProgram(source);
         setPipelineInitial({ ...machine, pc: 0 });
+        setPipelineArrays(arrays);
         setTab('pipeline');
+    }
+
+    function sendToCache(
+        source: string,
+        machine: MachineState,
+        arrays: MipsArrayDefinitionDraft[],
+    ) {
+        setCacheProgram(source);
+        setCacheInitial({
+            ...machine,
+            pc: 0,
+        });
+        setCacheArrays(arrays);
+        setTab('cache');
     }
 
     return (
@@ -57,7 +96,7 @@ export default function App() {
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-4 rounded-md bg-slate-100 p-1 ring-1 ring-slate-200">
+                    <div className="grid grid-cols-5 rounded-md bg-slate-100 p-1 ring-1 ring-slate-200">
                         {tabs.map(({ id, label }) => (
                             <button
                                 key={id}
@@ -80,15 +119,31 @@ export default function App() {
                 {tab === 'datapath' ? (
                     <DatapathPage />
                 ) : tab === 'assembly' ? (
-                    <AssemblyPage onSendToPipeline={sendToPipeline} />
+                    <AssemblyPage
+                        arrayDefinitions={assemblyArrays}
+                        onArrayDefinitionsChange={setAssemblyArrays}
+                        onSendToPipeline={sendToPipeline}
+                        onSendToCache={sendToCache}
+                    />
                 ) : tab === 'kmap' ? (
                     <KMapPage />
-                ) : (
+                ) : tab === 'pipeline' ? (
                     <PipelinePage
                         program={pipelineProgram}
                         onProgramChange={setPipelineProgram}
                         initialMachine={pipelineInitial}
                         onInitialMachineChange={setPipelineInitial}
+                        arrayDefinitions={pipelineArrays}
+                        onArrayDefinitionsChange={setPipelineArrays}
+                    />
+                ) : (
+                    <CachePage
+                        program={cacheProgram}
+                        onProgramChange={setCacheProgram}
+                        initialMachine={cacheInitial}
+                        onInitialMachineChange={setCacheInitial}
+                        arrayDefinitions={cacheArrays}
+                        onArrayDefinitionsChange={setCacheArrays}
                     />
                 )}
             </div>

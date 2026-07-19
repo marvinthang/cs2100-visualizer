@@ -1,0 +1,53 @@
+import type { MipsArrayDefinitionDraft } from '../../types/mips';
+
+export const DEFAULT_CACHE_PROGRAM = [
+    'add $t0, $0, $0 # Inst1: $t0 = loop index',
+    'add $t1, $a1, $0 # Inst2: $t1 = &A[0]',
+    'add $t2, $a2, $0 # Inst3: $t2 = &B[0]',
+    'add $s6, $0, $0 # Inst4: Initialize answer1 to 0',
+    'add $s7, $0, $0 # Inst5: Initialize answer2 to 0',
+    'loop: slt $t9, $t0, $a0 # Inst6',
+    'beq $t9, $0, exit # Inst7',
+    'lw $s1, 0($t1) # Inst8',
+    'lw $s2, 0($t2) # Inst9',
+    'sll $s3, $s2, 2 # Inst10: sll does not cause overflow',
+    'add $s5, $s1, $s3 # Inst11',
+    'add $s6, $s6, $s5 # Inst12',
+    'sub $t7, $s1, $s2 # Inst13',
+    'slt $t8, $t7, $0 # Inst14',
+    'beq $t8, $0, skip1 # Inst15',
+    'sub $t7, $0, $t7 # Inst16',
+    'skip1: slt $t8, $t7, $s7 # Inst17',
+    'bne $t8, $0, skip2 # Inst18',
+    'add $s7, $t7, $0 # Inst19',
+    'skip2: addi $t0, $t0, 1 # Inst20',
+    'addi $t1, $t1, 4 # Inst21',
+    'addi $t2, $t2, 4 # Inst22',
+    'j loop # Inst23',
+    'exit:',
+].join('\n');
+
+export const DEFAULT_CACHE_ARRAYS: MipsArrayDefinitionDraft[] = [
+    {
+        name: 'A',
+        addressMode: 'fixed',
+        baseAddress: '0x80082108',
+        lengthMode: 'fixed',
+        length: '1026',
+        addressFormat: 'hexadecimal',
+        baseAddressRegister: 5,
+        lengthRegister: 4,
+        valuePattern: '',
+    },
+    {
+        name: 'B',
+        addressMode: 'after-previous',
+        baseAddress: '0x80083110',
+        lengthMode: 'same-as-previous',
+        length: '1026',
+        addressFormat: 'hexadecimal',
+        baseAddressRegister: 6,
+        lengthRegister: 4,
+        valuePattern: '',
+    },
+];

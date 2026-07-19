@@ -94,6 +94,84 @@ describe('executeInstruction', () => {
         expect(result.pc).toBe(4);
     });
 
+    it('uses an unsigned 32-bit effective address for lw', () => {
+        const instruction: MipsInstructionFields = {
+            mnemonic: 'lw',
+            rs: 9,
+            rt: 8,
+            rd: 0,
+            immediate: -4,
+        };
+
+        const result = executeInstruction(
+            createMachine({ 9: 0 }, { [0xfffffffc]: 42 }),
+            instruction,
+        );
+
+        expect(result.registers[8]).toBe(42);
+        expect(result.pc).toBe(4);
+    });
+
+    it('uses an unsigned 32-bit effective address for sw', () => {
+        const instruction: MipsInstructionFields = {
+            mnemonic: 'sw',
+            rs: 9,
+            rt: 8,
+            rd: 0,
+            immediate: -4,
+        };
+
+        const result = executeInstruction(
+            createMachine({ 8: 42, 9: 0 }),
+            instruction,
+        );
+
+        expect(result.dataMemory[0xfffffffc]).toBe(42);
+        expect(result.dataMemory[-4]).toBeUndefined();
+    });
+
+    it('wraps an effective address to 32 bits', () => {
+        const instruction: MipsInstructionFields = {
+            mnemonic: 'sw',
+            rs: 9,
+            rt: 8,
+            rd: 0,
+            immediate: 8,
+        };
+
+        const result = executeInstruction(
+            createMachine({ 8: 42, 9: 0xfffffffc }),
+            instruction,
+        );
+
+        expect(result.dataMemory[4]).toBe(42);
+        expect(result.dataMemory[0x100000004]).toBeUndefined();
+    });
+
+    it('preserves the stored word value while normalizing its address', () => {
+        const store: MipsInstructionFields = {
+            mnemonic: 'sw',
+            rs: 9,
+            rt: 8,
+            rd: 0,
+            immediate: -4,
+        };
+        const load: MipsInstructionFields = {
+            ...store,
+            mnemonic: 'lw',
+            rt: 10,
+        };
+
+        const afterStore = executeInstruction(
+            createMachine({ 8: -1, 9: 0 }),
+            store,
+        );
+        const afterLoad = executeInstruction(afterStore, load);
+
+        expect(afterStore.dataMemory[0xfffffffc]).toBe(-1);
+        expect(afterLoad.registers[10]).toBe(-1);
+    });
+
     it('executes beq by updating PC when registers are equal', () => {
         const instruction: MipsInstructionFields = {
             mnemonic: 'beq',

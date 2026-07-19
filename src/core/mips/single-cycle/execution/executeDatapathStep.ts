@@ -232,15 +232,15 @@ function executeEX(frame: ExecutionFrame): void {
             `└─ Branch target = ${toHex(branchTarget)}`,
         ],
     };
-    console.log('op = ', op);
-    console.log('ALU execution frame:', frame.context);
 }
 
 function executeMEM(frame: ExecutionFrame): void {
     const memRead = getBitSignal(frame.signals, 'MemRead', frame.warnings);
     const memWrite = getBitSignal(frame.signals, 'MemWrite', frame.warnings);
 
-    const memAddress = frame.context.aluResult;
+    const rawMemAddress = frame.context.aluResult;
+    const memAddress =
+        rawMemAddress !== undefined ? rawMemAddress >>> 0 : undefined;
     const memWriteData = frame.context.readData2;
 
     frame.newContext = {
