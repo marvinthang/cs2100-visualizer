@@ -268,7 +268,6 @@ export function useDatapathSimulator() {
     }
 
     function handlePreviousStep() {
-        console.log('Restoring snapshot:', snapshots);
         const last_snapshot = snapshots[snapshots.length - 1];
 
         if (last_snapshot === undefined) {

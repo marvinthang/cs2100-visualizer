@@ -1,4 +1,8 @@
+import { useState } from 'react';
+import MipsArrayDefinitionsEditor from '../../components/MipsArrayDefinitionsEditor';
+import { prepareMipsArrays } from '../../core/mips/execution/prepareMipsArrays';
 import type { MachineState } from '../../core/mips/single-cycle/execution/machineState';
+import type { MipsArrayDefinitionDraft } from '../../types/mips';
 import MemoryTable from '../datapath/components/MemoryTable';
 import RegisterTable from '../datapath/components/RegisterTable';
 import MipsEditor from './MipsEditor';
@@ -24,10 +28,25 @@ function StatusPill({
 }
 
 export default function AssemblyPage({
+    arrayDefinitions,
+    onArrayDefinitionsChange,
     onSendToPipeline,
+    onSendToCache,
 }: {
-    onSendToPipeline?: (source: string, machine: MachineState) => void;
+    arrayDefinitions: MipsArrayDefinitionDraft[];
+    onArrayDefinitionsChange: (definitions: MipsArrayDefinitionDraft[]) => void;
+    onSendToPipeline?: (
+        source: string,
+        machine: MachineState,
+        arrays: MipsArrayDefinitionDraft[],
+    ) => void;
+    onSendToCache?: (
+        source: string,
+        machine: MachineState,
+        arrays: MipsArrayDefinitionDraft[],
+    ) => void;
 }) {
+    const [arrayErrors, setArrayErrors] = useState<string[]>([]);
     const {
         machine,
         machineHighlight,
@@ -51,6 +70,14 @@ export default function AssemblyPage({
         : programFinished
           ? 'Finished'
           : 'Ready';
+
+    function loadProgram(source: string) {
+        const prepared = prepareMipsArrays(machine, arrayDefinitions);
+        setArrayErrors(prepared.errors);
+        if (prepared.errors.length > 0) return;
+
+        handleLoadProgram(source, prepared.machine);
+    }
 
     return (
         <main className="min-h-full bg-[#eef2f3] p-3 text-slate-900 sm:p-4 lg:p-6">
@@ -93,11 +120,25 @@ export default function AssemblyPage({
                 <div className="grid items-start gap-4 lg:grid-cols-[320px_minmax(0,1fr)] xl:grid-cols-[320px_minmax(0,1fr)]">
                     <aside className="space-y-4">
                         <MipsEditor
-                            onLoad={handleLoadProgram}
+                            onLoad={loadProgram}
                             onSendToPipeline={
                                 onSendToPipeline
                                     ? (source) =>
-                                          onSendToPipeline(source, machine)
+                                          onSendToPipeline(
+                                              source,
+                                              machine,
+                                              arrayDefinitions,
+                                          )
+                                    : undefined
+                            }
+                            onSendToCache={
+                                onSendToCache
+                                    ? (source) =>
+                                          onSendToCache(
+                                              source,
+                                              machine,
+                                              arrayDefinitions,
+                                          )
                                     : undefined
                             }
                             programLoaded={programLoaded}
@@ -154,23 +195,34 @@ export default function AssemblyPage({
                         </section>
                     </aside>
 
-                    <div className="grid items-start gap-4 md:grid-cols-2">
-                        <RegisterTable
-                            machine={machine}
-                            onRegisterChange={handleRegisterChange}
-                            onResetRegisters={handleResetRegisters}
-                            machineHighlight={machineHighlight}
-                            tableMaxHeightClass="max-h-[480px]"
+                    <div className="space-y-4">
+                        <MipsArrayDefinitionsEditor
+                            definitions={arrayDefinitions}
+                            errors={arrayErrors}
+                            onChange={(definitions) => {
+                                setArrayErrors([]);
+                                onArrayDefinitionsChange(definitions);
+                            }}
                         />
 
-                        <MemoryTable
-                            machine={machine}
-                            onMemoryChange={handleMemoryChange}
-                            onMemoryRangeChange={handleMemoryRangeChange}
-                            onResetMemory={handleResetMemory}
-                            machineHighlight={machineHighlight}
-                            tableMaxHeightClass="max-h-[420px]"
-                        />
+                        <div className="grid items-start gap-4 md:grid-cols-2">
+                            <RegisterTable
+                                machine={machine}
+                                onRegisterChange={handleRegisterChange}
+                                onResetRegisters={handleResetRegisters}
+                                machineHighlight={machineHighlight}
+                                tableMaxHeightClass="max-h-[480px]"
+                            />
+
+                            <MemoryTable
+                                machine={machine}
+                                onMemoryChange={handleMemoryChange}
+                                onMemoryRangeChange={handleMemoryRangeChange}
+                                onResetMemory={handleResetMemory}
+                                machineHighlight={machineHighlight}
+                                tableMaxHeightClass="max-h-[420px]"
+                            />
+                        </div>
                     </div>
                 </div>
             </div>

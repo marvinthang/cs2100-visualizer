@@ -1,9 +1,16 @@
 import { useLayoutEffect, useMemo, useRef, useState } from 'react';
+import MipsArrayDefinitionsEditor from '../../components/MipsArrayDefinitionsEditor';
 import { assembleMipsProgram } from '../../core/mips/assembly/assembleMipsProgram';
+import { prepareMipsArrays } from '../../core/mips/execution/prepareMipsArrays';
 import { registerNames } from '../../core/mips/instruction/registers';
 import type { MachineState } from '../../core/mips/single-cycle/execution/machineState';
 import type { MachineStateHighlightState } from '../../core/mips/single-cycle/highlight/types';
-import type { MipsInstructionFields, RegisterNumber } from '../../types/mips';
+import type {
+    MipsArrayDefinitionDraft,
+    MipsInstructionFields,
+    RegisterNumber,
+} from '../../types/mips';
+import MipsSourceEditor from '../../components/MipsSourceEditor';
 import {
     buildHazardSchedule,
     type HazardSchedule,
@@ -586,11 +593,15 @@ export default function PipelinePage({
     onProgramChange,
     initialMachine,
     onInitialMachineChange,
+    arrayDefinitions,
+    onArrayDefinitionsChange,
 }: {
     program: string;
     onProgramChange: (next: string) => void;
     initialMachine: MachineState;
     onInitialMachineChange: (next: MachineState) => void;
+    arrayDefinitions: MipsArrayDefinitionDraft[];
+    onArrayDefinitionsChange: (definitions: MipsArrayDefinitionDraft[]) => void;
 }) {
     const [options, setOptions] = useState<Record<OptionId, boolean>>({
         forwarding: true,
@@ -607,6 +618,9 @@ export default function PipelinePage({
     // the program + inputs that were last Run (the diagram only updates on Run)
     const [runProgram, setRunProgram] = useState(program);
     const [runMachine, setRunMachine] = useState(initialMachine);
+    const [runArrayDefinitions, setRunArrayDefinitions] =
+        useState(arrayDefinitions);
+    const [arrayErrors, setArrayErrors] = useState<string[]>([]);
     const [pinnedInfo, setPinnedInfo] = useState<OptionId | null>(null);
     const [hoverInfo, setHoverInfo] = useState<OptionId | null>(null);
     const [maxRows, setMaxRows] = useState(50);
@@ -683,11 +697,20 @@ export default function PipelinePage({
         [program],
     );
     // true when the editor / inputs differ from what was last Run
-    const dirty = program !== runProgram || initialMachine !== runMachine;
+    const dirty =
+        program !== runProgram ||
+        initialMachine !== runMachine ||
+        arrayDefinitions !== runArrayDefinitions;
 
     function runCode() {
+        const prepared = prepareMipsArrays(initialMachine, arrayDefinitions);
+        setArrayErrors(prepared.errors);
+        if (prepared.errors.length > 0) return;
+
+        onInitialMachineChange(prepared.machine);
         setRunProgram(program);
-        setRunMachine(initialMachine);
+        setRunMachine(prepared.machine);
+        setRunArrayDefinitions(arrayDefinitions);
         setSelectedRow(0);
     }
     const schedule = useMemo(
@@ -739,9 +762,6 @@ export default function PipelinePage({
             }
         }
     }
-
-    const gutterRef = useRef<HTMLDivElement>(null);
-    const lineNumbers = program.split('\n').map((_, i) => i + 1);
 
     // Rows / Cols + Apply, shared by the panel header and the expand modal.
     const limitControls = (
@@ -861,22 +881,32 @@ export default function PipelinePage({
                     <span>{showInitial ? 'hide' : 'edit'}</span>
                 </button>
                 {showInitial ? (
-                    <div className="mt-3 grid items-start gap-4 md:grid-cols-2">
-                        <RegisterTable
-                            machine={initialMachine}
-                            onRegisterChange={handleRegisterChange}
-                            onResetRegisters={handleResetRegisters}
-                            machineHighlight={EMPTY_HIGHLIGHT}
-                            tableMaxHeightClass="max-h-[360px]"
+                    <div className="mt-3 space-y-4">
+                        <MipsArrayDefinitionsEditor
+                            definitions={arrayDefinitions}
+                            errors={arrayErrors}
+                            onChange={(definitions) => {
+                                setArrayErrors([]);
+                                onArrayDefinitionsChange(definitions);
+                            }}
                         />
-                        <MemoryTable
-                            machine={initialMachine}
-                            onMemoryChange={handleMemoryChange}
-                            onMemoryRangeChange={handleMemoryRangeChange}
-                            onResetMemory={handleResetMemory}
-                            machineHighlight={EMPTY_HIGHLIGHT}
-                            tableMaxHeightClass="max-h-[360px]"
-                        />
+                        <div className="grid items-start gap-4 md:grid-cols-2">
+                            <RegisterTable
+                                machine={initialMachine}
+                                onRegisterChange={handleRegisterChange}
+                                onResetRegisters={handleResetRegisters}
+                                machineHighlight={EMPTY_HIGHLIGHT}
+                                tableMaxHeightClass="max-h-[360px]"
+                            />
+                            <MemoryTable
+                                machine={initialMachine}
+                                onMemoryChange={handleMemoryChange}
+                                onMemoryRangeChange={handleMemoryRangeChange}
+                                onResetMemory={handleResetMemory}
+                                machineHighlight={EMPTY_HIGHLIGHT}
+                                tableMaxHeightClass="max-h-[360px]"
+                            />
+                        </div>
                     </div>
                 ) : (
                     <p className="mt-2 text-[11px] text-slate-400">
@@ -898,43 +928,16 @@ export default function PipelinePage({
                                 onClick={() => setExpanded('program')}
                             />
                         </div>
-                        <div className="flex h-48 rounded border border-slate-200 bg-slate-50 font-mono text-xs leading-5">
-                            <div
-                                ref={gutterRef}
-                                className="select-none overflow-hidden border-r border-slate-200 py-2 pl-2 pr-1.5 text-right text-slate-400"
-                            >
-                                {lineNumbers.map((n) => (
-                                    <div key={n}>{n}</div>
-                                ))}
-                            </div>
-                            <textarea
-                                wrap="off"
-                                className="flex-1 resize-none overflow-x-auto whitespace-pre bg-transparent py-2 pl-2 pr-2 leading-5 text-slate-700 outline-none"
-                                placeholder={
-                                    'sub $2, $1, $3\nand $12, $2, $5\nor  $13, $6, $2'
-                                }
-                                spellCheck={false}
-                                value={program}
-                                onChange={(e) =>
-                                    onProgramChange(e.target.value)
-                                }
-                                onScroll={(e) => {
-                                    if (gutterRef.current) {
-                                        gutterRef.current.scrollTop =
-                                            e.currentTarget.scrollTop;
-                                    }
-                                }}
-                            />
-                        </div>
-                        {draftErrors.length > 0 ? (
-                            <div className="mt-2 space-y-0.5 text-[11px] text-rose-600">
-                                {draftErrors.map((e, i) => (
-                                    <p key={i}>
-                                        Line {e.line}: {e.message}
-                                    </p>
-                                ))}
-                            </div>
-                        ) : null}
+                        <MipsSourceEditor
+                            value={program}
+                            onChange={onProgramChange}
+                            errors={draftErrors}
+                            heightClass="h-48"
+                            placeholder={
+                                'sub $2, $1, $3\nand $12, $2, $5\nor  $13, $6, $2'
+                            }
+                            ariaLabel="Pipeline MIPS program source"
+                        />
                         {trace.truncated ? (
                             <p className="mt-2 text-[11px] text-amber-600">
                                 Showing the first {instructionCount} executed
@@ -1091,12 +1094,13 @@ export default function PipelinePage({
                     onClose={() => setExpanded(null)}
                     maxWidthClass="max-w-3xl"
                 >
-                    <textarea
-                        wrap="off"
-                        spellCheck={false}
+                    <MipsSourceEditor
                         value={program}
-                        onChange={(e) => onProgramChange(e.target.value)}
-                        className="h-[60vh] w-full resize-none overflow-auto whitespace-pre rounded border border-slate-200 bg-slate-50 p-3 font-mono text-sm leading-5 text-slate-700 outline-none"
+                        onChange={onProgramChange}
+                        errors={draftErrors}
+                        heightClass="h-[60vh]"
+                        textSizeClass="text-sm"
+                        ariaLabel="Expanded pipeline MIPS program source"
                     />
                 </Modal>
             ) : null}

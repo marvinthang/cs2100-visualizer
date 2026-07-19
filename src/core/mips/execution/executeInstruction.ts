@@ -53,10 +53,10 @@ export function executeInstruction(
             return writeRegister(
                 next,
                 fields.rt,
-                readWord(machine, rs + imm) ?? 0,
+                readWord(machine, (rs + imm) >>> 0) ?? 0,
             );
         case 'sw':
-            return writeWord(next, rs + imm, rt);
+            return writeWord(next, (rs + imm) >>> 0, rt);
         case 'beq':
             return rs === rt ? { ...next, pc: pc + 4 + (imm << 2) } : next;
         case 'bne':

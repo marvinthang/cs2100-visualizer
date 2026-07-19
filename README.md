@@ -6,19 +6,13 @@
 
 **Authors:** Nguyen Duc Thang, Lai Minh Quang
 
----
-
 ## Demo
 
 [CS2100 Visualizer Demo](https://cs2100-visualizer.vercel.app/)
 
----
-
 ## Proposed Level of Achievement
 
 Target: **Apollo 11**
-
----
 
 ## Table of Contents
 
@@ -41,8 +35,6 @@ Target: **Apollo 11**
 17. [Tech Stack](#17-tech-stack)
 18. [Project Log and Repository](#18-project-log-and-repository)
 
----
-
 # 1. Project Overview
 
 CS2100 Visualizer is our Orbital project for making CS2100 topics easier to understand visually. Instead of only reading static diagrams, students can step through datapath execution, run small MIPS programs, practise K-maps, and compare pipeline timings.
@@ -56,8 +48,6 @@ The project currently contains four learning modules:
 
 The app is designed as a browser-based learning tool. It does not require accounts, backend storage, or installation. Students can directly open the demo, choose a module, and interact with CS2100 concepts visually.
 
----
-
 # 2. Motivation
 
 CS2100 introduces important computer organization concepts such as MIPS assembly, single-cycle datapath execution, control signals, register and memory updates, Boolean simplification, and pipelining. These concepts are often taught through static diagrams, tables, and final-answer examples.
@@ -69,8 +59,6 @@ Similarly, for Karnaugh maps, students may know the final simplified expression 
 For pipelining, students often manually draw stage-time tables and compute cycles, stalls, and CPI. This is error-prone because instruction dependencies, forwarding assumptions, branch resolution, prediction, and loops interact with each other.
 
 CS2100 Visualizer makes these hidden intermediate steps visible. Instead of only reading diagrams, students can interact with instructions, signals, memory, registers, K-map cells, groups, solver output, and pipeline timelines directly.
-
----
 
 # 3. Vision
 
@@ -87,8 +75,6 @@ The app should help students:
 - revise quickly before tutorials, quizzes, and exams
 
 The long-term direction is to cover more CS2100 topics through small, accurate visual modules rather than one large monolithic simulator.
-
----
 
 # 4. Target Users
 
@@ -125,8 +111,6 @@ The app is designed to help students:
 - practise K-map simplification interactively
 - compare pipeline configurations such as forwarding, branch resolution, prediction, and jump handling
 - learn from mistakes through logs, warnings, and visual feedback
-
----
 
 # 5. User Stories
 
@@ -166,27 +150,25 @@ The app is designed to help students:
 - As a CS2100 student, I want to understand pipeline behavior without manually tracking every stage on paper.
 - As a TA, I want a visual tool that helps explain pipeline timing and hazards during teaching.
 
----
-
 # 6. Scope and Feature Status
 
 ## 6.1 Current Modules
 
 ### MIPS Datapath Visualizer
 
-We built the Datapath Visualizer to make single-cycle execution visible stage by stage. It shows IF, ID, EX, MEM, and WB behavior because students often understand the final answer but struggle to see how values move through the datapath.
+The Datapath Visualizer makes single-cycle execution visible stage by stage. It shows IF, ID, EX, MEM, and WB behavior so students can trace how values move through the datapath.
 
 ### MIPS Assembly Simulator
 
-We built the Assembly Simulator to let students test supported MIPS programs quickly. It assembles source code into machine code and executes one instruction at a time because not every debugging task needs the full datapath view.
+The Assembly Simulator is for quickly testing supported MIPS programs. It assembles source code into machine code and executes one instruction at a time.
 
 ### K-map Visualizer
 
-We built the K-map Visualizer to support manual Boolean simplification practice. It includes editing, grouping, solver comparison, expression checking, and generated practice maps because students need to practise the reasoning process, not only see the final simplified expression.
+The K-map Visualizer supports manual Boolean simplification practice. It includes editing, grouping, solver comparison, expression checking, and generated practice maps.
 
 ### MIPS Pipeline Visualizer
 
-We built the Pipeline Visualizer to make cycle-by-cycle instruction overlap easier to reason about. It shows stage placement, stalls, bubbles, flushes, forwarding, branch behavior, jump handling, and CPI because pipeline questions become difficult when students have to track all of those effects manually.
+The Pipeline Visualizer shows cycle-by-cycle instruction overlap. It covers stage placement, stalls, bubbles, flushes, forwarding, branch behavior, jump handling, and CPI.
 
 ## 6.2 Planned Modules
 
@@ -213,8 +195,6 @@ A full pipelined datapath renderer is not planned as a core feature. It may be c
 | Automated Tests                 | Implemented             | Uses Vitest for MIPS, datapath, K-map, and pipeline core logic             |
 | Cache Visualizer                | Planned for Milestone 3 | Hits, misses, tags, index, offset, blocks, and replacement                 |
 | Pipeline Datapath Visualization | Stretch only            | Not part of core scope                                                     |
-
----
 
 # 7. Technical Proof of Concept
 
@@ -267,13 +247,11 @@ The pipeline visualizer proof of concept shows:
 7. inspecting per-instruction stage behavior and stall reasons
 8. updating CPI, cycle count, instruction count, stall count, and flush count
 
----
-
 # 8. Features
 
 ## 8.1 MIPS Datapath Visualizer
 
-We built the datapath visualizer so students can step through selected MIPS instructions across IF, ID, EX, MEM, and WB. The goal is to show how values move through a single-cycle datapath, how control signals affect execution, and why different instruction types activate different hardware paths.
+The datapath visualizer lets users step through selected MIPS instructions across IF, ID, EX, MEM, and WB. It shows how values move through a single-cycle datapath, how control signals affect execution, and why different instruction types activate different hardware paths.
 
 The current datapath visualizer supports:
 
@@ -298,11 +276,11 @@ Implemented:
 - dynamic SVG wire highlighting
 - Explore, Simulate, and Assembly modes
 
-The main tricky part was separating logical datapath paths from SVG wire segments. For example, the simulator can refer to a logical path such as `PC_TO_IM`, while the SVG renderer maps that path to the visible line segments on the diagram.
+At first, we tried to highlight SVG wires directly from the datapath logic, but this quickly became hard to maintain. A single logical connection such as `PC_TO_IM` can correspond to multiple SVG line segments on the diagram, so we split logical datapath paths from the actual SVG rendering.
 
-We chose this approach because datapath correctness and SVG layout change for different reasons. The simulator should be able to say which logical route is active, while the renderer should be free to decide how that route is drawn on screen.
+This avoided mixing simulator correctness with diagram coordinates. The simulator only needs to say which route is active, while the renderer decides which visible wire segments should light up.
 
-The module also has to handle edited control signals carefully. A wrong signal should not silently disappear or produce misleading output; it should either affect the simulated behavior or be surfaced through warnings. Automated tests cover stage transitions, control-signal behavior, invalid signal cases, path highlighting, inspector output, and machine-state updates.
+The module also has to handle edited control signals carefully. A wrong signal should not silently disappear or produce misleading output; it should either affect the simulated behavior or be surfaced through warnings. One issue we checked manually was `lw` with an unaligned address, where the warning panel had to make the problem clear instead of letting the memory stage look normal. Automated tests cover stage transitions, control-signal behavior, invalid signal cases, path highlighting, inspector output, and machine-state updates.
 
 Demo:
 
@@ -310,19 +288,15 @@ Demo:
 
 ![Annotated datapath](docs/assets/annotated-datapath.png)
 
----
-
 ## 8.2 MIPS Assembly Simulator
 
-We built the assembly simulator so students can write MIPS programs, assemble them into machine code, and step through execution one instruction at a time. We chose an instruction-level view rather than a datapath-level view because students need a quick way to test small programs and observe PC, register, and memory changes.
+The assembly simulator lets users write MIPS programs, assemble them into machine code, and step through execution one instruction at a time. The instruction-level view is faster for checking PC, register, and memory changes than opening the full datapath view for every instruction.
 
 The Assembly tab supports the currently implemented 17-instruction set:
 
 `add`, `addi`, `and`, `andi`, `beq`, `bne`, `j`, `lui`, `lw`, `nor`, `or`, `ori`, `slt`, `sll`, `srl`, `sw`, and `sub`.
 
 The Assembly Simulator supports a broader instruction set than the Datapath Visualizer because it executes instructions at the instruction-semantics level rather than visualizing every datapath path, control signal, and intermediate stage.
-
-We built this module separately from the Datapath Visualizer because students also need a faster way to test small assembly programs without stepping through every hardware stage.
 
 Implemented:
 
@@ -339,7 +313,7 @@ Implemented:
 - reset after loading
 - send-to-pipeline integration
 
-The main tricky part was keeping the parser consistent across different instruction formats and resolving labels correctly for branches and jumps. PC updates also require care because sequential instructions, taken branches, untaken branches, and jumps all update control flow differently.
+The parser was one of the more bug-prone parts because each instruction format has slightly different operands, and branches/jumps need labels to resolve correctly. PC updates also require care because sequential instructions, taken branches, untaken branches, and jumps all update control flow differently.
 
 This module shares MIPS logic with the Pipeline Visualizer, so consistency matters. Automated tests cover supported instruction parsing, invalid syntax handling, label resolution, machine-code encoding, instruction execution, and PC/register/memory updates. Manual testing checks whether the editor, generated machine-code table, highlights, and state panels update clearly after each step.
 
@@ -349,11 +323,9 @@ Demo:
 
 ![Annotated assembly](docs/assets/annotated-assembly.png)
 
----
-
 ## 8.3 K-map Visualizer
 
-We built the K-map visualizer so students can practise Boolean simplification by editing maps, creating manual groups, comparing against solver groups, and checking expressions. It supports 2-variable, 3-variable, and 4-variable K-maps, including don't-care terms.
+The K-map visualizer supports Boolean simplification through editable maps, manual groups, solver comparison, and expression checking. It supports 2-variable, 3-variable, and 4-variable K-maps, including don't-care terms.
 
 Implemented:
 
@@ -370,11 +342,11 @@ Implemented:
 - expression checker
 - practice-map generation
 
-The main tricky part was that K-map correctness is not just about drawing boxes. Wrap-around groups must be validated correctly, don't-care cells can be useful without needing to be covered, and expression checking must test logical equivalence instead of just comparing strings.
+K-map bugs were not only about drawing boxes in the right place. Wrap-around groups need special handling, don't-care cells can help simplify an expression without needing to be covered, and expression checking has to test logical equivalence instead of comparing strings. For example, two answers can look different but still represent the same Boolean function.
 
-Manual groups and solver groups are kept separate so students can attempt the problem before comparing against the app's solution. Tests cover K-map model creation, minterm and don't-care mapping, Gray-code layout behavior, group validation, solver output, practice-map generation, and expression checking.
+Manual groups and solver groups are kept separate so students can attempt the problem before comparing against the app's solution. Tests cover K-map model creation, minterm and don't-care mapping, Gray-code layout behavior, group validation, solver output, practice-map generation, and expression checking. We also manually checked the K-map workflow against finals/tutorial problems by hand, and it passed those checks.
 
-We kept these two workflows separate because immediately showing only the solver answer would turn the module into an answer checker instead of a practice tool.
+Keeping these two workflows separate makes the app feel more like a practice tool than an answer reveal. During user testing, the solver comparison was useful, but manual group clearing was not obvious enough, so that became one of the polish items.
 
 Demo:
 
@@ -382,11 +354,9 @@ Demo:
 
 ![Annotated K-map](docs/assets/annotated-kmap.png)
 
----
-
 ## 8.4 MIPS Pipeline Visualizer
 
-We built the pipeline visualizer to show how MIPS instructions overlap across a 5-stage pipeline. It helps students compare cycle counts under different assumptions such as forwarding, branch resolution stage, branch prediction, and jump handling.
+The pipeline visualizer shows how MIPS instructions overlap across a 5-stage pipeline. Users can compare cycle counts under different assumptions such as forwarding, branch resolution stage, branch prediction, and jump handling.
 
 The Pipeline Visualizer uses the same MIPS assembly subset as the Assembly Simulator, through the shared assembler and instruction executor.
 
@@ -420,11 +390,11 @@ We modeled the hazard logic around common CS2100-style pipeline assumptions:
 - With prediction enabled, correct branch guesses add no control penalty and wrong guesses flush by the configured branch penalty.
 - Jumps can resolve in ID or MEM through the `jumpInId` option.
 
-The main tricky part was deciding whether to schedule static source lines or dynamic executed instructions. We schedule dynamic executed instructions so loops, branches, and input-dependent control flow behave consistently with the Assembly Simulator before the pipeline scheduler places stages on the timeline.
+One issue we ran into was deciding whether the timeline should schedule static source lines or the instructions that actually execute. Static scheduling is simpler, but it breaks down for loops and taken branches because the written program is not always the executed trace.
 
-We chose this approach because pipeline questions often depend on whether a branch is taken, how many loop iterations run, and what values are in registers or memory. Scheduling only the written source lines would miss those runtime effects.
+We now execute the program first with the shared Assembly Simulator logic, then pass the dynamic trace into the pipeline scheduler. This made branch outcomes, loop iterations, and register/memory-dependent control flow match the assembly view before stages are placed on the timeline.
 
-The other tricky part was keeping the model close to CS2100-style questions without turning it into a full CPU simulator. Tests cover hazard scheduling, forwarding behavior, load-use stalls, branch penalties, jump penalties, prediction settings, loop traces, and cycle counts against selected course-style pipeline questions. Manual testing checks that the stage-time table, counters, bubbles, flushes, forwarding arrows, and instruction inspector remain visually understandable.
+Another boundary we had to watch was keeping the model close to CS2100 questions without turning it into a full CPU simulator. Tests cover hazard scheduling, forwarding behavior, load-use stalls, branch penalties, jump penalties, prediction settings, loop traces, and cycle-count behavior. We also manually checked the pipeline output against selected finals/tutorial problems by hand, and it passed those checks. Manual testing checks that the stage-time table, counters, bubbles, flushes, forwarding arrows, and instruction inspector remain visually understandable.
 
 Demo:
 
@@ -432,17 +402,15 @@ Demo:
 
 ![Annotated Pipeline](docs/assets/annotated-pipeline.png)
 
----
-
 ## 8.5 Example Learning Workflows
 
-We designed the four modules around short, repeatable learning workflows rather than one long fixed tutorial because students usually revise CS2100 by trying small examples and comparing outcomes.
+The four modules are organized around short, repeatable learning workflows rather than one long fixed tutorial.
 
 ### Datapath Revision Workflow
 
 A student can start with a simple instruction such as `add $t0, $t1, $t2`, step through IF, ID, EX, MEM, and WB, and watch which datapath wires become active at each stage.
 
-After that, the student can switch to a memory instruction such as `lw` or `sw` and compare how the control signals and active paths change. This helps connect textbook control-signal tables to concrete data movement.
+After that, the student can switch to a memory instruction such as `lw` or `sw` and compare how the control signals and active paths change.
 
 The editable control-signal mode also lets students intentionally create incorrect cases. For example, turning off `RegWrite` for an arithmetic instruction shows why the register file is not updated even if the ALU result is correct.
 
@@ -450,7 +418,7 @@ The editable control-signal mode also lets students intentionally create incorre
 
 A student can write a short MIPS program, assemble it, and step through the program instruction by instruction.
 
-The simulator highlights register and memory changes after each step, so students can debug small programs without manually tracking every value on paper.
+The simulator highlights register and memory changes after each step.
 
 Because labels are resolved by the assembler, branch and jump examples can be tested in a way that is closer to real assembly programming than isolated instruction examples.
 
@@ -465,19 +433,13 @@ This supports a useful learning sequence:
 3. Compare manual groups against solver groups.
 4. Adjust groups and expressions based on the feedback.
 
-The goal is not only to produce a simplified answer, but also to help students understand why a grouping is valid and how it maps to a Boolean term.
-
 ### Pipeline Comparison Workflow
 
 A student can load a preset program and toggle forwarding, early branch resolution, branch prediction, and jump handling.
 
 The stage-time table and counters update immediately, allowing students to compare CPI, cycle count, stalls, and flushes under different assumptions.
 
-This is useful for CS2100-style questions where the same instruction sequence can produce different timings depending on the pipeline model.
-
 ## 8.6 Concrete Example Scenarios
-
-We added examples and presets because students usually learn these topics by trying a small case, seeing where their expectation differs from the result, and then adjusting their reasoning.
 
 ### Example: `lw` in the Datapath Visualizer
 
@@ -491,7 +453,7 @@ The useful learning points are:
 - MEM shows the data memory read.
 - WB shows the loaded value being written back to the destination register.
 
-We use this kind of example because `lw` touches more datapath components than a simple arithmetic instruction. It is a compact way to show control signals, ALU input selection, data memory access, and register write-back in one instruction.
+`lw` is a compact example because it touches control signals, ALU input selection, data memory access, and register write-back in one instruction.
 
 ### Example: Branches in the Assembly and Pipeline Modules
 
@@ -499,15 +461,13 @@ For a short program with `beq` or `bne`, the Assembly Simulator shows whether th
 
 The Pipeline Visualizer then uses the executed trace to show how the same branch affects timing. This is where students can compare branch resolved in ID vs MEM, prediction off vs prediction on, and predicted taken vs predicted not taken.
 
-We built this connection because branch behavior is easy to misunderstand if it is shown only as a final PC value or only as a pipeline penalty. Seeing both views makes the control-flow effect more concrete.
+Showing both views makes the control-flow effect more concrete than showing only a final PC value or only a pipeline penalty.
 
 ### Example: K-map Solver Comparison
 
 For a K-map with several possible valid groupings, the student can first create manual groups and then reveal solver groups.
 
-The important part is that the solver is not treated as the only “real” solution. Some Boolean functions can be simplified through different valid group choices, so the tool checks equivalence and group validity instead of only expecting one visual answer.
-
-We chose this approach because K-map learning is partly about recognizing valid simplification patterns, not memorizing one exact layout.
+The solver is not treated as the only “real” solution. Some Boolean functions can be simplified through different valid group choices, so the tool checks equivalence and group validity instead of only expecting one visual answer.
 
 ### Example: Load-use Hazard in the Pipeline Visualizer
 
@@ -520,13 +480,11 @@ add  $t2, $t0, $t3
 
 the Pipeline Visualizer can show why forwarding does not remove every stall. The loaded value is only available after MEM, so the dependent instruction still needs a bubble in the common CS2100 model.
 
-We included this case because students often assume forwarding solves all RAW dependencies. The visual timeline makes the exception easier to see.
-
----
+The visual timeline makes this exception easier to see.
 
 # 9. System Design
 
-CS2100 Visualizer is a client-side React application. The system is organised around four independent learning modules: Datapath, Assembly, K-map, and Pipeline. Each module has its own page-level UI and state management, while correctness-sensitive logic is kept in `core/` folders so it can be reused and tested independently.
+CS2100 Visualizer is a client-side React application. The system is organised around four independent learning modules: Datapath, Assembly, K-map, and Pipeline. Each module has its own page-level UI and state management, while the logic that decides the actual answers is kept in `core/` folders so it can be reused and tested independently.
 
 ## 9.1 Overall Architecture
 
@@ -534,7 +492,7 @@ The system follows a feature-based frontend structure with a shared core-logic l
 
 ![Overall system architecture](docs/diagrams/overall-design.png)
 
-This separation keeps the UI responsible for interaction and rendering, while the core logic handles simulation, solving, scheduling, and validation.
+In the code, this means page components mostly handle controls, selected rows, highlighted cells, and rendered diagrams. The actual parsing, simulation, solving, and scheduling live outside the React components.
 
 ## 9.2 Shared MIPS Core
 
@@ -544,7 +502,7 @@ The shared MIPS core includes the parser and label resolver, instruction metadat
 
 The Assembly Simulator uses the shared MIPS parser and executor to run complete instructions. The Pipeline Visualizer also uses the executor to generate a dynamic instruction trace before scheduling pipeline stages. The Datapath Visualizer uses a smaller subset of MIPS instructions because it must represent each instruction through the staged single-cycle datapath UI.
 
-This design avoids duplicating MIPS semantics across modules and keeps instruction behavior consistent.
+This matters most for Assembly and Pipeline. A branch or `lw` instruction should execute the same way before the pipeline scheduler starts placing stages on the timeline.
 
 ## 9.3 Datapath Visualizer Design
 
@@ -552,7 +510,7 @@ The Datapath Visualizer models single-cycle datapath execution as a staged learn
 
 ![Datapath visualizer architecture](docs/diagrams/datapath-design.png)
 
-The SVG datapath is kept separate from the simulation logic. Core logic refers to logical paths such as `PC_TO_IM`, while the SVG renderer expands those paths into visible wire segments. This makes the simulator easier to test and prevents rendering details from being mixed with datapath execution rules.
+The SVG datapath is kept separate from the simulation logic. Core logic refers to logical paths such as `PC_TO_IM`, while the SVG renderer expands those paths into visible wire segments. When we move or redraw a wire, the datapath execution rule does not need to change.
 
 ## 9.4 Assembly Simulator Design
 
@@ -590,9 +548,9 @@ Although the modules are presented as separate tabs, they are connected through 
 
 The Assembly Simulator and Pipeline Visualizer both use the MIPS parser and instruction executor. This means a program that is accepted by the Assembly Simulator can also be used as pipeline input, subject to the current supported instruction subset.
 
-We keep the Datapath Visualizer to a smaller instruction set because each instruction must be represented visually through datapath stages and highlighted paths. This keeps the datapath explanation accurate instead of pretending that every supported assembly instruction has a complete visual datapath implementation.
+We keep the Datapath Visualizer to a smaller instruction set because each instruction must be represented visually through datapath stages and highlighted paths. For example, supporting `lw` means showing the base register read, immediate offset, ALU address calculation, memory read, and write-back path correctly, not just updating a register at the end.
 
-The K-map Visualizer is independent from the MIPS modules, but it follows the same design principle: interactive UI state is kept separate from correctness-sensitive logic. This keeps the solver and checker testable without relying on browser rendering.
+The K-map Visualizer is independent from the MIPS modules, but it follows the same design principle: interactive UI state is kept separate from the solver and checker logic. The solver and checker can be tested from minterm and group data directly, without needing to click cells in the browser.
 
 ## 9.8 Data Flow Summary
 
@@ -603,7 +561,7 @@ The K-map Visualizer is independent from the MIPS modules, but it follows the sa
 | K-map    | minterms, don't-cares, expression  | model updates, group validation, solving  | K-map grid, groups, simplified expression, feedback       |
 | Pipeline | MIPS source and pipeline options   | dynamic trace generation, hazard schedule | stage-time table, stalls, flushes, forwarding, CPI values |
 
-This flow keeps the app understandable for users and maintainable for developers. Each module has a clear input, a testable core transformation, and a visual output layer.
+This table also matches how we debugged the modules. When a pipeline cycle count looked wrong, we checked trace generation first, then hazard scheduling, then the rendered stage-time table. For K-maps, we could check the minterm/group data before looking at the grid drawing.
 
 ## 9.9 State and Feedback Design
 
@@ -613,13 +571,11 @@ In the Datapath Visualizer, stepping changes the current stage, highlighted path
 
 In the Assembly Simulator, stepping changes the PC, register table, memory table, and highlighted inputs/outputs. We keep a step history because backward stepping is useful when students want to compare before and after states.
 
-In the K-map Visualizer, cell edits, manual groups, solver groups, and expression checks are kept as related but separate pieces of state. We chose this split because editing the map should not erase a student's manual reasoning unless they explicitly reset or change the relevant part of the workflow.
+In the K-map Visualizer, cell edits, manual groups, solver groups, and expression checks are kept as related but separate pieces of state. This prevents a simple map edit from accidentally erasing a student's manual reasoning unless the workflow explicitly resets it.
 
-In the Pipeline Visualizer, program text, initial register/memory values, scheduling options, row limits, and cycle limits all affect the rendered timeline. We keep these as explicit controls because pipeline timing depends on assumptions, and students need to see which assumption produced which result.
+In the Pipeline Visualizer, program text, initial register/memory values, scheduling options, row limits, and cycle limits all affect the rendered timeline. We keep these as explicit controls because a small assumption change, such as resolving branches in ID instead of MEM, can change the cycle count.
 
-Across the app, the feedback style is intentionally direct: warnings, highlights, and counters are shown near the UI element they explain. We chose this because a visualizer should not make students search through a separate log just to understand what changed.
-
----
+Across the app, the feedback style is intentionally direct: warnings, highlights, and counters are shown near the UI element they explain. In practice, this helped most when something looked surprising, such as a branch changing PC, a pipeline row getting delayed, or a K-map group being rejected.
 
 # 10. Code Structure
 
@@ -643,15 +599,13 @@ Important files:
 - `src/core/kmap/` — K-map model, solver, practice generator, and manual group analysis.
 - `src/core/pipeline/` — pipeline trace generation, scheduling, hazard detection, forwarding edges, and pipeline tests.
 
----
-
 # 11. Key Design Decisions
 
 ## 11.1 Separate Learning Modules
 
 Datapath, Assembly, K-map, and Pipeline are separated because each module has a different learning workflow.
 
-We split the pages by learning activity because each topic asks students to reason in a different way. The datapath page is about staged hardware behavior, the assembly page is about instruction-level program execution, the K-map page is about Boolean simplification practice, and the pipeline page is about cycle-level timing, hazards, and performance trade-offs.
+Keeping the pages separate also made development easier. A K-map grouping bug did not affect pipeline controls, and a pipeline scheduling change did not risk breaking the datapath stepper UI.
 
 ## 11.2 Core Logic Separated from UI
 
@@ -679,17 +633,17 @@ This supports both correct execution and incorrect-signal exploration.
 
 ## 11.5 Logical Paths vs SVG Segments
 
-We separated logical datapath paths from SVG drawing segments because simulation correctness and diagram layout are different concerns.
+We separated logical datapath paths from SVG drawing segments because simulation correctness and diagram layout changed at different times during development.
 
-For example, the simulator can refer to a high-level path such as `PC_TO_IM`, while the SVG renderer can expand that into multiple actual SVG line segments.
+For example, the simulator can refer to a high-level path such as `PC_TO_IM`, while the SVG renderer can expand that into multiple actual SVG line segments. This mattered because moving a wire in the SVG should not require changing the datapath execution code.
 
-The main tricky part was making the diagram detailed enough to be useful without letting SVG coordinates leak into the simulator. Keeping the mapping outside the simulator makes the core logic easier to test and the drawing easier to adjust.
+The trade-off is that we maintain a mapping layer between logical paths and visible segments. That extra layer made the core logic easier to test and the drawing easier to adjust.
 
 ## 11.6 Dynamic Trace Before Pipeline Scheduling
 
 We schedule dynamic instructions rather than only static source lines. The program is first assembled and executed with the shared MIPS executor, then the executed trace is passed into the hazard scheduler.
 
-We chose this design because pipeline behavior is not only a property of the text in the editor. It also depends on the actual path the program takes during execution, including branch outcomes, loops, and memory/register-dependent control flow.
+This avoided a real mismatch we found with branches and loops: the pipeline table should reflect the instructions that actually ran, not only the lines written in the editor.
 
 ## 11.7 Course-style Hazard Options
 
@@ -701,13 +655,13 @@ We modeled pipeline options around common CS2100 questions:
 - predict taken or predict not taken
 - jump resolved in ID or MEM
 
-We chose these toggles because they make it easy to compare cycle counts and CPI across different assumptions without changing the source program.
+These toggles make it easy to compare cycle counts and CPI across different assumptions without changing the source program.
 
 ## 11.8 Browser-only Architecture
 
 We made the project run fully in the browser. There is no backend server, database, login system, or persistent cloud state.
 
-We chose this approach because it keeps deployment simple and makes the tool easy to share with students. A user can open the Vercel demo and start experimenting immediately.
+This made sharing the Vercel demo straightforward: users can open the link and try a datapath step, K-map group, or pipeline preset without installing anything.
 
 The trade-off is that user progress is not saved across sessions. For the current scope, this is acceptable because the app is mainly a revision and exploration tool rather than a graded learning platform.
 
@@ -719,7 +673,7 @@ The app tries to match CS2100 teaching assumptions without becoming a full hardw
 
 For example, the Pipeline Visualizer models common timing cases such as forwarding, load-use stalls, branch penalties, flushes, and jump handling. It does not attempt to model every possible microarchitectural detail of a real processor.
 
-This balance keeps the tool useful for course revision. Students can focus on the concepts they are expected to reason about, while the implementation remains small enough to test and explain.
+In practice, we stopped at the level used by the visualizer: pipeline timing, hazards, stalls, flushes, and CPI. We did not try to model lower-level processor details that would not show up in the current UI.
 
 ## 11.10 What We Deliberately Did Not Build
 
@@ -733,17 +687,15 @@ We did not make the Datapath Visualizer support every assembly instruction becau
 
 We did not make the K-map solver the only workflow because students need space to try manual groupings first. The solver is there for comparison and feedback, not to replace the practice process.
 
-These choices helped keep the project aligned with CS2100 revision rather than becoming a broad simulator with shallow coverage.
-
----
+This kept the scope closer to CS2100 revision: fewer topics, but with enough detail that the visual output can be checked and explained.
 
 # 12. Software Engineering Practices
 
 ## 12.1 Modular Feature Structure
 
-We used a feature-based structure where each major learning module has its own UI folder and core logic dependencies.
+Each major learning module has its own UI folder and core logic dependencies.
 
-We chose this structure because the modules have different interaction styles. Datapath stepping, assembly execution, K-map grouping, and pipeline scheduling should not have to share one large page component. It also makes the project easier to extend because new modules can be added without forcing all logic into one shared component.
+This matched how we actually built the app. Datapath stepping, assembly execution, K-map grouping, and pipeline scheduling all have different state shapes, so putting everything in one large page component would have made small fixes harder to isolate.
 
 ## 12.2 Separation of Concerns
 
@@ -763,13 +715,13 @@ Similarly, the Pipeline page renders the timeline, while the pipeline core logic
 
 We share MIPS instruction metadata, register names, parsing, encoding, and execution across the Assembly and Pipeline modules where appropriate.
 
-We chose this approach because a MIPS instruction should not mean one thing in the Assembly Simulator and another thing in the Pipeline Visualizer. It reduces duplicate instruction semantics and keeps behavior consistent across the app.
+A MIPS instruction should not mean one thing in the Assembly Simulator and another thing in the Pipeline Visualizer. Sharing the logic reduced duplicate instruction semantics and kept behavior consistent across the app.
 
 ## 12.4 TypeScript for Correctness
 
 TypeScript is used to make simulator state, instruction models, K-map models, pipeline traces, and UI props more explicit.
 
-This helps catch many mistakes during development, especially when passing data between core logic and React components.
+This was useful in places where the UI and core logic pass structured data back and forth, such as pipeline rows, forwarding edges, K-map cells, and datapath stage values.
 
 ## 12.5 Version Control
 
@@ -779,7 +731,7 @@ Git and GitHub are used for version control. The project is structured so that f
 
 The app is deployed as a browser-accessible demo through Vercel.
 
-This makes the project easy to test and review without requiring local setup.
+This meant user testing could start from the same link reviewers use, instead of asking students to clone the repository or install dependencies first.
 
 ## 12.7 Documentation
 
@@ -793,7 +745,7 @@ The README documents:
 - milestone plan
 - future work
 
-This helps future developers understand both what the app does and why it is structured this way.
+The README is also where we record decisions that are not obvious from the code alone, such as why the datapath instruction subset is smaller than the assembly subset.
 
 ## 12.8 Error Handling and Feedback
 
@@ -803,7 +755,7 @@ For assembly programs, parser and assembler errors are shown before execution so
 
 For the K-map module, feedback is given when groups are invalid or expressions are not equivalent. For the Pipeline Visualizer, stall reasons and selected-row explanations help students understand why timing changes occur.
 
-We added these explanations because correctness alone is not enough for a learning tool. Students need to know what went wrong and where to look next.
+These explanations came from the same pattern we saw during testing: a correct result was not always enough if users could not tell why a stall, warning, or rejected K-map group happened.
 
 ## 12.9 Maintainability Considerations
 
@@ -817,33 +769,29 @@ Important maintainability choices include:
 - writing tests for logic-heavy code
 - keeping visual rendering separate from core state transitions
 
-This structure is especially important because educational tools tend to grow over time. New topics such as cache visualization can be added as a new feature folder while reusing the same testing and UI patterns.
+The planned cache visualizer can follow the same structure: a feature page for the UI, core logic for hit/miss and replacement behavior, and focused tests for the cache calculations.
 
 ## 12.10 Development Workflow
 
-Our development workflow was to build the correctness-sensitive logic first, then connect it to the UI.
+Our development workflow was to build the logic that decides the result first, then connect it to the UI.
 
-For MIPS features, this meant implementing parsing, encoding, instruction execution, datapath stepping, and pipeline scheduling before polishing the visual presentation. We chose this order because a beautiful visualization is harmful if the underlying state transitions are wrong.
+For MIPS features, this meant implementing parsing, encoding, instruction execution, datapath stepping, and pipeline scheduling before polishing the visual presentation. This avoided polishing a screen that might still be showing the wrong state transitions.
 
 For the K-map module, this meant building the cell model, group validation, solver behavior, and expression checking separately from the grid UI. This made it easier to test edge cases such as wrap-around groups and don't-care cells.
 
-After the core behavior worked, we used manual testing to check whether the UI actually explained what the logic was doing. This step was important because correct output is not always understandable output.
+After the core behavior worked, we used manual testing to check whether the UI actually explained what the logic was doing. This was where issues such as Explore vs Simulate confusion and hidden K-map group deletion showed up.
 
 This workflow also made debugging easier. When a visual result looked wrong, we could check whether the issue came from core logic, React state, or rendering.
-
----
 
 # 13. Testing Strategy
 
 Testing is split into three parts:
 
-1. **Automated testing** for correctness-sensitive core logic.
-2. **Manual testing** for browser-visible UI behavior and full workflows.
+1. **Automated testing** for core logic.
+2. **Manual testing** for what users see and do in the browser.
 3. **User testing** for usability, clarity, and educational value.
 
-This separation is useful because many parts of the project involve visual interaction. Core logic such as MIPS parsing, K-map solving, and pipeline scheduling can be tested automatically, while visual highlights, UI clarity, and learning usefulness need manual and user-based evaluation.
-
----
+We split testing this way because not everything can be checked well with the same method. MIPS parsing, K-map solving, and pipeline scheduling can be tested with expected outputs, while SVG highlights, table readability, and confusing labels need manual or user testing.
 
 ## 13.1 Automated Testing
 
@@ -874,9 +822,7 @@ Current automated tests cover:
 - inspector output
 - pipeline schedule and hazard behavior
 - pipeline control penalties, prediction, jump penalties, and loop traces
-- cycle counts against selected course-style pipeline questions
-
----
+- pipeline cycle-count behavior
 
 ## 13.2 Test Coverage Summary
 
@@ -897,11 +843,9 @@ Current automated tests cover:
 | Pipeline Schedule     | Unit      | stalls, flushes, forwarding           | load-use and RAW hazards             |
 | Pipeline Options      | Unit      | branch, prediction, and jump behavior | forwarding on/off, prediction on/off |
 
----
-
 ## 13.3 Manual Testing
 
-Manual testing is used to verify browser-visible behavior that is difficult to fully validate through unit tests, such as SVG highlights, UI layout, inspector interactions, table rendering, and full user workflows.
+Manual testing is used to verify behavior that is difficult to fully validate through unit tests, such as SVG highlights, UI layout, inspector interactions, table rendering, and full user workflows.
 
 Manual workflows tested include:
 
@@ -917,13 +861,13 @@ Manual workflows tested include:
 | K-map Visualizer    | Create manual groups                                        | Valid groups are accepted and invalid groups are rejected or warned clearly                                |
 | K-map Visualizer    | Compare with solver groups                                  | Solver groups and simplified expression are shown correctly                                                |
 | K-map Visualizer    | Check Boolean expressions                                   | Equivalent expressions are accepted and incorrect expressions receive feedback                             |
+| K-map Visualizer    | Solve selected finals/tutorial problems by hand             | The visualizer's groups and expressions match the manually checked answers                                 |
 | Pipeline Visualizer | Run preset programs                                         | Stage-time table renders correctly with IF/ID/EX/MEM/WB stages                                             |
 | Pipeline Visualizer | Toggle forwarding, prediction, early branch, and jump-in-ID | Cycle count, CPI, stalls, flushes, and forwarding arrows update consistently                               |
+| Pipeline Visualizer | Check selected finals/tutorial problems by hand             | The rendered pipeline timing and cycle counts match the manually checked answers                           |
 | Pipeline Visualizer | Select pipeline rows                                        | Inspector explains stage behavior and stall reasons                                                        |
 | Cross-module Flow   | Send assembly program to pipeline                           | Pipeline tab receives the program and renders a valid trace                                                |
 | Deployment          | Open deployed Vercel demo                                   | All four modules load and remain usable in the browser                                                     |
-
----
 
 ## 13.4 User Testing
 
@@ -937,7 +881,7 @@ The most useful parts were:
 - datapath component inspection
 - explanations for stalls and changed machine state
 
-The main issues were UI clarity rather than correctness. Some users did not immediately understand the difference between Explore and Simulate mode in the Datapath Visualizer. Some pipeline options, such as early branch and jump-in-ID, also needed clearer explanations. In the K-map module, manual group clearing worked, but it was not always visually obvious.
+The main issues were UI clarity rather than correctness. One user stepped through `lw` in Explore mode and expected the register table to update, which showed that the mode name alone was not clear enough. Another user triggered an unaligned memory warning with `lw`, so we noted that the default memory examples and warning text should be friendlier. Pipeline options such as early branch and jump-in-ID also needed clearer labels, and K-map manual group deletion worked but was easy to miss.
 
 | Area     | What We Observed                                                                                                                                                                                               | Improvement                                                                                                                                     |
 | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -952,7 +896,7 @@ These findings will guide the next round of polish together with the planned Cac
 
 Testing did not only confirm that the app worked; it changed what we prioritized.
 
-For the Datapath Visualizer, testing showed that mode clarity matters as much as stage correctness. Explore mode is useful, but users can misunderstand it if they expect every step to update registers and memory.
+For the Datapath Visualizer, testing showed that mode clarity matters as much as stage correctness. Explore mode is useful, but the `lw` test showed that users can misunderstand it if they expect every step to update registers and memory.
 
 For the Assembly Simulator, testing reinforced the value of backward stepping. Students liked being able to step back after a register changed because it let them compare states without restarting the whole program.
 
@@ -960,9 +904,7 @@ For the K-map Visualizer, testing showed that solver comparison was useful, but 
 
 For the Pipeline Visualizer, testing showed that students found bubbles, forwarding arrows, and CPI counters helpful. The weaker point was terminology around options such as early branch and jump-in-ID, so future polish should explain those assumptions more clearly.
 
-These findings are useful because they point to small interface improvements rather than large rewrites.
-
----
+These findings pointed to small interface improvements rather than large rewrites.
 
 # 14. Limitations and Challenges
 
@@ -981,7 +923,7 @@ These findings are useful because they point to small interface improvements rat
 Key cross-module challenges include:
 
 - keeping MIPS instruction behavior consistent across Assembly, Datapath, and Pipeline modules
-- separating correctness-sensitive core logic from visual React components
+- separating answer-checking and simulation logic from visual React components
 - mapping simulator results to visual feedback without making the UI too crowded
 - keeping advanced features such as pipeline options and K-map solving understandable for beginners
 - balancing CS2100-level accuracy with a focused, browser-only learning tool scope
@@ -995,27 +937,25 @@ Potential future risks include:
 - inconsistent behavior if MIPS instruction semantics are duplicated
 - beginner users needing more guided explanations before interacting with advanced modules
 
-To address these risks, the project will continue using modular design, shared core logic, automated tests, and progressive UI explanations.
+The main lesson from the current modules is to add one concept at a time. Pipeline options already show this: forwarding, branch resolution, prediction, and jump handling are useful, but the labels have to stay readable or the timeline becomes harder to trust.
 
 ## 14.4 Risk Mitigation
 
 The project reduces implementation risk by keeping each module independently usable.
 
-If one module needs more work, the other modules can still be demonstrated and tested. This is useful for milestone-based development because the team can show completed functionality even while future modules are still being improved.
+If one module needs more work, the other modules can still be demonstrated and tested. For example, the K-map solver and Pipeline Visualizer can be checked independently even though they share the same overall app shell.
 
-Technical risk is reduced by testing shared logic such as MIPS parsing, instruction execution, K-map solving, and pipeline scheduling. These are the parts where small mistakes can produce misleading educational output.
+Technical risk is reduced by testing shared logic such as MIPS parsing, instruction execution, K-map solving, and pipeline scheduling. These are the parts where small mistakes can produce misleading educational output, such as a wrong branch target or an incorrect pipeline stall count.
 
 Usability risk is reduced through manual testing and user feedback. Several planned improvements, such as clearer mode labels and more visible K-map group controls, came directly from student testing.
 
 ## 14.5 Lessons Learned
 
-The project showed that educational visualizers need both correctness and explanation.
+The project showed that getting the right answer is only half of the job.
 
 A simulator can compute the right answer, but students still need to see why that answer happened. This influenced several design decisions, such as adding component inspectors, highlighting changed values, explaining stall reasons, and separating manual K-map groups from solver groups.
 
-The team also learned that visual clarity is an implementation problem, not only a design problem. Data structures, state transitions, and rendering code all affect whether the final UI feels understandable.
-
----
+The team also learned that visual clarity is an implementation problem, not only a design problem. For example, the pipeline timeline only became readable after the scheduler exposed stall reasons and forwarding edges in a form the UI could render directly.
 
 # 15. Timeline and Development Plan
 
@@ -1038,12 +978,12 @@ Completed:
 
 - K-map visualizer
 - K-map solver and expression checker
-- K-map tests
+- K-map manual checks against finals/tutorial problems, passing
 - pipeline instruction flow visualizer
 - dynamic pipeline execution traces
 - pipeline hazard scheduler
 - forwarding, branch, prediction, and jump options
-- pipeline tests against lecture/tutorial-style cycle counts
+- pipeline manual checks against finals/tutorial cycle counts, passing
 - README expansion
 - poster and demo updates
 
@@ -1092,7 +1032,7 @@ Concrete improvements:
 - add a short hint when an address is unaligned
 - make state-changing actions visually different from inspection-only actions
 
-We chose these improvements because they reduce confusion without changing the core datapath model.
+These changes target the confusion we saw in testing without changing the core datapath model.
 
 ### Assembly Polish
 
@@ -1105,7 +1045,7 @@ Concrete improvements:
 - keep parser errors close to the source line that caused them
 - improve examples for branches and loops
 
-We chose these improvements because assembly debugging is mostly about comparing the state before and after each instruction.
+This matters because assembly debugging is mostly about comparing the state before and after each instruction.
 
 ### K-map Polish
 
@@ -1118,7 +1058,7 @@ Concrete improvements:
 - improve feedback wording for invalid groups
 - add more practice presets with different difficulty levels
 
-We chose these improvements because K-map mistakes are often visual mistakes: students may understand the expression but miss a wrap-around group or include an invalid cell.
+K-map mistakes are often visual mistakes: students may understand the expression but miss a wrap-around group or include an invalid cell.
 
 ### Pipeline Polish
 
@@ -1132,7 +1072,7 @@ Concrete improvements:
 - allow row and cycle limits to apply through Enter or blur
 - make stall and flush reasons easier to scan
 
-We chose these improvements because pipeline timing depends heavily on assumptions. If the assumption is unclear, even a correct timeline can feel surprising.
+Pipeline timing depends heavily on assumptions. If the assumption is unclear, even a correct timeline can feel surprising.
 
 ### Documentation Polish
 
@@ -1145,9 +1085,7 @@ Concrete improvements:
 - keep diagrams and annotated screenshots near the related explanation
 - avoid repeated section templates that make the report feel mechanical
 
-We chose this structure because the README has to serve both as project documentation and as a reviewer-facing report.
-
----
+The README has to serve both jobs: someone reading on GitHub should see the real app behavior, while a reviewer should still find the design, testing, and milestone details without hunting through the code.
 
 # 16. Quick Start
 
@@ -1177,8 +1115,6 @@ npm run lint
 npm run format:check
 ```
 
----
-
 # 17. Tech Stack
 
 | Technology        | Purpose                                  |
@@ -1192,12 +1128,8 @@ npm run format:check
 | ESLint / Prettier | code quality                             |
 | Vercel            | deployment                               |
 
----
-
 # 18. Project Log and Repository
 
 [Project Log](https://docs.google.com/spreadsheets/d/1A2_8V8NCeS0M-E4F1fd_surIe4hl_3G42rxcGUjya_Q/edit?gid=1842178055#gid=1842178055)
 
 [GitHub Repository](https://github.com/marvinthang/cs2100-visualizer)
-
----

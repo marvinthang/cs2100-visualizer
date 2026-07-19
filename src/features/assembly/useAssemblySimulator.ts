@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import {
     assembleMipsProgram,
-    type AssembleMipsResult,
     type AssembledMipsInstruction,
 } from '../../core/mips/assembly/assembleMipsProgram';
 import { executeInstruction } from '../../core/mips/execution/executeInstruction';
@@ -129,32 +128,36 @@ export function useAssemblySimulator() {
     );
     const [machineHighlight, setMachineHighlight] =
         useState<MachineStateHighlightState>(emptyHighlight);
-    // snapshot of (machine, index) before each step, so we can step back
+    // Snapshot the complete displayed state before each step so Back restores
+    // both the machine values and the highlights for that state.
     const [history, setHistory] = useState<
-        { machine: MachineState; programIndex: number }[]
+        {
+            machine: MachineState;
+            programIndex: number;
+            machineHighlight: MachineStateHighlightState;
+        }[]
     >([]);
 
     const programLoaded = program.length > 0;
     const programFinished = programLoaded && programIndex >= program.length;
     const canStepBack = history.length > 0;
 
-    // Assemble the editor source and load it. Returns the assemble result so the
-    // editor can show errors; only loads when there are none.
-    function handleLoadProgram(source: string): AssembleMipsResult {
+    function handleLoadProgram(
+        source: string,
+        preparedMachine: MachineState = machine,
+    ): void {
         const result = assembleMipsProgram(source);
         if (result.errors.length > 0 || result.instructions.length === 0) {
-            return result;
+            return;
         }
 
-        const initialMachine: MachineState = { ...machine, pc: 0 };
+        const initialMachine: MachineState = { ...preparedMachine, pc: 0 };
         setProgram(result.instructions);
         setProgramIndex(0);
         setLoadedMachine(initialMachine);
         setMachine(initialMachine);
         setMachineHighlight(emptyHighlight);
         setHistory([]);
-
-        return result;
     }
 
     // Execute the current instruction in full, then advance to whatever PC it
@@ -165,7 +168,10 @@ export function useAssemblySimulator() {
         }
 
         const after = executeInstruction(machine, program[programIndex].fields);
-        setHistory((h) => [...h, { machine, programIndex }]);
+        setHistory((history) => [
+            ...history,
+            { machine, programIndex, machineHighlight },
+        ]);
         setMachineHighlight(
             getInstructionHighlights(machine, program[programIndex].fields),
         );
@@ -181,7 +187,7 @@ export function useAssemblySimulator() {
         const previous = history[history.length - 1];
         setMachine(previous.machine);
         setProgramIndex(previous.programIndex);
-        setMachineHighlight(emptyHighlight);
+        setMachineHighlight(previous.machineHighlight);
         setHistory(history.slice(0, -1));
     }
 
