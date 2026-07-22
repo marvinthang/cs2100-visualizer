@@ -18,6 +18,7 @@ import {
     isLastStep as isLastDatapathStep,
 } from '../../../core/mips/single-cycle/diagram/datapathSteps';
 import { executeDatapathStep } from '../../../core/mips/single-cycle/execution/executeDatapathStep';
+import { executeInstruction } from '../../../core/mips/execution/executeInstruction';
 import {
     type ExecutionContext,
     createEmptyExecutionContext,
@@ -84,6 +85,8 @@ export function useDatapathSimulator() {
     const [loadedMachine, setLoadedMachine] = useState<MachineState | null>(
         null,
     );
+    // source line numbers (1-based) the user marked as breakpoints
+    const [breakpoints, setBreakpoints] = useState<Set<number>>(new Set());
 
     const isAssembly = mode === 'assembly';
     const activeInstruction =
@@ -184,6 +187,87 @@ export function useDatapathSimulator() {
         setWarnings([]);
         setSignals(getDatapathControlSignals(nextMnemonic));
         setDefaultSignals(getDatapathControlSignals(nextMnemonic));
+    }
+
+    // Toggle a breakpoint on a source line.
+    function toggleBreakpoint(line: number) {
+        setBreakpoints((current) => {
+            const next = new Set(current);
+            if (next.has(line)) {
+                next.delete(line);
+            } else {
+                next.add(line);
+            }
+            return next;
+        });
+    }
+
+    // Jump to the start of instruction `target`, replaying the machine from the
+    // loaded state with the pure single-cycle executor (same values as stepping
+    // every stage). A snapshot is pushed so Prev returns to where we were.
+    function jumpToInstruction(target: number) {
+        const clamped = Math.max(0, Math.min(target, program.length));
+
+        let replayed: MachineState = {
+            ...(loadedMachine ?? machine),
+            pc: 0,
+        };
+        for (let k = 0; k < clamped; k++) {
+            replayed = executeInstruction(replayed, program[k].fields);
+        }
+
+        setSnapshots((snapshots) => [
+            ...snapshots,
+            {
+                machine,
+                currentContext,
+                defaultContext,
+                signals: { ...signals },
+                stepIndex,
+                warnings,
+                programIndex,
+            },
+        ]);
+
+        setMachine(replayed);
+        setProgramIndex(clamped);
+        setStepIndex(null);
+        setCurrentContext(createEmptyExecutionContext());
+        setDefaultContext(createEmptyExecutionContext());
+        setWarnings([]);
+
+        const nextMnemonic = program[clamped]?.fields.mnemonic;
+        if (nextMnemonic) {
+            setSignals(getDatapathControlSignals(nextMnemonic));
+            setDefaultSignals(getDatapathControlSignals(nextMnemonic));
+        }
+    }
+
+    // Fast-forward whole instructions until the next one sits on a breakpoint
+    // line, or the program ends.
+    function handleRunToBreakpoint() {
+        if (!isAssembly || program.length === 0 || programFinished) {
+            return;
+        }
+
+        let target = program.length;
+        for (let i = programIndex + 1; i < program.length; i++) {
+            if (breakpoints.has(program[i].line)) {
+                target = i;
+                break;
+            }
+        }
+
+        jumpToInstruction(target);
+    }
+
+    // Edit the PC to jump to any instruction (pc is a byte address; snap to the
+    // enclosing instruction). Only meaningful with a loaded program.
+    function handlePcChange(pc: number) {
+        if (!isAssembly || program.length === 0) {
+            return;
+        }
+        jumpToInstruction(Math.round(pc / 4));
     }
 
     function handleRegisterChange(register: RegisterNumber, value: number) {
@@ -462,5 +546,9 @@ export function useDatapathSimulator() {
         handleNextStep,
         handleResetStep,
         resetControlSignals,
+        breakpoints,
+        toggleBreakpoint,
+        handleRunToBreakpoint,
+        handlePcChange,
     };
 }

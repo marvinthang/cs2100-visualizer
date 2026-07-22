@@ -24,21 +24,21 @@ export default function Modal({
 
     return (
         <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4 dark:bg-black/60"
             onClick={onClose}
         >
             <div
-                className={`max-h-[85vh] w-full ${maxWidthClass} overflow-auto rounded-2xl border border-slate-200 bg-white p-6 shadow-xl`}
+                className={`max-h-[85vh] w-full ${maxWidthClass} overflow-auto rounded-2xl border border-slate-200 bg-white p-6 shadow-xl dark:border-slate-800 dark:bg-slate-900`}
                 onClick={(event) => event.stopPropagation()}
             >
                 <div className="mb-4 flex items-center justify-between">
-                    <h2 className="text-base font-semibold text-slate-900">
+                    <h2 className="text-base font-semibold text-slate-900 dark:text-slate-100">
                         {title}
                     </h2>
                     <button
                         type="button"
                         onClick={onClose}
-                        className="rounded-md border border-slate-200 px-2 py-1 text-xs font-medium text-slate-700 hover:bg-slate-100"
+                        className="rounded-md border border-slate-200 px-2 py-1 text-xs font-medium text-slate-700 hover:bg-slate-100 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800"
                     >
                         Close
                     </button>
@@ -57,7 +57,7 @@ export function ExpandButton({ onClick }: { onClick: () => void }) {
             onClick={onClick}
             aria-label="Open in window"
             title="Open in window"
-            className="rounded-md border border-slate-200 p-1 text-slate-700 hover:bg-slate-100"
+            className="rounded-md border border-slate-200 p-1 text-slate-700 hover:bg-slate-100 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
         >
             <svg
                 viewBox="0 0 24 24"

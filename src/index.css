@@ -8,6 +8,40 @@ body {
     background: #eef2f3;
 }
 
+/* Datapath diagram palette. Flips in dark mode so the black wires/labels
+   and white canvas become light-on-dark-gray instead of vanishing. */
+:root {
+    --dp-ink: #000000;
+    --dp-canvas: #ffffff;
+    --dp-blue: #2c1af4;
+    --dp-blue2: #093eb0;
+    --dp-box: #f1f1f1;
+    --dp-box-gray: #d9d9d9;
+    --dp-box-yellow: #ffffcb;
+    --dp-box-tan: #e7e4b9;
+    --dp-box-green: #e1fec4;
+    --dp-box-sel: #eff6ff;
+    --dp-title: #ff0000;
+    --dp-title2: #ff383c;
+    --dp-purple: #833a83;
+}
+
+.dark {
+    --dp-ink: #e2e8f0;
+    --dp-canvas: #1e293b;
+    --dp-blue: #93c5fd;
+    --dp-blue2: #60a5fa;
+    --dp-box: #566579;
+    --dp-box-gray: #64748b;
+    --dp-box-yellow: #6a6130;
+    --dp-box-tan: #625b40;
+    --dp-box-green: #2f6440;
+    --dp-box-sel: #345f92;
+    --dp-title: #f9a8d4;
+    --dp-title2: #f9a8d4;
+    --dp-purple: #d8b4fe;
+}
+
 * {
     scrollbar-width: thin;
     scrollbar-color: #cbd5e1 transparent;

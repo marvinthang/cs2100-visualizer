@@ -128,7 +128,7 @@ export default function MipsArrayDefinitionsEditor({
     }
 
     return (
-        <section className="rounded-md border border-slate-200 bg-slate-50 p-3">
+        <section className="rounded-md border border-slate-200 bg-slate-50 p-3 dark:border-slate-800 dark:bg-slate-800">
             <ArrayLayoutEditorHeader
                 description="Elements are 4-byte words. Registers and repeating values initialize when the program runs."
                 format={addressFormat}
@@ -170,7 +170,7 @@ export default function MipsArrayDefinitionsEditor({
 
                                 <div className="grid grid-cols-2 gap-2">
                                     <label>
-                                        <span className="block font-mono text-[8px] font-bold uppercase tracking-wider text-slate-500">
+                                        <span className="block font-mono text-[8px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                                             Base /{' '}
                                             {addressFormat === 'hexadecimal'
                                                 ? 'HEX'
@@ -182,7 +182,7 @@ export default function MipsArrayDefinitionsEditor({
                                                 className={`mt-1 block rounded border px-2 py-1.5 font-mono text-xs font-semibold ${
                                                     calculatedAddress === null
                                                         ? 'border-red-200 bg-red-50 text-red-700'
-                                                        : 'border-slate-200 bg-slate-50 text-slate-700'
+                                                        : 'border-slate-200 bg-slate-50 text-slate-700 dark:border-slate-800 dark:bg-slate-800 dark:text-slate-200'
                                                 }`}
                                             >
                                                 {calculatedAddress === null
@@ -207,7 +207,7 @@ export default function MipsArrayDefinitionsEditor({
                                                             event.target.value,
                                                     })
                                                 }
-                                                className="mt-1 w-full rounded border border-slate-300 bg-white px-2 py-1.5 font-mono text-xs font-semibold text-slate-900 outline-none focus:border-slate-500 focus:ring-2 focus:ring-slate-100"
+                                                className="mt-1 w-full rounded border border-slate-300 bg-white px-2 py-1.5 font-mono text-xs font-semibold text-slate-900 outline-none focus:border-slate-500 focus:ring-2 focus:ring-slate-100 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
                                             />
                                         )}
                                     </label>
@@ -228,7 +228,7 @@ export default function MipsArrayDefinitionsEditor({
                                 </div>
 
                                 <label className="mt-2 block">
-                                    <span className="block font-mono text-[8px] font-bold uppercase tracking-wider text-slate-500">
+                                    <span className="block font-mono text-[8px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                                         Repeating values / DEC
                                     </span>
                                     <input
@@ -244,13 +244,13 @@ export default function MipsArrayDefinitionsEditor({
                                         }
                                         placeholder="1 2 3 4 or 1,2,3,4 · blank keeps memory"
                                         aria-label={`Array ${definition.name} repeating values`}
-                                        className="mt-1 w-full rounded border border-slate-300 bg-white px-2 py-1.5 font-mono text-xs font-semibold text-slate-900 outline-none placeholder:text-[10px] placeholder:font-normal placeholder:text-slate-400 focus:border-slate-500 focus:ring-2 focus:ring-slate-100"
+                                        className="mt-1 w-full rounded border border-slate-300 bg-white px-2 py-1.5 font-mono text-xs font-semibold text-slate-900 outline-none placeholder:text-[10px] placeholder:font-normal placeholder:text-slate-400 focus:border-slate-500 focus:ring-2 focus:ring-slate-100 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-400"
                                     />
                                 </label>
 
-                                <div className="mt-2 grid grid-cols-2 gap-2 border-t border-slate-100 pt-2">
+                                <div className="mt-2 grid grid-cols-2 gap-2 border-t border-slate-100 pt-2 dark:border-slate-800">
                                     <label>
-                                        <span className="block font-mono text-[8px] font-bold uppercase tracking-wider text-slate-500">
+                                        <span className="block font-mono text-[8px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                                             Address register
                                         </span>
                                         <select
@@ -264,7 +264,7 @@ export default function MipsArrayDefinitionsEditor({
                                                     ) as RegisterNumber,
                                                 })
                                             }
-                                            className="mt-1 block w-full rounded border border-slate-300 bg-white px-2 py-1.5 font-mono text-xs font-semibold text-slate-900 outline-none focus:border-slate-500 focus:ring-2 focus:ring-slate-100"
+                                            className="mt-1 block w-full rounded border border-slate-300 bg-white px-2 py-1.5 font-mono text-xs font-semibold text-slate-900 outline-none focus:border-slate-500 focus:ring-2 focus:ring-slate-100 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
                                         >
                                             {registerNames.map(
                                                 (name, register) =>
@@ -281,7 +281,7 @@ export default function MipsArrayDefinitionsEditor({
                                     </label>
 
                                     <label>
-                                        <span className="block font-mono text-[8px] font-bold uppercase tracking-wider text-slate-500">
+                                        <span className="block font-mono text-[8px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                                             Length register
                                         </span>
                                         <select
@@ -293,7 +293,7 @@ export default function MipsArrayDefinitionsEditor({
                                                     ) as RegisterNumber,
                                                 })
                                             }
-                                            className="mt-1 block w-full rounded border border-slate-300 bg-white px-2 py-1.5 font-mono text-xs font-semibold text-slate-900 outline-none focus:border-slate-500 focus:ring-2 focus:ring-slate-100"
+                                            className="mt-1 block w-full rounded border border-slate-300 bg-white px-2 py-1.5 font-mono text-xs font-semibold text-slate-900 outline-none focus:border-slate-500 focus:ring-2 focus:ring-slate-100 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
                                         >
                                             {registerNames.map(
                                                 (name, register) =>

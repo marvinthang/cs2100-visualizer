@@ -11,6 +11,7 @@ import {
     type RegisterValueFormat,
 } from '../../../core/mips/registerValueFormat';
 import Modal, { ExpandButton } from './Modal';
+import CollapsibleSection from '../../../components/CollapsibleSection';
 
 function PanelMetric({
     label,
@@ -20,11 +21,11 @@ function PanelMetric({
     value: string | number;
 }) {
     return (
-        <div className="rounded-md border border-slate-200 bg-white px-3 py-2 shadow-sm">
-            <div className="text-[10px] font-semibold uppercase tracking-wide text-slate-400">
+        <div className="rounded-md border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 px-3 py-2 shadow-sm">
+            <div className="text-[10px] font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-400">
                 {label}
             </div>
-            <div className="mt-0.5 font-mono text-sm font-bold text-slate-900">
+            <div className="mt-0.5 font-mono text-sm font-bold text-slate-900 dark:text-slate-100">
                 {value}
             </div>
         </div>
@@ -38,6 +39,8 @@ export default function MemoryTable({
     onResetMemory,
     machineHighlight,
     tableMaxHeightClass = 'max-h-[200px]',
+    sectionId = 'memory',
+    defaultOpen = true,
 }: {
     machine: MachineState;
     onMemoryChange: (address: number, value: number) => void;
@@ -45,6 +48,8 @@ export default function MemoryTable({
     onResetMemory: () => void;
     machineHighlight: MachineStateHighlightState;
     tableMaxHeightClass?: string;
+    sectionId?: string;
+    defaultOpen?: boolean;
 }) {
     const [valueFormat, setValueFormat] = useState<RegisterValueFormat>('dec');
     const [startAddressInput, setStartAddressInput] = useState('0');
@@ -78,11 +83,11 @@ export default function MemoryTable({
     function renderTable(scrollClass: string) {
         return (
             <div
-                className={`${scrollClass} overflow-auto rounded-md border border-slate-200`}
+                className={`${scrollClass} overflow-auto rounded-md border border-slate-200 dark:border-slate-800`}
             >
                 <table className="w-full min-w-max text-sm">
-                    <thead className="sticky top-0 bg-[#fbfcfd]">
-                        <tr className="border-b border-slate-200 text-left text-xs text-slate-500">
+                    <thead className="sticky top-0 bg-[#fbfcfd] dark:bg-slate-900/60">
+                        <tr className="border-b border-slate-200 dark:border-slate-800 text-left text-xs text-slate-500 dark:text-slate-400">
                             <th className="px-3 py-2 font-semibold">Addr</th>
                             <th className="px-3 py-2 font-semibold">Hex</th>
                             <th className="px-3 py-2 font-semibold">Format</th>
@@ -108,7 +113,7 @@ export default function MemoryTable({
                             return (
                                 <tr
                                     key={address}
-                                    className={`border-b border-slate-100 font-mono text-xs last:border-b-0 ${bgClass}`}
+                                    className={`border-b border-slate-100 dark:border-slate-800 font-mono text-xs last:border-b-0 ${bgClass}`}
                                 >
                                     <td className={`px-3 py-1.5 ${textClass}`}>
                                         {address}
@@ -124,7 +129,7 @@ export default function MemoryTable({
                                         <div
                                             role="group"
                                             aria-label={`Address ${address} value format`}
-                                            className="inline-flex overflow-hidden rounded border border-slate-300 bg-white"
+                                            className="inline-flex overflow-hidden rounded border border-slate-300 bg-white dark:border-slate-700 dark:bg-slate-800"
                                         >
                                             {(
                                                 [
@@ -188,10 +193,10 @@ export default function MemoryTable({
                                                             },
                                                         );
                                                     }}
-                                                    className={`border-r border-slate-300 px-1.5 py-1 text-[9px] font-bold transition last:border-r-0 focus-visible:z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 ${
+                                                    className={`border-r border-slate-300 dark:border-slate-700 px-1.5 py-1 text-[9px] font-bold transition last:border-r-0 focus-visible:z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 ${
                                                         rowFormat === format
-                                                            ? 'bg-slate-700 text-white'
-                                                            : 'bg-white text-slate-400 hover:bg-slate-50 hover:text-slate-800'
+                                                            ? 'bg-slate-700 text-white dark:bg-slate-600'
+                                                            : 'bg-white text-slate-400 hover:bg-slate-50 hover:text-slate-800 dark:bg-slate-800 dark:text-slate-500 dark:hover:bg-slate-700 dark:hover:text-slate-100'
                                                     }`}
                                                 >
                                                     {name}
@@ -259,7 +264,7 @@ export default function MemoryTable({
                                                     event.currentTarget.blur();
                                                 }
                                             }}
-                                            className={`rounded-md border border-slate-300 bg-white px-2 py-1 text-left text-slate-900 shadow-sm outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-100 ${
+                                            className={`rounded-md border border-slate-300 bg-white px-2 py-1 text-left text-slate-900 shadow-sm outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-100 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 ${
                                                 rowFormat === 'bin'
                                                     ? 'w-64'
                                                     : rowFormat === 'hex'
@@ -278,118 +283,120 @@ export default function MemoryTable({
     }
 
     return (
-        <div className="h-fit overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
-            <div className="flex items-center justify-between gap-3 border-b border-slate-200 bg-[#fbfcfd] px-4 py-3">
-                <div>
-                    <h2 className="text-sm font-semibold text-slate-900">
-                        Data Memory
-                    </h2>
-                    <p className="mt-0.5 text-xs text-slate-500">
-                        Word-addressable data segment
-                    </p>
-                </div>
-                <div className="flex items-center gap-2">
-                    <div
-                        role="group"
-                        aria-label="Memory value format"
-                        className="inline-flex overflow-hidden rounded-md border border-slate-300 bg-white shadow-sm"
-                    >
-                        {(
-                            [
-                                { format: 'dec', name: 'DEC' },
-                                { format: 'hex', name: 'HEX' },
-                                { format: 'bin', name: 'BIN' },
-                            ] as const
-                        ).map(({ format, name }) => (
-                            <button
-                                key={format}
-                                type="button"
-                                aria-pressed={valueFormat === format}
-                                onClick={() => {
-                                    setDataMemoryDrafts({});
-                                    setMemoryFormats({});
-                                    setValueFormat(format);
-                                }}
-                                className={`border-r border-slate-300 px-2 py-1 font-mono text-[10px] font-bold transition last:border-r-0 focus-visible:z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 ${
-                                    valueFormat === format
-                                        ? 'bg-slate-900 text-white'
-                                        : 'bg-white text-slate-500 hover:bg-slate-50 hover:text-slate-900'
-                                }`}
-                            >
-                                {name}
-                            </button>
-                        ))}
-                    </div>
-                    <button
-                        type="button"
-                        onClick={() => {
-                            setDataMemoryDrafts({});
-                            onResetMemory();
-                        }}
-                        className="rounded-md border border-slate-300 bg-white px-2 py-1 text-xs font-semibold text-slate-700 shadow-sm transition hover:border-slate-400 hover:bg-slate-50"
-                    >
-                        Reset
-                    </button>
-                    <ExpandButton onClick={() => setIsExpanded(true)} />
-                </div>
-            </div>
-
-            <div className="space-y-3 p-3">
-                <div className="grid grid-cols-2 gap-2">
-                    <PanelMetric label="Addr range" value={memoryRange} />
-                    <PanelMetric label="Words" value={memoryRows.length} />
-                </div>
-
-                <div className="rounded-md border border-slate-200 bg-[#fbfcfd] p-2">
-                    <div className="grid grid-cols-[1fr_1fr_auto] gap-2">
-                        <label className="text-xs font-medium text-slate-600">
-                            Start addr
-                            <input
-                                type="number"
-                                min={0}
-                                step={4}
-                                value={startAddressInput}
-                                onChange={(event) =>
-                                    setStartAddressInput(event.target.value)
-                                }
-                                className="mt-1 w-full rounded-md border border-slate-300 bg-white px-2 py-1 font-mono text-xs shadow-sm outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-100"
-                            />
-                        </label>
-
-                        <label className="text-xs font-medium text-slate-600">
-                            Words
-                            <input
-                                type="number"
-                                min={1}
-                                value={wordCountInput}
-                                onChange={(event) =>
-                                    setWordCountInput(event.target.value)
-                                }
-                                className="mt-1 w-full rounded-md border border-slate-300 bg-white px-2 py-1 font-mono text-xs shadow-sm outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-100"
-                            />
-                        </label>
-
+        <>
+            <CollapsibleSection
+                id={sectionId}
+                title="Data Memory"
+                subtitle="Word-addressable data segment"
+                defaultOpen={defaultOpen}
+                className="h-fit overflow-hidden"
+                meta={
+                    <div className="flex shrink-0 items-center gap-2">
+                        <div
+                            role="group"
+                            aria-label="Memory value format"
+                            className="inline-flex overflow-hidden rounded-md border border-slate-300 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-800"
+                        >
+                            {(
+                                [
+                                    { format: 'dec', name: 'DEC' },
+                                    { format: 'hex', name: 'HEX' },
+                                    { format: 'bin', name: 'BIN' },
+                                ] as const
+                            ).map(({ format, name }) => (
+                                <button
+                                    key={format}
+                                    type="button"
+                                    aria-pressed={valueFormat === format}
+                                    onClick={() => {
+                                        setDataMemoryDrafts({});
+                                        setMemoryFormats({});
+                                        setValueFormat(format);
+                                    }}
+                                    className={`border-r border-slate-300 dark:border-slate-700 px-2 py-1 font-mono text-[10px] font-bold transition last:border-r-0 focus-visible:z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 ${
+                                        valueFormat === format
+                                            ? 'bg-slate-900 text-white dark:bg-slate-600'
+                                            : 'bg-white text-slate-500 hover:bg-slate-50 hover:text-slate-900 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-white'
+                                    }`}
+                                >
+                                    {name}
+                                </button>
+                            ))}
+                        </div>
                         <button
                             type="button"
                             onClick={() => {
                                 setDataMemoryDrafts({});
-                                onMemoryRangeChange(startAddress, wordCount);
+                                onResetMemory();
                             }}
-                            className="self-end rounded-md bg-slate-900 px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition hover:bg-slate-800"
+                            className="rounded-md border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-2 py-1 text-xs font-semibold text-slate-700 dark:text-slate-200 shadow-sm transition hover:border-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700"
                         >
-                            Apply
+                            Reset
                         </button>
+                        <ExpandButton onClick={() => setIsExpanded(true)} />
                     </div>
-                </div>
+                }
+            >
+                <div className="space-y-3 p-3">
+                    <div className="grid grid-cols-2 gap-2">
+                        <PanelMetric label="Addr range" value={memoryRange} />
+                        <PanelMetric label="Words" value={memoryRows.length} />
+                    </div>
 
-                {renderTable(tableMaxHeightClass)}
-            </div>
+                    <div className="rounded-md border border-slate-200 dark:border-slate-800 bg-[#fbfcfd] dark:bg-slate-900/60 p-2">
+                        <div className="grid grid-cols-[1fr_1fr_auto] gap-2">
+                            <label className="text-xs font-medium text-slate-600 dark:text-slate-400">
+                                Start addr
+                                <input
+                                    type="number"
+                                    min={0}
+                                    step={4}
+                                    value={startAddressInput}
+                                    onChange={(event) =>
+                                        setStartAddressInput(event.target.value)
+                                    }
+                                    className="mt-1 w-full rounded-md border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-2 py-1 font-mono text-xs shadow-sm outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-100"
+                                />
+                            </label>
+
+                            <label className="text-xs font-medium text-slate-600 dark:text-slate-400">
+                                Words
+                                <input
+                                    type="number"
+                                    min={1}
+                                    value={wordCountInput}
+                                    onChange={(event) =>
+                                        setWordCountInput(event.target.value)
+                                    }
+                                    className="mt-1 w-full rounded-md border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-2 py-1 font-mono text-xs shadow-sm outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-100"
+                                />
+                            </label>
+
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    setDataMemoryDrafts({});
+                                    onMemoryRangeChange(
+                                        startAddress,
+                                        wordCount,
+                                    );
+                                }}
+                                className="self-end rounded-md bg-slate-900 dark:bg-slate-600 px-3 py-1.5 text-xs font-semibold text-white dark:text-white shadow-sm transition hover:bg-slate-800 dark:hover:bg-slate-500"
+                            >
+                                Apply
+                            </button>
+                        </div>
+                    </div>
+
+                    {renderTable(tableMaxHeightClass)}
+                </div>
+            </CollapsibleSection>
 
             {isExpanded && (
                 <Modal title="Data Memory" onClose={() => setIsExpanded(false)}>
                     {renderTable('max-h-[65vh]')}
                 </Modal>
             )}
-        </div>
+        </>
     );
 }
