@@ -296,7 +296,7 @@ export default function App() {
                     title={`How to use — ${tabs.find((t) => t.id === tab)?.label}`}
                     onClose={() => setShowHelp(false)}
                 >
-                    <p className="text-sm text-slate-600">
+                    <p className="text-sm text-slate-600 dark:text-slate-100">
                         {howToUse[tab].intro}
                     </p>
                     {howToUse[tab].steps.length > 0 && (
@@ -304,7 +304,7 @@ export default function App() {
                             {howToUse[tab].steps.map((step, index) => (
                                 <li
                                     key={index}
-                                    className="flex gap-3 text-sm text-slate-700"
+                                    className="flex gap-3 text-sm text-slate-700 dark:text-slate-100"
                                 >
                                     <span className="flex h-5 w-5 flex-none items-center justify-center rounded-full bg-slate-900 text-[11px] font-bold text-white">
                                         {index + 1}

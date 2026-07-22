@@ -40,13 +40,13 @@ export default function ArrayPatternEditor({
     }
 
     return (
-        <section className="rounded-md border border-slate-200 bg-slate-50 p-3">
+        <section className="rounded-md border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800 p-3">
             <div className="flex items-start justify-between gap-3">
                 <div>
-                    <p className="text-xs font-semibold text-slate-900">
+                    <p className="text-xs font-semibold text-slate-900 dark:text-slate-100">
                         3 / Access order per iteration
                     </p>
-                    <p className="mt-1 text-xs text-slate-400">
+                    <p className="mt-1 text-xs text-slate-400 dark:text-slate-400">
                         Index = multiplier × i + offset.
                     </p>
                 </div>
@@ -63,7 +63,7 @@ export default function ArrayPatternEditor({
                             },
                         ])
                     }
-                    className="rounded-md border border-slate-300 bg-white px-2 py-1 text-[10px] font-semibold text-slate-700 transition hover:border-slate-400 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
+                    className="rounded-md border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-2 py-1 text-[10px] font-semibold text-slate-700 dark:text-slate-200 transition hover:border-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-40"
                 >
                     + Add access
                 </button>
@@ -73,13 +73,13 @@ export default function ArrayPatternEditor({
                 {patterns.map((pattern, index) => (
                     <div
                         key={index}
-                        className="grid gap-2 rounded-md border border-slate-200 bg-white p-2 sm:grid-cols-[64px_minmax(90px,0.7fr)_1fr_1fr_minmax(120px,1fr)_auto] sm:items-end"
+                        className="grid gap-2 rounded-md border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 p-2 sm:grid-cols-[64px_minmax(90px,0.7fr)_1fr_1fr_minmax(120px,1fr)_auto] sm:items-end"
                     >
-                        <span className="self-center font-mono text-[9px] font-bold uppercase tracking-wider text-slate-500">
+                        <span className="self-center font-mono text-[9px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                             Access {index + 1}
                         </span>
                         <label>
-                            <span className="block font-mono text-[8px] font-bold uppercase tracking-wider text-slate-500">
+                            <span className="block font-mono text-[8px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                                 Array
                             </span>
                             <select
@@ -91,7 +91,7 @@ export default function ArrayPatternEditor({
                                         event.target.value,
                                     )
                                 }
-                                className="mt-1 w-full rounded border border-slate-300 bg-white px-2 py-1.5 font-mono text-xs font-semibold text-slate-900 outline-none focus:border-slate-500 focus:ring-2 focus:ring-slate-100"
+                                className="mt-1 w-full rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-2 py-1.5 font-mono text-xs font-semibold text-slate-900 dark:text-slate-100 outline-none focus:border-slate-500 focus:ring-2 focus:ring-slate-100"
                             >
                                 {arrays.map((array) => (
                                     <option key={array.name} value={array.name}>
@@ -101,7 +101,7 @@ export default function ArrayPatternEditor({
                             </select>
                         </label>
                         <label>
-                            <span className="block font-mono text-[8px] font-bold uppercase tracking-wider text-slate-500">
+                            <span className="block font-mono text-[8px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                                 Multiplier
                             </span>
                             <input
@@ -114,11 +114,11 @@ export default function ArrayPatternEditor({
                                         event.target.value,
                                     )
                                 }
-                                className="mt-1 w-full rounded border border-slate-300 bg-white px-2 py-1.5 font-mono text-xs font-semibold text-slate-900 outline-none focus:border-slate-500 focus:ring-2 focus:ring-slate-100"
+                                className="mt-1 w-full rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-2 py-1.5 font-mono text-xs font-semibold text-slate-900 dark:text-slate-100 outline-none focus:border-slate-500 focus:ring-2 focus:ring-slate-100"
                             />
                         </label>
                         <label>
-                            <span className="block font-mono text-[8px] font-bold uppercase tracking-wider text-slate-500">
+                            <span className="block font-mono text-[8px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                                 Offset
                             </span>
                             <input
@@ -131,10 +131,10 @@ export default function ArrayPatternEditor({
                                         event.target.value,
                                     )
                                 }
-                                className="mt-1 w-full rounded border border-slate-300 bg-white px-2 py-1.5 font-mono text-xs font-semibold text-slate-900 outline-none focus:border-slate-500 focus:ring-2 focus:ring-slate-100"
+                                className="mt-1 w-full rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-2 py-1.5 font-mono text-xs font-semibold text-slate-900 dark:text-slate-100 outline-none focus:border-slate-500 focus:ring-2 focus:ring-slate-100"
                             />
                         </label>
-                        <div className="rounded border border-slate-200 bg-slate-50 px-2 py-1.5 font-mono text-xs font-semibold text-slate-700">
+                        <div className="rounded border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800 px-2 py-1.5 font-mono text-xs font-semibold text-slate-700 dark:text-slate-200">
                             {previewPattern(pattern)}
                         </div>
                         <button
@@ -148,7 +148,7 @@ export default function ArrayPatternEditor({
                                     ),
                                 )
                             }
-                            className="rounded border border-slate-300 bg-white px-2 py-1.5 text-[10px] font-semibold text-slate-600 transition hover:border-rose-300 hover:bg-rose-50 hover:text-rose-700 disabled:cursor-not-allowed disabled:opacity-40"
+                            className="rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-2 py-1.5 text-[10px] font-semibold text-slate-600 dark:text-slate-400 transition hover:border-rose-300 hover:bg-rose-50 hover:text-rose-700 disabled:cursor-not-allowed disabled:opacity-40"
                         >
                             Remove
                         </button>

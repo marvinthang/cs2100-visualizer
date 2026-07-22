@@ -78,7 +78,7 @@ export default function ArrayDefinitionsEditor({
     }
 
     return (
-        <section className="rounded-md border border-slate-200 bg-slate-50 p-3">
+        <section className="rounded-md border border-slate-200 bg-slate-50 p-3 dark:border-slate-800 dark:bg-slate-800">
             <ArrayLayoutEditorHeader
                 title="Memory layout"
                 stepLabel="1"
@@ -119,7 +119,7 @@ export default function ArrayDefinitionsEditor({
 
                                 <div className="grid grid-cols-2 gap-2">
                                     <label>
-                                        <span className="block font-mono text-[8px] font-bold uppercase tracking-wider text-slate-500">
+                                        <span className="block font-mono text-[8px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                                             Base /{' '}
                                             {format === 'hexadecimal'
                                                 ? 'HEX'
@@ -127,7 +127,7 @@ export default function ArrayDefinitionsEditor({
                                         </span>
                                         {array.addressMode ===
                                         'after-previous' ? (
-                                            <span className="mt-1 block rounded border border-slate-200 bg-slate-50 px-2 py-1.5 font-mono text-xs font-semibold text-slate-700">
+                                            <span className="mt-1 block rounded border border-slate-200 bg-slate-50 px-2 py-1.5 font-mono text-xs font-semibold text-slate-700 dark:border-slate-800 dark:bg-slate-800 dark:text-slate-200">
                                                 {calculatedBaseAddress === null
                                                     ? 'Invalid'
                                                     : format === 'hexadecimal'
@@ -148,7 +148,7 @@ export default function ArrayDefinitionsEditor({
                                                             event.target.value,
                                                     })
                                                 }
-                                                className="mt-1 w-full rounded border border-slate-300 bg-white px-2 py-1.5 font-mono text-xs font-semibold text-slate-900 outline-none focus:border-slate-500 focus:ring-2 focus:ring-slate-100"
+                                                className="mt-1 w-full rounded border border-slate-300 bg-white px-2 py-1.5 font-mono text-xs font-semibold text-slate-900 outline-none focus:border-slate-500 focus:ring-2 focus:ring-slate-100 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
                                             />
                                         )}
                                     </label>

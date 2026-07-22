@@ -45,22 +45,25 @@ export default function CacheGeometryPanel({
     ];
 
     return (
-        <section className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm xl:sticky xl:top-6">
+        <section className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm xl:sticky xl:top-6 dark:border-slate-800 dark:bg-slate-900">
             <div>
-                <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-400">
+                <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-400">
                     Cache geometry
                 </p>
-                <h2 className="mt-1 text-base font-semibold text-slate-900">
+                <h2 className="mt-1 text-base font-semibold text-slate-900 dark:text-slate-100">
                     {validation.valid
                         ? describeOrganization(config)
                         : 'Resolve the layout'}
                 </h2>
             </div>
 
-            <div className="mt-4 grid grid-cols-3 gap-px overflow-hidden rounded-md bg-slate-200 ring-1 ring-slate-200">
+            <div className="mt-4 grid grid-cols-3 gap-px overflow-hidden rounded-md bg-slate-200 ring-1 ring-slate-200 dark:bg-slate-800 dark:ring-slate-800">
                 {fields.map((field) => (
-                    <label key={field.label} className="bg-slate-50 p-3">
-                        <span className="block text-[10px] font-semibold uppercase tracking-wide text-slate-500">
+                    <label
+                        key={field.label}
+                        className="bg-slate-50 p-3 dark:bg-slate-800"
+                    >
+                        <span className="block text-[10px] font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
                             {field.label}
                         </span>
                         <input
@@ -70,7 +73,7 @@ export default function CacheGeometryPanel({
                             onChange={(event) =>
                                 field.onChange(event.target.value)
                             }
-                            className="mt-2 w-full border-0 bg-transparent p-0 font-mono text-2xl font-bold text-slate-900 outline-none focus:ring-0"
+                            className="mt-2 w-full border-0 bg-transparent p-0 font-mono text-2xl font-bold text-slate-900 outline-none focus:ring-0 dark:text-slate-100"
                         />
                     </label>
                 ))}
@@ -83,15 +86,15 @@ export default function CacheGeometryPanel({
                             <span className="block font-mono text-lg font-bold">
                                 {validation.layout.lineCount}
                             </span>
-                            <span className="font-mono text-[9px] uppercase tracking-wider text-slate-500">
+                            <span className="font-mono text-[9px] uppercase tracking-wider text-slate-500 dark:text-slate-400">
                                 lines
                             </span>
                         </div>
-                        <div className="border-x border-slate-200">
+                        <div className="border-x border-slate-200 dark:border-slate-800">
                             <span className="block font-mono text-lg font-bold">
                                 {validation.layout.setCount}
                             </span>
-                            <span className="font-mono text-[9px] uppercase tracking-wider text-slate-500">
+                            <span className="font-mono text-[9px] uppercase tracking-wider text-slate-500 dark:text-slate-400">
                                 sets
                             </span>
                         </div>
@@ -99,13 +102,13 @@ export default function CacheGeometryPanel({
                             <span className="block font-mono text-lg font-bold">
                                 {validation.layout.wordCountPerBlock}
                             </span>
-                            <span className="font-mono text-[9px] uppercase tracking-wider text-slate-500">
+                            <span className="font-mono text-[9px] uppercase tracking-wider text-slate-500 dark:text-slate-400">
                                 words / block
                             </span>
                         </div>
                     </div>
 
-                    <div className="mt-5 flex h-2 overflow-hidden rounded-full bg-slate-100">
+                    <div className="mt-5 flex h-2 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
                         <div
                             className="bg-slate-900"
                             style={{ flexGrow: validation.layout.tagBits }}
@@ -135,7 +138,7 @@ export default function CacheGeometryPanel({
                             }}
                         />
                     </div>
-                    <div className="mt-2 flex justify-between font-mono text-[9px] uppercase tracking-wide text-slate-500">
+                    <div className="mt-2 flex justify-between font-mono text-[9px] uppercase tracking-wide text-slate-500 dark:text-slate-400">
                         <span>Tag {validation.layout.tagBits}b</span>
                         <span>Set {validation.layout.setIndexBits}b</span>
                         <span>Word {validation.layout.blockOffsetBits}b</span>

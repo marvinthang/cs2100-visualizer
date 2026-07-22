@@ -150,7 +150,7 @@ export default function RegisterTable({
                                         <div
                                             role="group"
                                             aria-label={`${name} value format`}
-                                            className="inline-flex overflow-hidden rounded border border-slate-300 bg-white"
+                                            className="inline-flex overflow-hidden rounded border border-slate-300 bg-white dark:border-slate-700 dark:bg-slate-800"
                                         >
                                             {(
                                                 [
@@ -211,10 +211,10 @@ export default function RegisterTable({
                                                             },
                                                         );
                                                     }}
-                                                    className={`border-r border-slate-300 px-1.5 py-1 text-[9px] font-bold transition last:border-r-0 focus-visible:z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 ${
+                                                    className={`border-r border-slate-300 dark:border-slate-700 px-1.5 py-1 text-[9px] font-bold transition last:border-r-0 focus-visible:z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 ${
                                                         rowFormat === format
-                                                            ? 'bg-slate-700 text-white'
-                                                            : 'bg-white text-slate-400 hover:bg-slate-50 hover:text-slate-800'
+                                                            ? 'bg-slate-700 text-white dark:bg-slate-600'
+                                                            : 'bg-white text-slate-400 hover:bg-slate-50 hover:text-slate-800 dark:bg-slate-800 dark:text-slate-500 dark:hover:bg-slate-700 dark:hover:text-slate-100'
                                                     }`}
                                                 >
                                                     {name}
@@ -304,7 +304,7 @@ export default function RegisterTable({
                     <div
                         role="group"
                         aria-label="Register value format"
-                        className="inline-flex overflow-hidden rounded-md border border-slate-300 bg-white shadow-sm"
+                        className="inline-flex overflow-hidden rounded-md border border-slate-300 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-800"
                     >
                         {(
                             [
@@ -322,10 +322,10 @@ export default function RegisterTable({
                                     setRegisterFormats({});
                                     setValueFormat(format);
                                 }}
-                                className={`border-r border-slate-300 px-2 py-1 font-mono text-[10px] font-bold transition last:border-r-0 focus-visible:z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 ${
+                                className={`border-r border-slate-300 dark:border-slate-700 px-2 py-1 font-mono text-[10px] font-bold transition last:border-r-0 focus-visible:z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 ${
                                     valueFormat === format
-                                        ? 'bg-slate-900 text-white'
-                                        : 'bg-white text-slate-500 hover:bg-slate-50 hover:text-slate-900'
+                                        ? 'bg-slate-900 text-white dark:bg-slate-600'
+                                        : 'bg-white text-slate-500 hover:bg-slate-50 hover:text-slate-900 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-white'
                                 }`}
                             >
                                 {name}

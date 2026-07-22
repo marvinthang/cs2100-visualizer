@@ -61,29 +61,29 @@ export default function MipsInitialMachineEditor({
     }
 
     return (
-        <div className="mt-3 overflow-hidden rounded-md border border-slate-200 bg-slate-50">
+        <div className="mt-3 overflow-hidden rounded-md border border-slate-200 bg-slate-50 dark:border-slate-800 dark:bg-slate-800">
             <button
                 type="button"
                 onClick={() => setExpanded((current) => !current)}
                 aria-expanded={expanded}
-                className="flex w-full items-center justify-between px-4 py-3 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-slate-400"
+                className="flex w-full items-center justify-between px-4 py-3 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-slate-400 dark:hover:bg-slate-700"
             >
                 <span>
-                    <span className="block text-[10px] font-semibold uppercase tracking-wide text-slate-400">
+                    <span className="block text-[10px] font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-400">
                         Program inputs
                     </span>
-                    <span className="mt-0.5 block text-sm font-semibold text-slate-900">
+                    <span className="mt-0.5 block text-sm font-semibold text-slate-900 dark:text-slate-100">
                         Initial registers and memory
                     </span>
                 </span>
 
-                <span className="font-mono text-[10px] font-bold uppercase text-slate-500">
+                <span className="font-mono text-[10px] font-bold uppercase text-slate-500 dark:text-slate-400">
                     {expanded ? 'Hide' : 'Edit'}
                 </span>
             </button>
 
             {expanded && (
-                <div className="grid items-start gap-4 border-t border-slate-200 bg-white p-4 xl:grid-cols-2">
+                <div className="grid items-start gap-4 border-t border-slate-200 bg-white p-4 xl:grid-cols-2 dark:border-slate-800 dark:bg-slate-900">
                     <RegisterTable
                         machine={machine}
                         onRegisterChange={updateRegister}

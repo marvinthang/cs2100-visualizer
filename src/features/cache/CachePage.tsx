@@ -47,18 +47,18 @@ function CacheErrors({ errors }: { errors: string[] }) {
 
 function CacheHero() {
     return (
-        <header className="rounded-lg border border-slate-200 bg-[#fbfcfd] px-4 py-3 shadow-sm">
+        <header className="rounded-lg border border-slate-200 dark:border-slate-800 bg-[#fbfcfd] dark:bg-slate-900/60 px-4 py-3 shadow-sm">
             <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
                 <div>
                     <div className="flex flex-wrap items-center gap-2">
-                        <h1 className="text-xl font-bold tracking-tight text-slate-950">
+                        <h1 className="text-xl font-bold tracking-tight text-slate-950 dark:text-slate-100">
                             Cache Visualizer
                         </h1>
                         <span className="rounded-md bg-slate-900 px-2 py-1 text-xs font-semibold text-white">
                             Data + instruction
                         </span>
                     </div>
-                    <p className="mt-1 text-sm text-slate-500">
+                    <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
                         Run an address trace and inspect its tag, set, word,
                         hits, misses, and replacements one access at a time.
                     </p>
@@ -71,12 +71,12 @@ function CacheHero() {
                     ].map(([label, value]) => (
                         <div
                             key={label}
-                            className="rounded-md border border-slate-200 bg-white px-3 py-2 shadow-sm"
+                            className="rounded-md border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 px-3 py-2 shadow-sm"
                         >
-                            <span className="block text-[10px] font-semibold uppercase tracking-wide text-slate-400">
+                            <span className="block text-[10px] font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-400">
                                 {label}
                             </span>
-                            <span className="font-mono text-sm font-bold text-slate-900">
+                            <span className="font-mono text-sm font-bold text-slate-900 dark:text-slate-100">
                                 {value}
                             </span>
                         </div>
@@ -302,7 +302,7 @@ export default function CachePage({
     }
 
     return (
-        <main className="min-h-full bg-[#eef2f3] p-3 text-slate-900 sm:p-4 lg:p-6">
+        <main className="min-h-full bg-[#eef2f3] dark:bg-slate-950 p-3 text-slate-900 dark:text-slate-100 sm:p-4 lg:p-6">
             <div className="mx-auto flex w-full max-w-[1760px] flex-col gap-4">
                 <CacheHero />
 

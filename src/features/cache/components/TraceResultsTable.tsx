@@ -64,19 +64,19 @@ export default function TraceResultsTable({
     );
 
     return (
-        <section className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
-            <div className="border-b border-slate-200 bg-[#fbfcfd] px-4 py-3">
-                <h2 className="text-sm font-semibold text-slate-900">
+        <section className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
+            <div className="border-b border-slate-200 bg-[#fbfcfd] px-4 py-3 dark:border-slate-800 dark:bg-slate-900/60">
+                <h2 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
                     Select an access to inspect it
                 </h2>
-                <p className="mt-0.5 text-xs text-slate-500">
+                <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
                     Dynamic cache-access trace
                 </p>
             </div>
 
             {traceWindow.windowed && (
                 <p
-                    className="border-b border-slate-200 bg-slate-50 px-4 py-2 font-mono text-[10px] font-semibold text-slate-500"
+                    className="border-b border-slate-200 bg-slate-50 px-4 py-2 font-mono text-[10px] font-semibold text-slate-500 dark:border-slate-800 dark:bg-slate-800 dark:text-slate-400"
                     aria-live="polite"
                 >
                     Showing {traceWindow.startIndex + 1}–{traceWindow.endIndex}{' '}
@@ -86,7 +86,7 @@ export default function TraceResultsTable({
 
             <div className="max-h-[620px] overflow-auto">
                 <table className="w-full min-w-[1040px] border-collapse text-left text-xs">
-                    <thead className="sticky top-0 z-10 bg-slate-100 font-mono text-[9px] uppercase tracking-wide text-slate-600">
+                    <thead className="sticky top-0 z-10 bg-slate-100 font-mono text-[9px] uppercase tracking-wide text-slate-600 dark:bg-slate-800 dark:text-slate-400">
                         <tr>
                             {[
                                 '#',
@@ -109,7 +109,7 @@ export default function TraceResultsTable({
                             ))}
                         </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-100">
+                    <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                         {visibleSteps.map((step, visibleIndex) => {
                             const index = traceWindow.startIndex + visibleIndex;
                             const rowAnalysis = analysis.steps[index];
@@ -148,14 +148,14 @@ export default function TraceResultsTable({
                                     }}
                                     className={`cursor-pointer outline-none transition focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-slate-400 ${
                                         selected
-                                            ? 'bg-sky-50 shadow-[inset_3px_0_0_#0f172a]'
-                                            : 'hover:bg-slate-50'
+                                            ? 'bg-sky-50 shadow-[inset_3px_0_0_#0f172a] dark:bg-slate-600 dark:text-white'
+                                            : 'hover:bg-slate-50 dark:hover:bg-slate-800'
                                     }`}
                                 >
-                                    <td className="px-3 py-3 font-mono font-bold text-slate-500">
+                                    <td className="px-3 py-3 font-mono font-bold text-slate-500 dark:text-slate-400">
                                         {index + 1}
                                     </td>
-                                    <td className="px-3 py-3 font-mono font-bold text-slate-900">
+                                    <td className="px-3 py-3 font-mono font-bold text-slate-900 dark:text-slate-100">
                                         {formatAddress(
                                             step.access.address,
                                             format,
@@ -177,7 +177,7 @@ export default function TraceResultsTable({
                                         {sourceLabel || arrayLabel ? (
                                             <div className="flex flex-wrap gap-1.5">
                                                 {sourceLabel && (
-                                                    <span className="inline-flex rounded bg-slate-100 px-2 py-1 font-mono text-[10px] font-semibold text-slate-700 ring-1 ring-slate-200">
+                                                    <span className="inline-flex rounded bg-slate-100 px-2 py-1 font-mono text-[10px] font-semibold text-slate-700 ring-1 ring-slate-200 dark:bg-slate-800 dark:text-slate-200 dark:ring-slate-700">
                                                         {sourceLabel}
                                                     </span>
                                                 )}
@@ -193,7 +193,7 @@ export default function TraceResultsTable({
                                                 )}
                                             </div>
                                         ) : (
-                                            <span className="font-mono text-slate-400">
+                                            <span className="font-mono text-slate-400 dark:text-slate-400">
                                                 —
                                             </span>
                                         )}
@@ -228,7 +228,7 @@ export default function TraceResultsTable({
                                             {step.hit ? 'Hit' : 'Miss'}
                                         </span>
                                     </td>
-                                    <td className="px-3 py-3 capitalize text-slate-600">
+                                    <td className="px-3 py-3 capitalize text-slate-600 dark:text-slate-400">
                                         {rowAnalysis.missType ??
                                             rowAnalysis.locality ??
                                             '—'}
