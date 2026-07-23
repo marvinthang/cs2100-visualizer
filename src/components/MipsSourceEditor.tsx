@@ -29,12 +29,12 @@ export default function MipsSourceEditor({
     return (
         <div>
             <div
-                className={`flex ${heightClass} overflow-hidden rounded-md border border-slate-300 bg-white font-mono ${textSizeClass} leading-5 shadow-sm focus-within:border-slate-500 focus-within:ring-2 focus-within:ring-slate-100`}
+                className={`flex ${heightClass} overflow-hidden rounded-md border border-slate-300 bg-white font-mono ${textSizeClass} leading-5 shadow-sm focus-within:border-slate-500 focus-within:ring-2 focus-within:ring-slate-100 dark:border-slate-700 dark:bg-slate-950`}
             >
                 <div
                     ref={gutterRef}
                     aria-hidden="true"
-                    className="select-none overflow-hidden border-r border-slate-200 bg-slate-50 py-2 pl-3 pr-2 text-right text-slate-400"
+                    className="select-none overflow-hidden border-r border-slate-200 bg-slate-50 py-2 pl-3 pr-2 text-right text-slate-400 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-500"
                 >
                     {lineNumbers.map((lineNumber) => (
                         <div
@@ -67,7 +67,7 @@ export default function MipsSourceEditor({
                     aria-describedby={
                         errors.length > 0 ? errorListId : undefined
                     }
-                    className="min-w-0 flex-1 resize-none overflow-auto whitespace-pre bg-transparent px-3 py-2 leading-5 text-slate-900 outline-none placeholder:text-slate-400"
+                    className="min-w-0 flex-1 resize-none overflow-auto whitespace-pre bg-transparent px-3 py-2 leading-5 text-slate-900 outline-none placeholder:text-slate-400 dark:text-slate-100 dark:placeholder:text-slate-500"
                 />
             </div>
 

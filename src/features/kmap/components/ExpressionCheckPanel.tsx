@@ -1,4 +1,5 @@
 import type { KMapSolveForm } from '../../../core/kmap/kmapSolver';
+import CollapsibleSection from '../../../components/CollapsibleSection';
 import {
     monoInputClass,
     primaryButtonClass,
@@ -28,21 +29,17 @@ export default function ExpressionCheckPanel({
     onAddGroupExpression,
 }: ExpressionCheckPanelProps) {
     return (
-        <section className="rounded-lg border border-slate-300 bg-[#fbfcfd] shadow-sm">
-            <div className="flex items-center justify-between gap-3 border-b border-slate-200 px-4 py-3">
-                <div>
-                    <h2 className="text-sm font-semibold text-slate-950">
-                        Expression Check
-                    </h2>
-                    <p className="text-xs text-slate-500">
-                        Test a full {solverForm} grouping answer.
-                    </p>
-                </div>
-                <span className="rounded-md border border-slate-300 bg-white px-2 py-1 text-xs font-semibold text-slate-700">
+        <CollapsibleSection
+            id="kmap-expression-check"
+            title="Expression Check"
+            subtitle={`Test a full ${solverForm} grouping answer.`}
+            defaultOpen={false}
+            meta={
+                <span className="shrink-0 rounded-md border border-slate-300 bg-white px-2 py-1 text-xs font-semibold text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200">
                     {solverForm}
                 </span>
-            </div>
-
+            }
+        >
             <div className="space-y-2 p-4">
                 <input
                     type="text"
@@ -89,6 +86,6 @@ export default function ExpressionCheckPanel({
                     </p>
                 )}
             </div>
-        </section>
+        </CollapsibleSection>
     );
 }

@@ -76,11 +76,11 @@ function CacheWords({
                                 ? 'border-sky-400 bg-sky-100 shadow-[inset_0_0_0_1px_#38bdf8]'
                                 : previous
                                   ? 'border-amber-300 bg-amber-50 shadow-[inset_0_0_0_1px_#fcd34d]'
-                                  : 'border-slate-200 bg-slate-50'
+                                  : 'border-slate-200 bg-slate-50 dark:border-slate-800 dark:bg-slate-800'
                         }`}
                     >
                         <div className="flex items-center justify-between gap-1.5">
-                            <span className="text-[8px] font-bold uppercase tracking-wider text-slate-500">
+                            <span className="text-[8px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                                 Word {wordIndex}
                             </span>
                             {!evictedLine && (
@@ -158,7 +158,7 @@ function CacheWords({
                                 </span>
                             )}
                             <span
-                                className={`block text-[10px] font-bold text-slate-900 ${
+                                className={`block text-[10px] font-bold text-slate-900 dark:text-slate-100 ${
                                     label ? 'mt-0.5' : 'mt-1'
                                 }`}
                             >
@@ -195,21 +195,21 @@ export default function CacheLineContents({
 }) {
     return (
         <div className="grid min-w-0 grid-cols-[112px_minmax(0,1fr)] gap-3 font-mono">
-            <div className="border-r border-slate-200 pr-3">
+            <div className="border-r border-slate-200 pr-3 dark:border-slate-800">
                 <div className="grid gap-3">
                     <div>
-                        <span className="block text-[8px] font-bold uppercase tracking-wider text-slate-400">
+                        <span className="block text-[8px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-400">
                             Tag
                         </span>
-                        <span className="text-sm font-bold text-slate-900">
+                        <span className="text-sm font-bold text-slate-900 dark:text-slate-100">
                             {formatHex(line.tag)}
                         </span>
                     </div>
                     <div>
-                        <span className="block text-[8px] font-bold uppercase tracking-wider text-slate-400">
+                        <span className="block text-[8px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-400">
                             Block
                         </span>
-                        <span className="text-sm font-bold text-slate-900">
+                        <span className="text-sm font-bold text-slate-900 dark:text-slate-100">
                             #{line.blockNumber}
                         </span>
                     </div>
@@ -217,7 +217,7 @@ export default function CacheLineContents({
             </div>
 
             <div className="min-w-0">
-                <p className="mb-1.5 text-[8px] font-bold uppercase tracking-[0.12em] text-slate-400">
+                <p className="mb-1.5 text-[8px] font-bold uppercase tracking-[0.12em] text-slate-400 dark:text-slate-400">
                     {evictedLine
                         ? 'Words replaced in place · byte addresses'
                         : 'Words in block · byte addresses'}

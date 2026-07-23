@@ -1,6 +1,5 @@
 import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
-import { createInitialMachineState } from '../../../core/mips/single-cycle/execution/machineState';
 import type { MipsCacheAccessMode } from '../../../core/cache/mipsTrace';
 import MipsTraceInputPanel from './MipsTraceInputPanel';
 
@@ -9,13 +8,11 @@ function renderPanel(accessMode: MipsCacheAccessMode): string {
         <MipsTraceInputPanel
             program="addi $t0, $zero, 1"
             traceTruncated={false}
-            initialMachine={createInitialMachineState()}
             arrayDefinitions={[]}
             accessMode={accessMode}
             instructionBaseAddress="0x00400000"
             instructionAddressFormat="hexadecimal"
             onProgramChange={() => {}}
-            onInitialMachineChange={() => {}}
             onArrayDefinitionsChange={() => {}}
             onAccessModeChange={() => {}}
             onInstructionBaseAddressChange={() => {}}

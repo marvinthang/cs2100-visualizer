@@ -1,6 +1,7 @@
 import type { KMapGroup, KMapModel } from '../../../core/kmap/kmapModel';
 import type { KMapSolveForm } from '../../../core/kmap/kmapSolver';
 import { formatGroupExpression } from '../kmapPageUtils';
+import CollapsibleSection from '../../../components/CollapsibleSection';
 
 const groupMarkerClasses = [
     'bg-emerald-500',
@@ -37,29 +38,29 @@ export default function ManualGroupsPanel({
     onGroupViewChange,
 }: ManualGroupsPanelProps) {
     return (
-        <div className="rounded-lg border border-slate-300 bg-[#fbfcfd] shadow-sm">
-            <div className="flex items-center justify-between gap-3 border-b border-slate-200 px-4 py-3">
-                <div>
-                    <h2 className="text-sm font-semibold text-slate-950">
-                        Manual Groups
-                    </h2>
-                    <p className="text-xs text-slate-500">
-                        Saved groups on the grid.
-                    </p>
+        <CollapsibleSection
+            id="kmap-manual-groups"
+            title="Manual Groups"
+            subtitle="Saved groups on the grid."
+            meta={
+                <div className="flex shrink-0 items-center gap-2">
+                    <span className="rounded-md border border-slate-300 bg-white px-2 py-1 font-mono text-xs font-semibold text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200">
+                        {groups.length}
+                    </span>
+                    {groups.length > 0 && (
+                        <button
+                            type="button"
+                            onClick={onClearGroups}
+                            className="rounded-md border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-2 py-1.5 text-xs font-semibold text-slate-600 dark:text-slate-400 transition hover:border-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700"
+                        >
+                            Clear
+                        </button>
+                    )}
                 </div>
-                {groups.length > 0 && (
-                    <button
-                        type="button"
-                        onClick={onClearGroups}
-                        className="rounded-md border border-slate-300 bg-white px-2 py-1.5 text-xs font-semibold text-slate-600 transition hover:border-slate-400 hover:bg-slate-50"
-                    >
-                        Clear
-                    </button>
-                )}
-            </div>
-
+            }
+        >
             {groups.length === 0 ? (
-                <div className="m-4 rounded-md border border-slate-300 bg-white p-4 font-mono text-sm text-slate-500">
+                <div className="m-4 rounded-md border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 p-4 font-mono text-sm text-slate-500 dark:text-slate-400">
                     No groups yet.
                 </div>
             ) : (
@@ -78,10 +79,10 @@ export default function ManualGroupsPanel({
                         return (
                             <li
                                 key={group.id}
-                                className={`rounded-md border bg-white p-3 transition ${
+                                className={`rounded-md border bg-white dark:bg-slate-800 p-3 transition ${
                                     isActive
                                         ? 'border-sky-400 ring-2 ring-sky-200'
-                                        : 'border-slate-300'
+                                        : 'border-slate-300 dark:border-slate-700'
                                 }`}
                             >
                                 <div className="flex items-center justify-between gap-3">
@@ -103,22 +104,22 @@ export default function ManualGroupsPanel({
                                                 ]
                                             }`}
                                         />
-                                        <span className="text-sm font-semibold text-slate-900">
+                                        <span className="text-sm font-semibold text-slate-900 dark:text-slate-100">
                                             Group {index + 1}
                                         </span>
                                     </button>
                                     <button
                                         type="button"
                                         onClick={() => onRemoveGroup(group.id)}
-                                        className="rounded-md border border-slate-300 px-2 py-1 text-xs font-semibold text-slate-600 transition hover:border-slate-400 hover:bg-slate-50"
+                                        className="rounded-md border border-slate-300 dark:border-slate-700 px-2 py-1 text-xs font-semibold text-slate-600 dark:text-slate-400 transition hover:border-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700"
                                     >
                                         Remove
                                     </button>
                                 </div>
-                                <p className="mt-2 rounded-md bg-slate-950 px-2 py-1.5 font-mono text-sm font-semibold text-white">
+                                <p className="mt-2 rounded-md bg-slate-950 dark:bg-slate-600 px-2 py-1.5 font-mono text-sm font-semibold text-white dark:text-white">
                                     {expression}
                                 </p>
-                                <p className="mt-2 font-mono text-xs text-slate-600">
+                                <p className="mt-2 font-mono text-xs text-slate-600 dark:text-slate-400">
                                     {group.minterms
                                         .map((minterm) => `m${minterm}`)
                                         .join(', ')}
@@ -128,6 +129,6 @@ export default function ManualGroupsPanel({
                     })}
                 </ul>
             )}
-        </div>
+        </CollapsibleSection>
     );
 }

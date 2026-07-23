@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { usePersistentState } from '../../hooks/usePersistentState';
 import {
     areKMapGroupCellsAllDontCare,
     areKMapGroupCellsValid,
@@ -36,11 +37,11 @@ import ManualFeedbackPanel from './components/ManualFeedbackPanel';
 
 function StatusPill({ label, value }: { label: string; value: number }) {
     return (
-        <div className="rounded-md border border-slate-200 bg-white px-3 py-2 shadow-sm">
-            <div className="text-[10px] font-semibold uppercase tracking-wide text-slate-400">
+        <div className="rounded-md border border-slate-200 bg-white px-3 py-2 shadow-sm dark:border-slate-800 dark:bg-slate-800">
+            <div className="text-[10px] font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-400">
                 {label}
             </div>
-            <div className="font-mono text-sm font-bold text-slate-900">
+            <div className="font-mono text-sm font-bold text-slate-900 dark:text-slate-100">
                 {value}
             </div>
         </div>
@@ -48,8 +49,14 @@ function StatusPill({ label, value }: { label: string; value: number }) {
 }
 
 export default function KMapPage() {
-    const [variableCount, setVariableCount] = useState<VariableCount>(4);
-    const [model, setModel] = useState(createKMapModel(variableCount));
+    const [variableCount, setVariableCount] = usePersistentState<VariableCount>(
+        'cs2100:kmap:variableCount',
+        4,
+    );
+    const [model, setModel] = usePersistentState(
+        'cs2100:kmap:model',
+        createKMapModel(variableCount),
+    );
 
     const [selectedMinterms, setSelectedMinterms] = useState<number[]>([]);
     const [mintermInput, setMintermInput] = useState('');
@@ -82,11 +89,15 @@ export default function KMapPage() {
     } | null>(null);
 
     const groupTargetValue = solverForm === 'SOP' ? 1 : 0;
-    const canSaveSelectedGroup = canCreateKMapGroup(
-        model,
-        selectedMinterms,
-        groupTargetValue,
+    // the exact same set of cells is already a saved group
+    const selectedKey = [...selectedMinterms].sort((a, b) => a - b).join(',');
+    const isDuplicateGroup = groups.some(
+        (group) =>
+            [...group.minterms].sort((a, b) => a - b).join(',') === selectedKey,
     );
+    const canSaveSelectedGroup =
+        !isDuplicateGroup &&
+        canCreateKMapGroup(model, selectedMinterms, groupTargetValue);
     const selectedCellsHaveValidValues = areKMapGroupCellsValid(
         model,
         selectedMinterms,
@@ -157,6 +168,19 @@ export default function KMapPage() {
                 : [...prev, minterm];
             return next.sort((a, b) => a - b);
         });
+    }
+
+    // Drag-select in group mode: replace the selection with the dragged
+    // rectangle, then auto-add it on release if it forms a valid group.
+    function handleSelectRegion(minterms: number[]) {
+        setActiveGroupId(null);
+        setSelectedGroupMinterms(minterms);
+    }
+
+    function handleGroupDragEnd() {
+        if (canSaveSelectedGroup) {
+            handleAddGroup();
+        }
     }
 
     function handleApplyValueInputs() {
@@ -493,7 +517,8 @@ export default function KMapPage() {
         setSelectedGroupMinterms([]);
         setGroups([]);
         setNextGroupId(1);
-        setGroupView('manual');
+        // keep the current view (solver/manual) when switching SOP <-> POS;
+        // only the manual groups are cleared since they no longer apply
         setSolverPrimeListView('all');
         setBooleanExpressionError(null);
         setGroupLiteralError(null);
@@ -506,20 +531,20 @@ export default function KMapPage() {
     }
 
     return (
-        <main className="min-h-full bg-[#eef2f3] p-3 text-slate-900 sm:p-4 lg:p-6">
+        <main className="min-h-full bg-[#eef2f3] p-3 text-slate-900 sm:p-4 lg:p-6 dark:bg-slate-950 dark:text-slate-100">
             <div className="mx-auto flex max-w-[1480px] flex-col gap-4">
-                <header className="rounded-lg border border-slate-200 bg-[#fbfcfd] px-4 py-3 shadow-sm">
+                <header className="rounded-lg border border-slate-200 bg-[#fbfcfd] px-4 py-3 shadow-sm dark:border-slate-800 dark:bg-slate-900/60">
                     <div className="flex flex-col justify-between gap-3 lg:flex-row lg:items-center">
                         <div>
                             <div className="flex flex-wrap items-center gap-2">
-                                <h1 className="text-xl font-bold tracking-tight text-slate-950">
+                                <h1 className="text-xl font-bold tracking-tight text-slate-950 dark:text-slate-100">
                                     K-map Visualizer
                                 </h1>
-                                <span className="rounded-md bg-slate-900 px-2 py-1 text-xs font-semibold text-white">
+                                <span className="rounded-md bg-slate-900 px-2 py-1 text-xs font-semibold text-white dark:bg-slate-600 dark:text-white">
                                     {solverForm}
                                 </span>
                             </div>
-                            <p className="mt-1 text-sm text-slate-500">
+                            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
                                 Build the map, draw groups, and compare the
                                 expression.
                             </p>
@@ -592,27 +617,27 @@ export default function KMapPage() {
                     </section>
 
                     <section className="space-y-4">
-                        <div className="overflow-hidden rounded-lg border border-slate-300 bg-white shadow-sm">
-                            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 bg-[#fbfcfd] px-4 py-3">
+                        <div className="overflow-hidden rounded-lg border border-slate-300 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-900">
+                            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 bg-[#fbfcfd] px-4 py-3 dark:border-slate-800 dark:bg-slate-900/60">
                                 <div>
-                                    <h2 className="text-base font-semibold tracking-tight text-slate-950">
+                                    <h2 className="text-base font-semibold tracking-tight text-slate-950 dark:text-slate-100">
                                         K-map Grid
                                     </h2>
-                                    <p className="mt-1 text-xs text-slate-500">
+                                    <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
                                         {mode === 'edit'
                                             ? 'Click cells to cycle 0, 1, and X.'
-                                            : `Select ${groupTargetValue}/X cells to form a valid group.`}
+                                            : `Click or drag a rectangle over ${groupTargetValue}/X cells to form a valid group.`}
                                     </p>
                                 </div>
 
                                 <div className="flex flex-wrap gap-1.5 text-xs">
-                                    <span className="rounded-md border border-slate-200 bg-white px-2 py-1 font-semibold text-slate-700">
+                                    <span className="rounded-md border border-slate-200 bg-white px-2 py-1 font-semibold text-slate-700 dark:border-slate-800 dark:bg-slate-800 dark:text-slate-200">
                                         {mode}
                                     </span>
                                     <span className="rounded-md border border-emerald-200 bg-emerald-50 px-2 py-1 font-semibold text-emerald-700">
                                         target {groupTargetValue}/X
                                     </span>
-                                    <span className="rounded-md border border-slate-200 bg-white px-2 py-1 font-mono font-semibold text-slate-700">
+                                    <span className="rounded-md border border-slate-200 bg-white px-2 py-1 font-mono font-semibold text-slate-700 dark:border-slate-800 dark:bg-slate-800 dark:text-slate-200">
                                         {selectedMinterms.length} selected
                                     </span>
                                 </div>
@@ -625,6 +650,9 @@ export default function KMapPage() {
                                 groups={visibleGroups}
                                 activeGroupId={activeGroupId}
                                 onCellClick={handleCellClick}
+                                dragEnabled={mode === 'group'}
+                                onSelectRegion={handleSelectRegion}
+                                onDragEnd={handleGroupDragEnd}
                             />
                         </div>
 
